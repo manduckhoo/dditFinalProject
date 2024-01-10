@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+	<!-- Appenders -->
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %5p [%c] %m%n"/>
+		</Console>
+	</Appenders>
+
+	<!-- Application Loggers -->
+	<Loggers>
+
+		<Logger name="kr.or.onesome" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+
+		<!-- 3rdparty Loggers -->
+		<logger name="org.springframework.core" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+		<logger name="org.springframework.beans" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+		<logger name="org.springframework.context" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+		<logger name="org.springframework.web" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+		<!-- Root Logger -->
+		<root level="DEBUG">
+			<appender-ref ref="console"/>
+		</root>
+	</Loggers>
+
+
+</Configuration>

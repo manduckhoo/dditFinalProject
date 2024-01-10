@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.frcsinventory.mapper.FrcsInventoryMapper">
+
+    <resultMap id="frcsInventoryMap" type="kr.or.onesome.frcsinventory.vo.FrcsInventoryVO">
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="prdctNo" column="PRDCT_NO"/>
+        <result property="frcsInvenCnt" column="FRCS_INVEN_CNT"/>
+        <result property="frcsInvenProperCnt" column="FRCS_INVEN_PROPER_CNT"/>
+        <result property="frcsLastInDt" column="FRCS_LAST_IN_DT"/>
+        <result property="frcsAutoOrderYn" column="FRCS_AUTO_ORDER_YN"/>
+        <result property="frcsAutoOrderCnt" column="FRCS_AUTO_ORDER_CNT"/>
+
+        <association property="productVO" resultMap="productMap"></association>
+    </resultMap>
+
+    <resultMap id="productMap" type="kr.or.onesome.product.vo.ProductVO">
+        <result property="prdctNo" column="PRDCT_NO"/>
+        <result property="prdctClsfCd" column="PRDCT_CLSF_CD"/>
+        <result property="prdctNm" column="PRDCT_NM"/>
+        <result property="prdctRcvnAmt" column="PRDCT_RCVN_AMT"/>
+        <result property="prdctExpln" column="PRDCT_EXPLN"/>
+        <result property="prdctPrchsStrtDt" column="PRDCT_PRCHS_STRT_DT"/>
+        <result property="prdctPrchsEndDt" column="PRDCT_PRCHS_END_DT"/>
+        <result property="prdctDscnYn" column="PRDCT_DSCN_YN"/>
+        <result property="allergensYn" column="ALLERGENS_YN"/>
+        <result property="hqInvenCnt" column="HQ_INVEN_CNT"/>
+        <result property="hqInvenProperCnt" column="HQ_INVEN_PROPER_CNT"/>
+        <result property="acntNo" column="ACNT_NO"/>
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+
+        <association property="comDetCodeInfoVO" resultMap="comDetCodeInfoMap" />
+    </resultMap>
+
+    <resultMap id="comDetCodeInfoMap" type="kr.or.onesome.vo.ComDetCodeInfoVO">
+        <result property="comDetCode" column="COM_DET_CODE"/>
+        <result property="comCode" column="COM_CODE"/>
+        <result property="comDetCodeNm" column="COM_DET_CODE_NM"/>
+        <result property="comDetCodeRm" column="COM_DET_CODE_RM"/>
+    </resultMap>
+
+    <select id="frcsInventoryList" parameterType="int" resultMap="frcsInventoryMap">
+        SELECT
+            a.FRCS_NO
+             , a.PRDCT_NO
+             , a.FRCS_INVEN_CNT
+             , a.FRCS_INVEN_PROPER_CNT
+             , a.FRCS_LAST_IN_DT
+             , a.FRCS_AUTO_ORDER_YN
+             , a.FRCS_AUTO_ORDER_CNT
+             , p.PRDCT_NM
+             , p.PRDCT_CLSF_CD
+             , p.PRDCT_DSCN_YN
+             , p.PRDCT_RCVN_AMT
+             , c.COM_DET_CODE_NM
+        FROM
+            FRCS_INVENTORY a
+                JOIN
+            PRODUCT p ON
+                a.PRDCT_NO = p.PRDCT_NO
+                JOIN
+            COM_DET_CODE_INFO c ON
+                p.PRDCT_CLSF_CD = c.COM_DET_CODE
+        WHERE
+            FRCS_NO = #{crrFrcsNo}
+        ORDER BY
+            PRDCT_DSCN_YN ASC
+               , FRCS_INVEN_CNT ASC
+               , FRCS_INVEN_PROPER_CNT DESC
+    </select>
+
+    <select id="productDetail" parameterType="HashMap" resultMap="frcsInventoryMap">
+         SELECT
+            FRCS_NO
+             , PRDCT_NO
+             , FRCS_INVEN_CNT
+             , FRCS_INVEN_PROPER_CNT
+             , FRCS_LAST_IN_DT
+             , FRCS_AUTO_ORDER_YN
+             , FRCS_AUTO_ORDER_CNT
+        FROM
+            FRCS_INVENTORY
+        WHERE
+            PRDCT_NO = #{prdctNo}
+          AND
+            FRCS_NO = #{crrFrcsNo}
+    </select>
+
+    <update id="autoOrderUpdate">
+        UPDATE
+            FRCS_INVENTORY
+        SET
+             FRCS_AUTO_ORDER_YN = #{frcsAutoOrderYn}
+          , FRCS_AUTO_ORDER_CNT = #{frcsAutoOrderCnt}
+        WHERE
+            FRCS_NO = #{frcsNo}
+          AND PRDCT_NO = #{prdctNo}
+    </update>
+
+    <update id="modifyInventoryCnt">
+        UPDATE
+            FRCS_INVENTORY
+        SET
+            FRCS_INVEN_PROPER_CNT = #{frcsInvenProperCnt}
+        WHERE
+            FRCS_NO = #{frcsNo}
+          AND PRDCT_NO = #{prdctNo}
+    </update>
+
+    <insert id="inventoryUpdate" parameterType="int">
+        INSERT
+        INTO
+            FRCS_INVENTORY(FRCS_NO
+                          , PRDCT_NO
+                          , FRCS_INVEN_CNT
+                          , FRCS_INVEN_PROPER_CNT
+                          , FRCS_LAST_IN_DT
+                          , FRCS_AUTO_ORDER_YN
+                          , FRCS_AUTO_ORDER_CNT)
+        SELECT
+            #{crrFrcsNo}
+             , A.PRDCT_NO
+             , 0
+             , 0
+             , SYSDATE
+             , 'N'
+             , 0
+        FROM
+            PRODUCT A
+        WHERE
+            NOT EXISTS(
+                SELECT
+                    B.PRDCT_NO
+                FROM
+                    FRCS_INVENTORY B
+                WHERE
+                    B.FRCS_NO = #{crrFrcsNo}
+                  AND
+                    A.PRDCT_NO = B.PRDCT_NO
+            )
+    </insert>
+
+</mapper>

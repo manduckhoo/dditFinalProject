@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.notice.mapper.NoticeMapper">
+	
+	<resultMap type="noticeVO" id="noticeMap">
+		<result property="ntcMdfcnDt" column="NTC_MDFCN_DT"/>
+		<result property="ntcWrtDt" column="NTC_WRT_DT"/>
+		<result property="ntcWrtr" column="NTC_WRTR"/>
+		<result property="ntcConts" column="NTC_CONTS"/>
+		<result property="ntcTitle" column="NTC_TITLE"/>
+		<result property="ntcNo" column="NTC_NO"/>
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="rnum" column="rnum"/>
+		<result property="recent" column="RECENT"/>
+		<collection property="atchFileVOList" resultMap="atchFileMap"/>
+	</resultMap>
+	
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="fileSn" column="FILE_SN"/>
+		<result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+		<result property="fileStreCours" column="FILE_STRE_COURS"/>
+		<result property="streFileNm" column="STRE_FILE_NM"/>
+		<result property="fileThumYn" column="FILE_THUM_YN"/>
+		<result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+		<result property="fileExtsn" column="FILE_EXTSN"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+	</resultMap>
+	
+	<!-- 리스트 페이징 -->
+	<select id="noticeList" parameterType="Map" resultMap="noticeMap">
+		SELECT A.*
+		FROM 
+		(
+		    SELECT ROW_NUMBER() OVER (ORDER BY NTC_NO DESC) RNUM,
+		           NTC_NO, 
+		           NTC_TITLE, 
+		           NTC_WRTR, 
+		           NTC_WRT_DT
+		    FROM NOTICE
+		    WHERE NTC_TITLE LIKE '%' || #{keyword} || '%'
+		    OR NTC_WRTR LIKE '%' || #{keyword} || '%'
+		) A
+		WHERE A.RNUM BETWEEN ((#{currentPage} - 1) * 10) + 1 AND (#{currentPage} * 10)
+	</select>
+	
+	<!-- 리스트 페이징(일반회원) - 재람
+	{searchType=title,keyword=개인정보,currentPage=1}
+	 -->
+	<select id="list" parameterType="hashMap" resultMap="noticeMap">
+	    SELECT A.*, 
+	        CASE WHEN A.RNUM <![CDATA[<=]]> 3 THEN 'Y' ELSE 'N' END AS RECENT
+	    FROM 
+	    (
+	        SELECT ROW_NUMBER() OVER(ORDER BY NTC_NO DESC) RNUM, N.*
+	        FROM
+	        (
+	            SELECT NTC_NO, NTC_TITLE, NTC_CONTS, NTC_WRTR, NTC_WRT_DT
+	            FROM NOTICE
+	            WHERE 1 = 1
+	            <if test="searchType=='title'">
+	                AND NTC_TITLE LIKE '%' || #{keyword} || '%'
+	            </if>
+	            <if test="searchType=='content'">
+	                AND NTC_CONTS LIKE '%' || #{keyword} || '%'
+	            </if>
+	            ORDER BY NTC_NO DESC
+	        ) N 
+	    ) A 
+	    WHERE A.RNUM BETWEEN (#{currentPage} * 10) - (10 - 1) AND (#{currentPage} * 10)
+	</select>
+	
+	<!-- 전체게시글 개수 -->
+	<select id="getCount" resultType="int">
+		SELECT COUNT(*) FROM NOTICE
+	</select>
+	
+	<insert id="writeNotice" parameterType="noticeVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="ntcNo">
+			SELECT NOTICE_SEQ.NEXTVAL AS ntcNo FROM DUAL
+		</selectKey>
+		INSERT INTO NOTICE (
+		      NTC_NO
+		    , NTC_TITLE
+		    , NTC_CONTS
+		    , NTC_WRTR
+		    , NTC_WRT_DT
+		    , NTC_MDFCN_DT
+		    , ATCH_FILE_NO
+		) VALUES (
+		    #{ntcNo}
+		  , #{ntcTitle}
+		  , #{ntcConts}
+		  , #{ntcWrtr}
+		  , SYSDATE
+		  , SYSDATE
+		  , #{atchFileNo}
+		)
+	</insert>
+	
+	<!-- 공지사항 상세 -->
+	<select id="noticeDetail" parameterType="int" resultMap="noticeMap">
+		SELECT 
+	        A.NTC_NO,
+	        A.NTC_TITLE,
+	        A.NTC_CONTS,
+	        A.NTC_WRTR,
+	        A.NTC_WRT_DT,
+	        A.NTC_MDFCN_DT,
+	        A.ATCH_FILE_NO,
+	        B.FILE_SN, 
+	        B.ORIGNL_FILE_NM, 
+	        B.FILE_STRE_COURS, 
+	        B.STRE_FILE_NM, 
+	        B.FILE_THUM_YN, 
+	        B.FILE_UPLOAD_DT,
+	        B.FILE_EXTSN, FILE_SIZE
+	    FROM 
+	        notice A, ATCH_FILE B
+	    WHERE
+	        A.atch_file_no = B.atch_file_no(+)
+	    AND
+	        A.NTC_NO = #{ntcNo}
+	</select>
+	
+	<!-- 공지사항 삭제 -->
+	<delete id="deleteNotice" parameterType="noticeVO">
+		DELETE 
+		FROM NOTICE
+		WHERE NTC_NO = #{ntcNo}
+		AND NTC_WRTR = #{ntcWrtr}
+	</delete>
+	
+	<update id="updateNotice" parameterType="noticeVO">
+		<!-- 수정된 날짜를 jsp에 뿌림 -->
+		UPDATE NOTICE
+		SET
+		    NTC_TITLE = #{ntcTitle},
+		    NTC_CONTS = #{ntcConts},
+		    NTC_MDFCN_DT = SYSDATE,
+		    ATCH_FILE_NO = #{atchFileNo}
+		WHERE
+		    NTC_NO = #{ntcNo}
+	</update>
+	
+	<!-- 공지사항 리스트(일반회원) - 재람 -->
+	<select id="memNoticeList" resultType="noticeVO">
+		select * 
+		from NOTICE
+		order by NTC_NO
+	</select>
+	
+	<!-- 공지사항 디테일,첨부파일(일반회원) - 재람 -->
+	<select id="memNoticeDetail" parameterType="noticeVO" resultMap="noticeMap">
+				select 
+			A.NTC_NO,
+			A.NTC_TITLE,
+			A.NTC_CONTS,
+			A.NTC_WRTR,
+			A.NTC_WRT_DT,
+			A.NTC_MDFCN_DT,
+			A.ATCH_FILE_NO,
+            B.ATCH_FILE_NO, 
+            B.FILE_SN, ORIGNL_FILE_NM, 
+            B.FILE_STRE_COURS, 
+            B.STRE_FILE_NM, 
+            B.FILE_THUM_YN, 
+            B.FILE_UPLOAD_DT,
+            B.FILE_EXTSN, FILE_SIZE
+		from 
+			notice A, ATCH_FILE B 
+		WHERE
+            A.atch_file_no = B.atch_file_no(+)
+            and A.NTC_NO = #{ntcNo}
+<!--             and B.FILE_SN = 1 -->
+	</select>
+	
+	<select id="getTotal" parameterType="hashMap" resultType="int">
+		SELECT COUNT(*)
+		FROM (
+		    SELECT ROWNUM AS R, N.*
+		    FROM
+		        (SELECT NTC_NO, NTC_TITLE, NTC_CONTS, NTC_WRTR, NTC_WRT_DT
+		         FROM NOTICE
+		         WHERE 1 = 1
+		         <if test="searchType=='title'">
+     			 AND   NTC_TITLE LIKE '%' || #{keyword} || '%'
+     			 </if>
+		         <if test="searchType=='content'">
+     			 AND   NTC_CONTS LIKE '%' || #{keyword} || '%'
+     			 </if>
+		         ORDER BY NTC_NO DESC
+		         )N )
+		
+	</select>
+	
+	<!-- 공지사항 디테일 이전글, 다음글(일반회원) - 재람 -->
+	<select id="movePage" resultType="noticeVO" parameterType="int">
+	    SELECT * from (select
+	    	NTC_NO,
+	    	LEAD(NTC_NO,1,9999) OVER(ORDER BY NTC_NO) AS next,
+	    	LAG(NTC_NO,1,9999) OVER(ORDER BY NTC_NO) AS last,
+	    	NTC_TITLE,
+	    	LEAD(NTC_TITLE,1,9999) OVER(ORDER BY NTC_NO) AS nextTitle,
+	    	LAG(NTC_TITLE,1,9999) OVER(ORDER BY NTC_NO) AS lastTitle,
+            NTC_WRT_DT,
+            CAST(LEAD(NTC_WRT_DT, 1, TO_DATE('99990101', 'YYYYMMDD')) OVER(ORDER BY NTC_NO) AS DATE) AS nextDay,
+            CAST(LAG(NTC_WRT_DT, 1, TO_DATE('99990101', 'YYYYMMDD')) OVER(ORDER BY NTC_NO) AS DATE) AS lastDay
+	    	FROM NOTICE
+	    		ORDER BY NTC_NO DESC)
+	    	WHERE
+	    		NTC_NO = #{ntcNo}
+	</select>
+	
+
+</mapper>
+
+
+
+

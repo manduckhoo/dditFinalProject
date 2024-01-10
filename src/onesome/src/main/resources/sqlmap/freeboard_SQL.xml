@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="kr.or.onesome.freeboard.mapper.FreeBoardMapper">
+
+	<resultMap type="freeBoardVO" id="freeBoardMap">
+		<result property="freeBoardNo" column="FREE_BOARD_NO" />
+		<result property="freeBoardTitle" column="FREE_BOARD_TITLE" />
+		<result property="freeBoardConts" column="FREE_BOARD_CONTS" />
+		<result property="freeBoardWrtDt" column="FREE_BOARD_WRT_DT" />
+		<result property="freeBoardFnlMdfDt"
+			column="FREE_BOARD_FNL_MDF_DT" />
+		<result property="freeBoardWrtrNo" column="FREE_BOARD_WRTR_NO" />
+		<result property="freeBoardView" column="FREE_BOARD_VIEW" />
+		<result property="atchFileNo" column="ATCH_FILE_NO" />
+		<result property="frcsOwnrNm" column="FRCS_OWNR_NM" />
+
+		<collection property="atchFileVOList"
+			resultMap="atchFileMap" />
+	</resultMap>
+
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<result property="atchFileNo" column="ATCH_FILE_NO" />
+		<result property="fileSn" column="FILE_SN" />
+		<result property="orignlFileNm" column="ORIGNL_FILE_NM" />
+		<result property="fileStreCours" column="FILE_STRE_COURS" />
+		<result property="streFileNm" column="STRE_FILE_NM" />
+		<result property="fileThumYn" column="FILE_THUM_YN" />
+		<result property="fileUploadDt" column="FILE_UPLOAD_DT" />
+		<result property="fileExtsn" column="FILE_EXTSN" />
+		<result property="fileSize" column="FILE_SIZE" />
+	</resultMap>
+
+
+	<!-- 자유게시판 리스트 -->
+	<select id="freeBoardList" resultMap="freeBoardMap">
+		SELECT FREE_BOARD_NO, FREE_BOARD_TITLE, FREE_BOARD_CONTS, FREE_BOARD_WRT_DT,
+		FREE_BOARD_FNL_MDF_DT, FREE_BOARD_WRTR_NO, ATCH_FILE_NO,
+		FREE_BOARD_VIEW,
+		(
+		select FRCS_OWNR_NM
+		FROM FRCS_OWNER fo
+		WHERE
+		fo.FRCS_OWNR_NO = fd.FREE_BOARD_WRTR_NO
+		) as FRCS_OWNR_NM
+		FROM
+		FREE_BOARD fd
+		ORDER BY free_board_no DESC
+	</select>
+
+	<!-- 자유게시판 디테일, 첨부파일 -->
+	<select id="freeBoardDetail"
+		resultType="kr.or.onesome.vo.FreeBoardVO" resultMap="freeBoardMap">
+		<!-- SELECT * FROM FREE_BOARD WHERE free_board_no = #{freeBoardNo} -->
+		select
+		A.FREE_BOARD_NO,
+		A.FREE_BOARD_TITLE,
+		A.FREE_BOARD_CONTS,
+		A.FREE_BOARD_WRT_DT,
+		A.FREE_BOARD_FNL_MDF_DT,
+		A.FREE_BOARD_WRTR_NO,
+		A.FREE_BOARD_VIEW,
+		A.ATCH_FILE_NO,
+		B.FILE_SN, ORIGNL_FILE_NM,
+		B.FILE_STRE_COURS,
+		B.STRE_FILE_NM,
+		B.FILE_THUM_YN,
+		B.FILE_UPLOAD_DT,
+		B.FILE_EXTSN, FILE_SIZE
+		FROM
+		free_board A, ATCH_FILE B
+		WHERE
+		A.atch_file_no = B.atch_file_no(+)
+		and A.FREE_BOARD_NO = #{freeBoardNo}
+	</select>
+
+	<!-- 자유게시판 조회수 증가 -->
+	<update id="updateView">
+		UPDATE free_board
+		SET
+		FREE_BOARD_VIEW = FREE_BOARD_VIEW+1
+		WHERE
+		free_board_no = #{freeBoardNo}
+	</update>
+
+	<!-- 자유게시판 글쓰기 -->
+	<insert id="freeBoardCreate" parameterType="FreeBoardVO">
+		<selectKey resultType="int" order="BEFORE"
+			keyProperty="freeBoardNo">
+			SELECT FREE_BOARD_SEQ.NEXTVAL AS FREE_BOARD_NO FROM DUAL
+		</selectKey>
+		INSERT INTO FREE_BOARD (
+		FREE_BOARD_NO
+		, FREE_BOARD_TITLE
+		, FREE_BOARD_CONTS
+		, FREE_BOARD_WRTR_NO
+		, ATCH_FILE_NO
+		, FREE_BOARD_VIEW
+		) VALUES (
+		#{freeBoardNo}
+		, #{freeBoardTitle}
+		, #{freeBoardConts}
+		, #{freeBoardWrtrNo}
+		, #{atchFileNo}
+		, #{freeBoardView}
+		)
+	</insert>
+
+	<!-- 삭제 -->
+	<delete id="deleteFreeBoard" parameterType="String">
+		DELETE
+		FROM FREE_BOARD
+		WHERE free_board_no = #{freeBoardNo}
+	</delete>
+
+	<!-- 수정 -->
+	<update id="updateFreeBoard"
+		parameterType="kr.or.onesome.vo.FreeBoardVO">
+		UPDATE FREE_BOARD
+		SET
+		FREE_BOARD_TITLE = #{freeBoardTitle},
+		FREE_BOARD_CONTS = #{freeBoardConts},
+		FREE_BOARD_FNL_MDF_DT = SYSDATE, <!-- 수정일자를 현재 날짜로 업데이트 -->
+		ATCH_FILE_NO = #{atchFileNo}
+		WHERE
+		FREE_BOARD_NO = #{freeBoardNo}
+	</update>
+
+	<!-- 댓글 리스트 조회 -->
+	<select id="commentsList"
+		resultType="kr.or.onesome.vo.CommentsVO">
+		SELECT
+		CMNTS_SN
+		, FREE_BOARD_NO
+		, CMNTS_WRTR
+		, CMNTS_CONTS
+		, CMNTS_WRT_DT
+		, CMNTS_FNL_MOF_DT
+		FROM
+		COMMENTS
+		WHERE FREE_BOARD_NO = #{freeBoardNo} <!-- 조건은 웨얼 -->
+		ORDER BY CMNTS_SN DESC
+	</select>
+
+	<!-- 댓글쓰기 -->
+	<insert id="createComments"
+		parameterType="kr.or.onesome.vo.CommentsVO">
+		<selectKey resultType="int" order="BEFORE"
+			keyProperty="cmntsSn">
+			SELECT comments_seq.nextval as cmntsSn FROM dual
+		</selectKey>
+		INSERT INTO COMMENTS (
+		CMNTS_SN
+		, FREE_BOARD_NO
+		, CMNTS_WRTR
+		, CMNTS_CONTS
+		, CMNTS_WRT_DT
+		, CMNTS_FNL_MOF_DT
+		) VALUES (
+		#{cmntsSn}
+		, #{freeBoardNo}
+		, #{cmntsWrtr}
+		, #{cmntsConts}
+		, SYSDATE
+		, SYSDATE
+		)
+	</insert>
+	
+	<!-- 댓글 삭제 -->
+	<delete id="deleteComments" parameterType="int">
+		DELETE
+		FROM COMMENTS
+		WHERE CMNTS_SN = #{cmntsSn}
+	</delete>
+	
+	<!-- 댓글 수정 -->
+	<update id="updateComments" parameterType="commentsVO">
+      UPDATE 
+         COMMENTS
+      SET
+         CMNTS_CONTS = #{cmntsConts},       
+         CMNTS_FNL_MOF_DT = SYSDATE          
+      WHERE
+         CMNTS_SN = #{cmntsSn}             
+   </update>
+   
+   <!-- 게시물에 달린 댓글 수 가져오기 -->
+   <select id="getCommentCount" resultType="int">
+   SELECT COUNT(*) 
+   FROM 
+   		COMMENTS
+	WHERE 
+		FREE_BOARD_NO = #{freeBoardNo}
+   </select>
+</mapper>
+
+
+

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.excel.mapper.ExcelUploadMapper">
+	
+	<select id="getMenuList" resultMap="menuMap">
+		SELECT T.*
+        FROM (SELECT ROW_NUMBER() OVER (ORDER BY MENU_NO DESC) RNUM,
+                     MENU_NO,
+                     MENU_NM,
+                     MENU_PRICE,
+                     MENU_DESCRIPTION,
+                     MENU_STRT_DT,
+                     MENU_END_DT,
+                     CALORIES,
+                     SUGAR,
+                     SODIUM,
+                     PROTEIN,
+                     SATURATED_FAT,
+                     CAFFEINE,
+                     CTGRY_DETAIL_NM
+              FROM MENU m,
+                   CTGRY_DETAIL ct
+              where m.CTGRY_DETAIL_ID = ct.CTGRY_DETAIL_ID
+                and m.MENU_NM LIKE '%' || #{keyword} || '%'
+             ) T
+        WHERE T.RNUM BETWEEN (#{currentPage} * 10) - (10 - 1) AND (#{currentPage} * 10)
+	</select>
+	
+	<select id="getTotal" resultType="int" parameterType="hashMap">
+        select count(*) from MENU where MENU_NM LIKE '%' || #{keyword} || '%'
+    </select>
+	
+	<insert id="insertMenuList" parameterType="kr.or.onesome.menu.vo.MenuVO">
+	<selectKey resultType="int" order="BEFORE" keyProperty="menuNo">
+		select MENU_SEQ.nextval from DUAL
+    </selectKey>
+		INSERT INTO MENU (
+		    MENU_NO
+		    , MENU_NM
+		    , MENU_PRICE
+		    , CTGRY_DETAIL_ID
+		    , MENU_DESCRIPTION
+		    , MENU_STRT_DT
+		    , MENU_END_DT
+		) VALUES (
+		  #{menuNo},
+		  #{menuNm},
+		  #{menuPrice},
+		  #{ctgryDetailId},
+		  #{menuDescription},
+		  #{menuStrtDt},
+		  #{menuEndDt}
+		)
+	</insert>
+	
+	
+	<select id="getExcelList" resultMap="menuMap">
+		SELECT *
+		FROM MENU
+	</select>
+	
+	<resultMap type="kr.or.onesome.menu.vo.MenuVO" id="menuMap">
+		<result property="menuNo" column="MENU_NO"/>
+		<result property="menuNm" column="MENU_NM"/>
+		<result property="menuPrice" column="MENU_PRICE"/>
+		<result property="ctgryDetailId" column="CTGRY_DETAIL_ID"/>
+		<result property="menuDescription" column="MENU_DESCRIPTION"/>
+		<result property="menuStrtDt" column="MENU_STRT_DT"/>
+		<result property="menuEndDt" column="MENU_END_DT"/>
+		<result property="calories" column="CALORIES"/>
+		<result property="sugar" column="SUGAR"/>
+		<result property="sodium" column="SODIUM"/>
+		<result property="protein" column="PROTEIN"/>
+		<result property="saturatedFat" column="SATURATED_FAT"/>
+		<result property="caffeine" column="CAFFEINE"/>
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+	</resultMap>
+	
+	<select id="download" parameterType="hashMap" resultMap="menuMap">
+		SELECT *
+		FROM MENU
+		WHERE 1 = 1
+		AND   MENU_NO IN
+		<foreach collection="menuNoList" item="menuNo" index="index"
+            separator="," open="(" close=")">
+            #{menuNo}
+        </foreach>
+	</select>
+</mapper>
+
+
+
+
+
+
+

@@ -1,0 +1,132 @@
+/* ==================== 일반회원 가입을 위한 css 파일 ==================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Poppins&family=Roboto&display=swap");
+
+/* 홈페이지 맨위로 가는 버튼 */
+/* #arrowBtn{ */
+/*     width: 40px; */
+/*     height: 40px; */
+/*     position: fixed; */
+/*     right : 20px; */
+/*     bottom: 20px; */
+/* } */
+
+/* 회원가입 메인 사진 뒷배경 */
+.mainSectionJoin {
+	height : 1080px;
+  	padding: 20px;
+	background: url('/resources/image/회원가입배경.jpg') no-repeat;
+	position: relative;
+	background-size: cover; /* 이미지를 덮도록 설정 */
+	
+}
+
+/* 회원가입 환영페이지 전체 div 감싸는 도형 */
+#join-welcome-wrapper {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px 0px;
+    border: 1px solid rgb(200, 205, 224);
+    background-color: rgb(255, 255, 255);
+    width: 70vh;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-style: normal;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+/* 회원가입 환영페이지 이미지 */
+#join-welcome-wrapper img {
+    max-width: 100%;
+    height: auto;
+}
+/* 회원가입 환영페이지 환영합니다 글씨 */
+#join-welcome-wrapper h2{
+	font-size : 46px;
+}
+
+/* 회원가입 환영페이지 환영합니다 아랫 글씨 */
+#join-welcome-wrapper p{
+	font-size : 18px;
+}
+
+/* Sign up 글씨 굵고 크게*/
+.mb-4{
+	color: #2B2934;
+	font-weight: 600;
+	text-align: center;
+	font-size: 60px;
+}
+
+/* 회원가입 폼 스타일 */
+.mainSectionJoin .container {
+	position: absolute;
+	height: 100%;
+  	max-height: 80vh; /* 전체 높이 제한*/
+	width: 40%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 30px;
+	border-radius: 10px;
+	background-color: #fff; /* 배경 색상을 흰색으로 지정 */
+	padding: 30px 40px;
+	background: transparent;
+	border: 2px solid rgba(255,255,255.2);
+	backdrop-filter: blur(4px);
+	box-shadow: 0 0 10px rgba(0,0,0,.1);
+	font-weight: 600;
+	font-family: 'Noto Sans KR', sans-serif;
+	overflow : auto; /* 스크롤 생성 */
+}
+
+/* 스크롤바 너비 */
+.container::-webkit-scrollbar {
+    width: 7px;
+}
+
+/* 스크롤바 막대 색상, 둥글기*/
+.container::-webkit-scrollbar-thumb {
+	height: 30%; /* 스크롤바의 길이 */
+    background-color: #000000;
+    border-radius: 15px;
+    background-clip: padding-box; /* 공간 설정 */
+    border: 2px solid transparent; /* 투명 조절 */
+}
+
+/* 스크롤바 여백 조정 */
+.container::-webkit-scrollbar-track {
+    background: #fff;  /*스크롤바 뒷 배경 색상*/
+    border-radius: 15px;
+    box-shadow: inset 0px 0px 5px white;
+}
+
+/* 회원가입 폼 안의 input타입 가로 길이 조정 */
+.mainSectionJoin .container form input {
+	width: 100%; /* 입력 필드 전체 너비 사용 */
+	max-width: 320px; /* 폼태그 너비 설정 */
+}
+
+/* 중복확인, 우편번호 찾기 버튼 크기 줄이기*/
+#checkMemId, #findZipcodeBtn {
+    height: 85%;
+}
+
+/* 회원가입 가입하기 버튼*/
+#join-btn{
+/* 	position: absolute; */
+	right: 90px;
+}
+
+/* 회원가입 취소 버튼*/
+#joinCancle{
+	/*position: absolute;*/
+	right: 20px;
+}
+
+

@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.hqSales.mapper.HqSalesMapper">
+
+	<!--  1) 카테고리별 매출과 판매갯수 및 전체 판매갯수와 매출   -->
+	<select id="totalSales" parameterType="hashMap" resultType="hashMap">
+
+		SELECT  
+		    c.ctgry_name AS CategoryName, 
+		    SUM(pd.pynm_cnt) AS SalesCount, 
+		    SUM(pd.menu_price * pd.pynm_cnt) AS OrderAmount
+		FROM 
+		    payment p, payment_detail pd, menu m, ctgry_detail cd, ctgry c
+		WHERE 
+		    p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		    AND p.pynm_no = pd.pynm_no(+)
+		    AND pd.menu_no = m.menu_no
+		    AND m.ctgry_detail_id = cd.ctgry_detail_id
+		    AND cd.ctgry_id = c.ctgry_id
+		GROUP BY ROLLUP(c.ctgry_name)
+
+	</select>
+
+	<!-- 2) 해당기간 동안의 판매된 메뉴 갯수   -->
+	<select id="menuCnt" parameterType="hashMap" resultType="hashMap">
+		
+		SELECT  
+		    COUNT(DISTINCT(m.menu_nm)) AS MenuCount
+		FROM 
+		    payment p, payment_detail pd, menu m
+		WHERE 
+		    p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		    AND p.pynm_no = pd.pynm_no(+)
+		    AND pd.menu_no = m.menu_no
+		    	
+	</select>
+	
+	
+	<!-- 3) 카테고리별 월별 매출   -->
+	<select id="monthSales" parameterType="hashMap" resultType="hashMap">
+	
+		select *
+		from(
+			SELECT "날짜",
+			       NVL(음료, 0) AS 음료,
+			       NVL(푸드, 0) AS 푸드,
+			       NVL(상품, 0) AS 상품
+			FROM (
+			    SELECT 
+			        TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+			        c.ctgry_name AS "카테고리명",
+			        pd.menu_price * pd.pynm_cnt AS "주문금액"
+			    FROM
+			        payment p
+			        LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+			        JOIN menu m ON pd.menu_no = m.menu_no
+			        JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+			        JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+			    WHERE 
+			        p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+			)
+			PIVOT (
+			    SUM("주문금액")
+			    FOR "카테고리명" IN ('음료' AS 음료, '푸드' AS 푸드, '상품' AS 상품)
+			)
+			UNION ALL
+			SELECT 'Total' AS "날짜",
+			       SUM(NVL(음료, 0)) AS 음료,
+			       SUM(NVL(푸드, 0)) AS 푸드,
+			       SUM(NVL(상품, 0)) AS 상품
+			FROM (
+			    SELECT 
+			        TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+			        c.ctgry_name AS "카테고리명",
+			        pd.menu_price * pd.pynm_cnt AS "주문금액"
+			    FROM
+			        payment p
+			        LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+			        JOIN menu m ON pd.menu_no = m.menu_no
+			        JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+			        JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+			    WHERE 
+			        p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+			)
+			PIVOT (
+			    SUM("주문금액")
+			    FOR "카테고리명" IN ('음료' AS 음료, '푸드' AS 푸드, '상품' AS 상품)
+			)
+		)
+		order by "날짜"
+		
+	</select>
+	
+	<!-- 4) 해당 기간 중 최다 판매 카테고리 1개    -->
+	<select id="topSales" parameterType="hashMap" resultType="hashMap">
+				
+		SELECT *
+		FROM (
+		    SELECT 
+		        m.menu_nm AS "MenuName",
+		        SUM(pd.pynm_cnt) AS "SalesCount"
+		    FROM 
+		        payment p
+		        JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+		        JOIN menu m ON pd.menu_no = m.menu_no
+		        JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+		        JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+		    WHERE 
+		        p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		    GROUP BY 
+		        m.menu_nm
+		    ORDER BY 
+		        "SalesCount" DESC
+		)
+		WHERE rownum = 1	
+	</select>
+	
+	<!-- 1) 음료카테고리별 매출과 판매갯수 및 전체 판매갯수와 매출   -->
+	<select id="beverageTotalSales" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+		
+			SELECT 
+			    c.ctgry_name,
+			    cd.CTGRY_DETAIL_NM AS "카테고리",
+			    SUM(NVL(pd.pynm_cnt, 0)) AS "판매갯수",
+			    SUM(NVL(pd.menu_price * pd.pynm_cnt, 0)) AS "주문금액"
+			FROM
+			    ctgry c
+			LEFT JOIN
+			    ctgry_detail cd ON c.ctgry_id = cd.ctgry_id
+			LEFT JOIN
+			    menu m ON cd.ctgry_detail_id = m.ctgry_detail_id
+			LEFT JOIN
+			    payment_detail pd ON m.menu_no = pd.menu_no
+			LEFT JOIN
+			    payment p ON pd.pynm_no = p.pynm_no AND p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'yyyy-mm-dd') AND TO_DATE(#{endDate}, 'yyyy-mm-dd')
+			GROUP BY 
+			    ROLLUP(c.ctgry_name, cd.CTGRY_DETAIL_NM)
+		)
+		where ctgry_name ='음료'
+	</select>
+	
+	<!-- 2) 음료 카테고리의 판매된 메뉴 갯수  -->
+	<select id="beverageMenuCnt" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+			select 
+				c.ctgry_name,  count(distinct(m.menu_nm)) as "메뉴갯수"
+			from 
+				payment p, payment_detail pd, menu m, ctgry_detail cd, ctgry c
+			where 
+				p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				and   p.pynm_no = pd.pynm_no(+)
+				and   pd.menu_no = m.menu_no
+				and   m.ctgry_detail_id = cd.ctgry_detail_id
+				and  cd.ctgry_id = c.ctgry_id
+			group by c.ctgry_name
+		)
+		where ctgry_name = '음료'
+	</select>
+	
+	<!-- 3) 음료 카테고리별 월별 매출  -->
+	<select id="beverageTopSales" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+			select 
+				m.menu_nm as "메뉴" ,sum(pd.pynm_cnt) as "판매갯수"
+			from 
+				payment p, payment_detail pd, menu m, ctgry_detail cd, ctgry c
+			where 
+				p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				and   p.pynm_no = pd.pynm_no(+)
+				and   pd.menu_no = m.menu_no
+				and   m.ctgry_detail_id = cd.ctgry_detail_id
+				and  cd.ctgry_id = c.ctgry_id
+				and  c.ctgry_id='ctg01'
+			group by m.menu_nm
+			order by "판매갯수" desc)
+		where rownum = 1
+	</select>
+	
+	<!-- 4) 음료카테고리 중 최다 판매  메뉴 1개    -->
+	<select id="beverageMonthSales" parameterType="hashMap" resultType="hashMap">
+	SELECT *
+	FROM (
+	    SELECT "날짜",
+	           NVL(티, 0) AS 티,
+	           NVL(기타, 0) AS 기타,
+	           NVL(커피, 0) AS 커피,
+	           NVL(스무디, 0) AS 스무디,
+	           NVL(프라푸치노, 0) AS 프라푸치노
+	    FROM (
+	        SELECT 
+	            TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+	            cd.CTGRY_DETAIL_NM AS "카테고리명",
+	            pd.menu_price * pd.pynm_cnt AS "주문금액"
+	        FROM
+	            payment p
+	            LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+	            JOIN menu m ON pd.menu_no = m.menu_no
+	            JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+	            JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+	        WHERE 
+	            p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            and c.CTGRY_ID='ctg01'
+	    )
+	    PIVOT (
+	        SUM("주문금액")
+	        FOR "카테고리명" IN ('티' AS 티, '기타' AS 기타, '커피' AS 커피, '스무디' AS 스무디, '프라푸치노' AS 프라푸치노)
+	    )
+	    UNION ALL
+	    SELECT 'Total' AS "날짜",
+	           SUM(NVL(티, 0)) AS 티,
+	           SUM(NVL(기타, 0)) AS 기타,
+	           SUM(NVL(커피, 0)) AS 커피,
+	           SUM(NVL(스무디, 0)) AS 스무디,
+	           SUM(NVL(프라푸치노, 0)) AS 프라푸치노
+	    FROM (
+	        SELECT 
+	            TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+	            cd.CTGRY_DETAIL_NM AS "카테고리명",
+	            pd.menu_price * pd.pynm_cnt AS "주문금액"
+	        FROM
+	            payment p
+	            LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+	            JOIN menu m ON pd.menu_no = m.menu_no
+	            JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+	            JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+	        WHERE 
+	            p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            and c.CTGRY_ID='ctg01'
+	    )
+	    PIVOT (
+	        SUM("주문금액")
+	        FOR "카테고리명" IN ('티' AS 티, '기타' AS 기타, '커피' AS 커피, '스무디' AS 스무디, '프라푸치노' AS 프라푸치노)
+	    )
+	)
+	ORDER BY "날짜"
+	</select>
+	
+	
+	
+	<!-- 1) 푸드카테고리별 매출과 판매갯수 및 전체 판매갯수와 매출   -->
+	<select id="foodTotalSales" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+		
+			SELECT 
+			    c.ctgry_name,
+			    cd.CTGRY_DETAIL_NM AS "카테고리",
+			    SUM(NVL(pd.pynm_cnt, 0)) AS "판매갯수",
+			    SUM(NVL(pd.menu_price * pd.pynm_cnt, 0)) AS "주문금액"
+			FROM
+			    ctgry c
+			LEFT JOIN
+			    ctgry_detail cd ON c.ctgry_id = cd.ctgry_id
+			LEFT JOIN
+			    menu m ON cd.ctgry_detail_id = m.ctgry_detail_id
+			LEFT JOIN
+			    payment_detail pd ON m.menu_no = pd.menu_no
+			LEFT JOIN
+			    payment p ON pd.pynm_no = p.pynm_no AND p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'yyyy-mm-dd') AND TO_DATE(#{endDate}, 'yyyy-mm-dd')
+			GROUP BY 
+			    ROLLUP(c.ctgry_name, cd.CTGRY_DETAIL_NM)
+		)
+		where ctgry_name ='푸드'
+	</select>
+	
+	<!-- 2) 푸드 카테고리의 판매된 메뉴 갯수  -->
+	<select id="foodMenuCnt" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+			select 
+				c.ctgry_name,  count(distinct(m.menu_nm)) as "메뉴갯수"
+			from 
+				payment p, payment_detail pd, menu m, ctgry_detail cd, ctgry c
+			where 
+				p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				and   p.pynm_no = pd.pynm_no(+)
+				and   pd.menu_no = m.menu_no
+				and   m.ctgry_detail_id = cd.ctgry_detail_id
+				and  cd.ctgry_id = c.ctgry_id
+			group by c.ctgry_name
+		)
+		where ctgry_name = '푸드'
+	</select>
+	
+	<!-- 3) 푸드 카테고리 중 최다 판매  메뉴 1개    -->	
+	<select id="foodTopSales" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+			select 
+				m.menu_nm as "메뉴" ,sum(pd.pynm_cnt) as "판매갯수"
+			from 
+				payment p, payment_detail pd, menu m, ctgry_detail cd, ctgry c
+			where 
+				p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				and   p.pynm_no = pd.pynm_no(+)
+				and   pd.menu_no = m.menu_no
+				and   m.ctgry_detail_id = cd.ctgry_detail_id
+				and  cd.ctgry_id = c.ctgry_id
+				and  c.ctgry_id='ctg02'
+			group by m.menu_nm
+			order by "판매갯수" desc)
+		where rownum = 1
+	</select>
+	
+	<!-- 4) 푸드 카테고리별 월별 매출  -->
+	<select id="foodMonthSales" parameterType="hashMap" resultType="hashMap">
+	SELECT *
+	FROM (
+	    SELECT "날짜",
+	           NVL(빵, 0) AS 빵,
+	           NVL(케이크, 0) AS 케이크,
+	           NVL(샌드위치, 0) AS 샌드위치
+	    FROM (
+	        SELECT 
+	            TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+	            cd.CTGRY_DETAIL_NM AS "카테고리명",
+	            pd.menu_price * pd.pynm_cnt AS "주문금액"
+	        FROM
+	            payment p
+	            LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+	            JOIN menu m ON pd.menu_no = m.menu_no
+	            JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+	            JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+	        WHERE 
+	            p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            and c.CTGRY_ID='ctg02'
+	    )
+	    PIVOT (
+	        SUM("주문금액")
+	        FOR "카테고리명" IN ('빵' AS 빵, '케이크' AS 케이크, '샌드위치' AS 샌드위치)
+	    )
+	    UNION ALL
+	    SELECT 'Total' AS "날짜",
+	           SUM(NVL(빵, 0)) AS 빵,
+	           SUM(NVL(케이크, 0)) AS 케이크,
+	           SUM(NVL(샌드위치, 0)) AS 샌드위치
+	    FROM (
+	        SELECT 
+	            TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+	            cd.CTGRY_DETAIL_NM AS "카테고리명",
+	            pd.menu_price * pd.pynm_cnt AS "주문금액"
+	        FROM
+	            payment p
+	            LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+	            JOIN menu m ON pd.menu_no = m.menu_no
+	            JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+	            JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+	        WHERE 
+	            p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            and c.CTGRY_ID='ctg02'
+	    )
+	    PIVOT (
+	        SUM("주문금액")
+	        FOR "카테고리명" IN ('빵' AS 빵, '케이크' AS 케이크, '샌드위치' AS 샌드위치)
+	    )
+	)
+	ORDER BY "날짜"
+	</select>
+
+		
+	
+	<!-- 1) 푸드카테고리별 매출과 판매갯수 및 전체 판매갯수와 매출   -->
+	<select id="goodsTotalSales" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+		
+			SELECT 
+			    c.ctgry_name,
+			    cd.CTGRY_DETAIL_NM AS "카테고리",
+			    SUM(NVL(pd.pynm_cnt, 0)) AS "판매갯수",
+			    SUM(NVL(pd.menu_price * pd.pynm_cnt, 0)) AS "주문금액"
+			FROM
+			    ctgry c
+			LEFT JOIN
+			    ctgry_detail cd ON c.ctgry_id = cd.ctgry_id
+			LEFT JOIN
+			    menu m ON cd.ctgry_detail_id = m.ctgry_detail_id
+			LEFT JOIN
+			    payment_detail pd ON m.menu_no = pd.menu_no
+			LEFT JOIN
+			    payment p ON pd.pynm_no = p.pynm_no AND p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'yyyy-mm-dd') AND TO_DATE(#{endDate}, 'yyyy-mm-dd')
+			GROUP BY 
+			    ROLLUP(c.ctgry_name, cd.CTGRY_DETAIL_NM)
+		)
+		where ctgry_name ='상품'
+	</select>
+	
+	<!-- 2) 상품 카테고리의 판매된 메뉴 갯수  -->
+	<select id="goodsMenuCnt" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+			select 
+				c.ctgry_name,  count(distinct(m.menu_nm)) as "메뉴갯수"
+			from 
+				payment p, payment_detail pd, menu m, ctgry_detail cd, ctgry c
+			where 
+				p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				and   p.pynm_no = pd.pynm_no(+)
+				and   pd.menu_no = m.menu_no
+				and   m.ctgry_detail_id = cd.ctgry_detail_id
+				and  cd.ctgry_id = c.ctgry_id
+			group by c.ctgry_name
+		)
+		where ctgry_name = '상품'
+	</select>
+	
+	
+	<!-- 3) 상품 카테고리별 월별 매출  -->
+	<select id="goodsMonthSales" parameterType="hashMap" resultType="hashMap">
+	SELECT *
+	FROM (
+	    SELECT "날짜",
+	           NVL(머그컵, 0) AS 머그컵,
+	           NVL(텀블러, 0) AS 텀블러,
+	           NVL(플래너, 0) AS 플래너
+	    FROM (
+	        SELECT 
+	            TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+	            cd.CTGRY_DETAIL_NM AS "카테고리명",
+	            pd.menu_price * pd.pynm_cnt AS "주문금액"
+	        FROM
+	            payment p
+	            LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+	            JOIN menu m ON pd.menu_no = m.menu_no
+	            JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+	            JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+	        WHERE 
+	            p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            and c.CTGRY_ID='ctg03'
+	    )
+	    PIVOT (
+	        SUM("주문금액")
+	        FOR "카테고리명" IN ('머그컵' AS 머그컵, '텀블러' AS 텀블러, '플래너' AS 플래너)
+	    )
+	    UNION ALL
+	    SELECT 'Total' AS "날짜",
+	           SUM(NVL(머그컵, 0)) AS 머그컵,
+	           SUM(NVL(텀블러, 0)) AS 텀블러,
+	           SUM(NVL(플래너, 0)) AS 플래너
+	    FROM (
+	        SELECT 
+	            TO_CHAR(p.pynm_dt, 'YYYY-MM') AS "날짜",
+	            cd.CTGRY_DETAIL_NM AS "카테고리명",
+	            pd.menu_price * pd.pynm_cnt AS "주문금액"
+	        FROM
+	            payment p
+	            LEFT OUTER JOIN payment_detail pd ON p.pynm_no = pd.pynm_no
+	            JOIN menu m ON pd.menu_no = m.menu_no
+	            JOIN ctgry_detail cd ON m.ctgry_detail_id = cd.ctgry_detail_id
+	            JOIN ctgry c ON cd.ctgry_id = c.ctgry_id
+	        WHERE 
+	            p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            and c.CTGRY_ID='ctg03'
+	    )
+	    PIVOT (
+	        SUM("주문금액")
+	        FOR "카테고리명" IN ('머그컵' AS 머그컵, '텀블러' AS 텀블러, '플래너' AS 플래너)
+	    )
+	)
+	ORDER BY "날짜"
+	</select>
+	
+	<!-- 4) 상품 카테고리 중 최다 판매  메뉴 1개    -->	
+	<select id="goodsTopSales" parameterType="hashMap" resultType="hashMap">
+		select *
+		from(
+			select 
+				m.menu_nm as "메뉴" ,sum(pd.pynm_cnt) as "판매갯수"
+			from 
+				payment p, payment_detail pd, menu m, ctgry_detail cd, ctgry c
+			where 
+				p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				and   p.pynm_no = pd.pynm_no(+)
+				and   pd.menu_no = m.menu_no
+				and   m.ctgry_detail_id = cd.ctgry_detail_id
+				and  cd.ctgry_id = c.ctgry_id
+				and  c.ctgry_id='ctg03'
+			group by m.menu_nm
+			order by "판매갯수" desc)
+		where rownum = 1
+	</select>
+	
+	
+	<!-- 지역분석의 전체 가맹점 매출 list -->
+	<select id="regionList" parameterType="hashMap" resultType="hashMap">
+	
+		SELECT 
+		    fn_region(frcs_region_cd) AS region_name,
+		    NVL(SUM(pd.menu_price * pd.pynm_cnt),0) AS total_price
+		FROM 
+		    franchise f
+		LEFT JOIN 
+		    payment p ON f.frcs_no = p.frcs_no
+		LEFT JOIN 
+		    payment_detail pd ON p.pynm_no = pd.pynm_no AND p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		GROUP BY rollup(fn_region(frcs_region_cd))
+		order by GROUPING(fn_region(frcs_region_cd)) DESC, total_price DESC
+		
+	</select>
+	
+	<!-- 지역분석의 해당지역의 월별 매출  -->
+	<select id="regionSales" parameterType="hashMap" resultType="hashMap">
+		SELECT 
+		    TO_CHAR(p.pynm_dt, 'yyyy-mm') AS payment_month,
+		    NVL(SUM(pd.menu_price * pd.pynm_cnt), 0) AS total_price
+		FROM 
+		    franchise f
+		LEFT JOIN 
+		    payment p ON f.frcs_no = p.frcs_no
+		LEFT JOIN 
+		    payment_detail pd ON p.pynm_no = pd.pynm_no
+		WHERE 
+		    f.FRCS_REGION_CD = FN_REGION_CODE(#{region})
+		    AND p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		GROUP BY 
+		    TO_CHAR(p.pynm_dt, 'yyyy-mm')
+		ORDER BY 
+		    payment_month
+	</select>
+	
+	<!-- 지역분석의 해당지역의 가맹점 목록 -->
+	<select id="regionFrcsList" parameterType="hashMap" resultType="hashMap">
+	SELECT 
+	    frcs_nm, 
+	    total_price
+	FROM (
+	    SELECT 
+	        f.frcs_nm AS frcs_nm,
+	        NVL(SUM(pd.menu_price * pd.pynm_cnt), 0) AS total_price
+	    FROM 
+	        franchise f
+	    LEFT JOIN 
+	        payment p ON f.frcs_no = p.frcs_no  
+	        AND p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	    LEFT JOIN 
+	        payment_detail pd ON p.pynm_no = pd.pynm_no
+	    WHERE 
+	        f.FRCS_REGION_CD = FN_REGION_CODE(#{region})
+	    GROUP BY 
+	        ROLLUP(f.frcs_nm)
+	) 
+	ORDER BY 
+	    CASE WHEN frcs_nm IS NULL THEN 1 ELSE 0 END, 
+	    total_price DESC
+	</select>
+	
+	<!-- 지역분석의 해당지역의 판매순 메뉴 TOP10 -->
+	<select id="regionMenuTop10" parameterType="hashMap" resultType="hashMap">
+		select cd.ctgry_detail_nm, m.menu_nm ,nvl(sum(pd.pynm_cnt),0) as cnt, NVL(SUM(pd.menu_price * pd.pynm_cnt), 0) AS total_price
+		FROM 
+	        franchise f
+	    LEFT JOIN 
+	        payment p ON f.frcs_no = p.frcs_no AND p.pynm_dt BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	    LEFT JOIN 
+	        payment_detail pd ON p.pynm_no = pd.pynm_no
+	    JOIN
+	        menu m on pd.menu_no = m.menu_no
+	    JOIN 
+	        ctgry_detail cd on m.ctgry_detail_id = cd.ctgry_detail_id
+	    WHERE 
+	        f.FRCS_REGION_CD = FN_REGION_CODE(#{region})
+	    group by 
+	    	rollup(cd.ctgry_detail_nm, m.menu_nm)
+	    HAVING 
+		    GROUPING(m.menu_nm) = 0 OR
+		    (GROUPING(cd.ctgry_detail_nm) = 1 AND GROUPING(m.menu_nm) = 1)
+	    order by 
+	    	CASE WHEN m.menu_nm IS NULL THEN 1 ELSE 0 END, 
+	    cnt desc
+	</select>
+	
+	<select id="menuSalesTop10" parameterType="hashMap" resultType="hashMap">
+			select *
+		from(
+		SELECT
+		    m.menu_no,
+		    m.menu_nm,
+		SUM(CASE WHEN TO_CHAR(p.pynm_dt, 'YYYY-MM') = #{endDate} THEN pd.pynm_cnt ELSE 0 END) AS sales
+		FROM menu m
+		LEFT JOIN payment_detail pd ON m.menu_no = pd.menu_no
+		LEFT JOIN payment p ON pd.pynm_no = p.pynm_no
+		GROUP BY m.menu_no, m.menu_nm
+		order by sales desc
+		) where rownum &lt; 11
+	</select>
+	
+	<select id="menuSalesMp" parameterType="hashMap" resultType="hashMap">
+		SELECT
+    m.menu_no,
+    m.menu_nm,
+    SUM(CASE WHEN TO_CHAR(p.pynm_dt, 'YYYY-MM') = #{startDate} THEN pd.pynm_cnt ELSE 0 END) AS sales_2023,
+    SUM(CASE WHEN TO_CHAR(p.pynm_dt, 'YYYY-MM') = #{endDate} THEN pd.pynm_cnt ELSE 0 END) AS sales_2024,
+    (SUM(CASE WHEN TO_CHAR(p.pynm_dt, 'YYYY-MM') = #{endDate} THEN pd.pynm_cnt ELSE 0 END) - 
+     SUM(CASE WHEN TO_CHAR(p.pynm_dt, 'YYYY-MM') = #{startDate} THEN pd.pynm_cnt ELSE 0 END)) AS sales_difference
+	FROM menu m
+	LEFT JOIN payment_detail pd ON m.menu_no = pd.menu_no
+	LEFT JOIN payment p ON pd.pynm_no = p.pynm_no
+	GROUP BY m.menu_no, m.menu_nm
+	ORDER BY sales_difference DESC
+		
+	</select>
+	
+	<!-- 메인 페이지의 년도별 data-->
+	<select id="yearData" resultType="hashMap">
+		WITH sales_data AS (
+		    SELECT EXTRACT(YEAR FROM TO_DATE(RY_CLM_YM, 'YYYY-MM')) AS year, SUM(ry_total_amt) as sales
+		    FROM royalty
+		    GROUP BY EXTRACT(YEAR FROM TO_DATE(RY_CLM_YM, 'YYYY-MM'))
+		),
+		order_data AS (
+		    SELECT TO_CHAR(hq_order_dt, 'yyyy') as year, SUM(hq_order_total_amt) as totalOrder
+		    FROM hq_order
+		    GROUP BY TO_CHAR(hq_order_dt, 'yyyy')
+		),
+		salary_total AS (
+		    SELECT SUM(hq_emp_sal) as salary
+		    FROM hq_employee
+		)
+		SELECT s.year, s.sales, o.totalOrder, m.salary
+		FROM sales_data s
+		JOIN order_data o ON s.year = o.year,
+		salary_total m
+		
+	</select>
+	
+	<select id="sales" resultType="hashMap">
+		select 
+		sum(RY_FRCS_FEE_AMT) as "가맹비",sum(RY_ROYALTY_AMT) as "로얄티"
+		, sum(RY_ORDER_AMT) as "제품 판매비", sum(ry_ovrint_amt) as "연체 이자"
+		from royalty
+	</select>
+	
+	<select id="monthData" resultType="hashMap">
+		WITH a AS 
+			(
+			    SELECT TO_DATE(ry_clm_ym, 'yyyy-mm') AS month, SUM(RY_FRCS_FEE_AMT) AS fee, SUM(RY_ROYALTY_AMT) AS royal, SUM(RY_ORDER_AMT) AS orderAmt, SUM(ry_ovrint_amt) AS ovrint
+			    FROM royalty
+			    GROUP BY TO_DATE(ry_clm_ym, 'yyyy-mm')
+			), 
+			b AS (
+			    SELECT TO_CHAR(hq_order_dt, 'yyyy-mm') AS year, SUM(hq_order_total_amt) AS totalOrder
+			    FROM hq_order
+			    GROUP BY TO_CHAR(hq_order_dt, 'yyyy-mm')
+			), 
+			c AS (
+			    SELECT ROUND((SUM(hq_emp_sal)) / 12, -2) AS salary
+			    FROM hq_employee
+			)
+		SELECT a.month, a.fee, a.royal, a.orderAmt, a.ovrint, nvl(b.totalOrder,0) as total, c.salary
+		FROM a
+		LEFT JOIN b ON TO_CHAR(a.month, 'yyyy-mm') = b.year, c
+		order by a.month
+	</select>
+	
+	<select id="mainMonthSales" resultType="hashMap">
+		SELECT 
+		    EXTRACT(YEAR FROM TO_DATE(ry_clm_ym, 'yyyy-mm')) AS year, 
+		    SUM(RY_FRCS_FEE_AMT) AS "가맹비", 
+		    SUM(RY_ROYALTY_AMT) AS "로얄티", 
+		    SUM(RY_ORDER_AMT) AS "제품 판매비", 
+		    SUM(ry_ovrint_amt) AS "연체 이자"
+		FROM 
+		    royalty
+		GROUP BY 
+		    EXTRACT(YEAR FROM TO_DATE(ry_clm_ym, 'yyyy-mm'))
+	</select>
+
+</mapper>

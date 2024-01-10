@@ -1,0 +1,82 @@
+/* 일반회원 마이페이지를 위한 css파일 */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Poppins&family=Roboto&display=swap");
+
+.myPageSidebar{
+    margin-right: auto;
+}
+/* 페이지 전체 div 감싸는 네모 */
+.myPageContainer{
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 10px 0px;
+    border: 1px solid rgb(200, 205, 224);
+    background-color: rgb(255, 255, 255);
+    width: 70vh;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-left: auto;
+	font-family: 'Noto Sans KR', sans-serif;
+    font-style: normal;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 내 정보 글씨 , 사이드바 마이 페이지 글씨*/
+.mb-0{
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: bold;
+	font-size: 24px;
+}
+
+/* 각 항목들 글씨 */
+.secondText, .form-label{
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+/* 각 항목들 옆에 ()소괄호 더 작은 글씨 */
+.thirdSpanText{
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: bold;
+	font-size: 14px;
+	color: navy;
+}
+
+/* 비밀번호 변경 버튼 사이즈 조절 */
+#pswdbtn, #telbtn, #birthbtn{
+	height: 85%;
+	margin-bottom: 5px;
+}
+
+/* input type text인 부분들 */
+.inputText, .form-control{
+    box-sizing: border-box;
+    align-items: center;
+    border-radius: 5px;
+    border-color: lightgray;
+    opacity: 0.5;
+    width: 80%;
+    height: 3vh;
+    border: 1px solid rgb(204, 207, 222);
+    background-color: rgb(249, 250, 251);
+    transition: box-shadow 0.2s ease-in-out 0s;
+    box-shadow: rgba(192, 204, 215, 0.4) 1px 1px 2px 0px inset;
+}
+
+/* 회원탈퇴 hover */
+.myPageDelete span:hover{
+	text-decoration: underline;
+    cursor: pointer;
+    color: red;
+}
+
+/* 수정 완료 버튼 */
+.myPageModify{
+    box-sizing: border-box;
+    color: rgb(255, 255, 255);
+    height: 70px;
+    border-radius: 10px;
+    text-align-last: center;
+}

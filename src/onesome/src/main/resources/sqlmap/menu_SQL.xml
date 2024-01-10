@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.menu.mapper.MenuMapper">
+	
+	<select id="getCtgryDetailNm" resultMap="ctgryDetailMap">
+		SELECT *
+		FROM CTGRY_DETAIL
+		WHERE CTGRY_DETAIL_NM = #{ctgryDetailNm}
+	</select>
+	
+    <update id="modifyMenu">
+        BEGIN
+            update MENU
+                set MENU_NM = #{menuNm},
+                    MENU_PRICE = #{menuPrice},
+                    MENU_DESCRIPTION = #{menuDescription},
+                    MENU_STRT_DT = #{menuStrtDt},
+                    MENU_END_DT = #{menuEndDt},
+                    CALORIES = #{calories},
+                    SUGAR = #{sugar},
+                    SODIUM = #{sodium},
+                    PROTEIN = #{protein},
+                    SATURATED_FAT = #{saturatedFat},
+                    CAFFEINE = #{caffeine},
+                    ATCH_FILE_NO = #{atchFileNo}
+                where MENU_NO = #{menuNo};
+
+        <if test="recipeVOList != null">
+            delete from RECIPE where MENU_NO=${menuNo};
+
+            insert all
+            <foreach collection="recipeVOList" item="recipeVO" close="SELECT * FROM DUAL;">
+                into RECIPE(menu_no, prdct_no, rec_qy) VALUES (#{menuNo},#{recipeVO.prdctNo},#{recipeVO.recQy})
+            </foreach>
+        </if>
+        end;
+    </update>
+
+    <delete id="deleteMenu">
+        BEGIN
+            delete from RECIPE where MENU_NO=${menuNo};
+            delete from MENU where MENU_NO=${menuNo};
+        end;
+    </delete>
+
+    <select id="adminMenuDetail" resultMap="menuMap">
+        select m.MENU_NO,
+               m.MENU_NM,
+               m.MENU_PRICE,
+               m.CTGRY_DETAIL_ID,
+               m.MENU_DESCRIPTION,
+               m.MENU_STRT_DT,
+               m.MENU_END_DT,
+               m.CALORIES,
+               m.SUGAR,
+               m.SODIUM,
+               m.PROTEIN,
+               m.SATURATED_FAT,
+               m.CAFFEINE,
+               m.ATCH_FILE_NO,
+               r.PRDCT_NO,
+               r.REC_QY,
+               af.STRE_FILE_NM,
+               (select PRDCT_CLSF_CD
+                from PRODUCT
+                where PRDCT_NO=r.PRDCT_NO) as PRDCT_CLSF_CD
+        from MENU m, RECIPE r, ATCH_FILE af
+        where m.MENU_NO = r.MENU_NO(+)
+          and m.ATCH_FILE_NO = af.ATCH_FILE_NO
+          and m.MENU_NO = #{menuNo}
+    </select>
+
+    <insert id="menuRegistration" parameterType="kr.or.onesome.menu.vo.MenuVO">
+        <selectKey resultType="int" order="BEFORE" keyProperty="menuNo">
+            select MENU_SEQ.nextval from DUAL
+        </selectKey>
+
+        insert ALL
+            into MENU (MENU_NO,
+                      MENU_NM,
+                      MENU_PRICE,
+                      CTGRY_DETAIL_ID,
+                      MENU_DESCRIPTION,
+                      MENU_STRT_DT,
+                      MENU_END_DT,
+                      CALORIES,
+                      SUGAR,
+                      SODIUM,
+                      PROTEIN,
+                      SATURATED_FAT,
+                      CAFFEINE,
+                      ATCH_FILE_NO)
+                values (#{menuNo},
+                        #{menuNm},
+                        #{menuPrice},
+                        #{ctgryDetailId},
+                        #{menuDescription},
+                        #{menuStrtDt},
+                        #{menuEndDt},
+                        #{calories},
+                        #{sugar},
+                        #{sodium},
+                        #{protein},
+                        #{saturatedFat},
+                        #{caffeine},
+                        #{atchFileNo})
+
+        <foreach collection="recipeVOList" item="recipeVO" close="SELECT * FROM DUAL">
+            into RECIPE(menu_no, prdct_no, rec_qy) VALUES (#{menuNo},#{recipeVO.prdctNo},#{recipeVO.recQy})
+        </foreach>
+    </insert>
+    
+    <select id="getProductList" resultType="kr.or.onesome.product.vo.ProductVO">
+        select *
+        from PRODUCT
+        order by PRDCT_NO
+    </select>
+
+    <select id="getCtgryDetailList" resultType="kr.or.onesome.vo.CtgryDetailVO">
+        select * from CTGRY_DETAIL
+    </select>
+
+    <select id="getCtgryList" resultType="kr.or.onesome.vo.CtgryVO">
+        select * from CTGRY
+    </select>
+
+    <select id="adminMenuList" resultMap="menuMap" parameterType="hashMap">
+        SELECT T.*
+        FROM (SELECT ROW_NUMBER() OVER (ORDER BY MENU_NO DESC) RNUM,
+                     MENU_NO,
+                     MENU_NM,
+                     MENU_PRICE,
+                     MENU_DESCRIPTION,
+                     MENU_STRT_DT,
+                     MENU_END_DT,
+                     CALORIES,
+                     SUGAR,
+                     SODIUM,
+                     PROTEIN,
+                     SATURATED_FAT,
+                     CAFFEINE,
+                     CTGRY_DETAIL_NM,
+                     STRE_FILE_NM
+              FROM MENU m,
+                   CTGRY_DETAIL ct,
+                   ATCH_FILE af
+              where m.CTGRY_DETAIL_ID = ct.CTGRY_DETAIL_ID
+                and m.ATCH_FILE_NO = af.ATCH_FILE_NO(+)
+                and m.MENU_NM LIKE '%' || #{keyword} || '%'
+             ) T
+        WHERE T.RNUM BETWEEN (#{currentPage} * 10) - (10 - 1) AND (#{currentPage} * 10)
+    </select>
+    <select id="getTotal" resultType="int" parameterType="hashMap">
+        select count(*) from MENU where MENU_NM LIKE '%' || #{keyword} || '%'
+    </select>
+
+    <resultMap id="menuMap" type="kr.or.onesome.menu.vo.MenuVO">
+        <result property="menuNo" column="MENU_NO"/>
+        <result property="menuNm" column="MENU_NM"/>
+        <result property="menuPrice" column="MENU_PRICE"/>
+        <result property="ctgryDetailId" column="CTGRY_DETAIL_ID"/>
+        <result property="menuDescription" column="MENU_DESCRIPTION"/>
+        <result property="menuStrtDt" column="MENU_STRT_DT"/>
+        <result property="menuEndDt" column="MENU_END_DT"/>
+        <result property="calories" column="CALORIES"/>
+        <result property="sugar" column="SUGAR"/>
+        <result property="sodium" column="SODIUM"/>
+        <result property="protein" column="PROTEIN"/>
+        <result property="saturatedFat" column="SATURATED_FAT"/>
+        <result property="caffeine" column="CAFFEINE"/>
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+
+        <association property="atchFileVO" resultMap="fileMap"/>
+        <association property="ctgryDetailVO" resultMap="ctgryDetailMap"/>
+        <collection property="recipeVOList" resultMap="recipeMap"/>
+    </resultMap>
+    <resultMap id="ctgryDetailMap" type="kr.or.onesome.vo.CtgryDetailVO">
+        <result property="ctgryDetailId" column="CTGRY_DETAIL_ID"/>
+        <result property="ctgryDetailNm" column="CTGRY_DETAIL_NM"/>
+        <result property="ctgryId" column="CTGRY_ID"/>
+    </resultMap>
+    <resultMap id="recipeMap" type="kr.or.onesome.vo.RecipeVO">
+        <result property="menuNo" column="MENU_NO"/>
+        <result property="prdctNo" column="PRDCT_NO"/>
+        <result property="recQy" column="REC_QY"/>
+        <result property="prdctClsfCd" column="PRDCT_CLSF_CD"/>
+    </resultMap>
+    <resultMap id="fileMap" type="kr.or.onesome.vo.AtchFileVO">
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+        <result property="fileSn" column="FILE_SN"/>
+        <result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+        <result property="fileStreCours" column="FILE_STRE_COURS"/>
+        <result property="streFileNm" column="STRE_FILE_NM"/>
+        <result property="fileThumYn" column="FILE_THUM_YN"/>
+        <result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+        <result property="fileExtsn" column="FILE_EXTSN"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+    </resultMap>
+</mapper>

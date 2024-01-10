@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.frcsorder.mapper.FrcsOrderMapper">
+
+    <insert id="frcsOrder" parameterType="kr.or.onesome.frcsorder.vo.FrcsOrderVO">
+        <selectKey resultType="int" order="BEFORE" keyProperty="frcsOrderNo">
+            SELECT
+                TO_CHAR(SYSDATE, 'yyMMdd') || NVL(TRIM(TO_CHAR(SUBSTR(MAX(FRCS_ORDER_NO), 7) + 1, '00')), '01')
+            FROM
+                FRCS_ORDER
+        </selectKey>
+        INSERT ALL
+        INTO FRCS_ORDER (FRCS_ORDER_NO, FRCS_NO, FRCS_ORDER_DT, FRCS_ORDER_ORDER_AMT, FRCS_ORDER_TYPE_CD)
+        VALUES(#{frcsOrderNo}, #{frcsNo}, sysdate, 0, 'FODST01')
+        <foreach collection="productCheckBox" item="prdtNo">
+            INTO FRCS_ORDER_DETAIL (FRCS_ORDER_NO, FRCS_NO, FRCS_ORDER_QY, FRCS_ORDER_COST, PRDCT_NO, PRDCT_NM)
+            VALUES(#{frcsOrderNo}, #{frcsNo}, 0, (SELECT PRDCT_RCVN_AMT FROM PRODUCT WHERE PRDCT_NO=#{prdtNo}), #{prdtNo}, (SELECT PRDCT_NM FROM PRODUCT WHERE PRDCT_NO=#{prdtNo}))
+        </foreach>
+        SELECT 1 FROM DUAL
+
+    </insert>
+
+    <resultMap id="frcsOrderMap" type="kr.or.onesome.frcsorder.vo.FrcsOrderVO">
+        <result property="frcsOrderNo" column="FRCS_ORDER_NO"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="frcsOrderDt" column="FRCS_ORDER_DT"/>
+        <result property="frcsOrderOrderAmt" column="FRCS_ORDER_ORDER_AMT"/>
+        <result property="frcsOrderTypeCd" column="FRCS_ORDER_TYPE_CD"/>
+
+        <collection property="frcsOrderDetailVOList" resultMap="frcsOrderDetailMap" />
+    </resultMap>
+
+    <resultMap id="frcsOrderDetailMap" type="kr.or.onesome.frcsorder.vo.FrcsOrderDetailVO">
+        <result property="frcsOrderNo" column="FRCS_ORDER_NO"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="frcsOrderQy" column="FRCS_ORDER_QY"/>
+        <result property="frcsOrderCost" column="FRCS_ORDER_COST"/>
+        <result property="prdctNo" column="PRDCT_NO"/>
+        <result property="prdctNm" column="PRDCT_NM"/>
+        <result property="prdctClsfCd" column="PRDCT_CLSF_CD"/>
+        <result property="prdctRcvnAmt" column="PRDCT_RCVN_AMT"/>
+
+        <association property="frcsInventoryVO" resultMap="frcsInventoryMap" />
+        <association property="comDetCodeInfoVO" resultMap="comDetCodeInfoMap" />
+    </resultMap>
+
+    <resultMap id="frcsInventoryMap" type="kr.or.onesome.frcsinventory.vo.FrcsInventoryVO">
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="prdctNo" column="PRDCT_NO"/>
+        <result property="frcsInvenCnt" column="FRCS_INVEN_CNT"/>
+        <result property="frcsInvenProperCnt" column="FRCS_INVEN_PROPER_CNT"/>
+        <result property="frcsLastInDt" column="FRCS_LAST_IN_DT"/>
+        <result property="frcsAutoOrderYn" column="FRCS_AUTO_ORDER_YN"/>
+        <result property="frcsAutoOrderCnt" column="FRCS_AUTO_ORDER_CNT"/>
+    </resultMap>
+
+    <resultMap id="comDetCodeInfoMap" type="kr.or.onesome.vo.ComDetCodeInfoVO">
+        <result property="comDetCode" column="COM_DET_CODE"/>
+        <result property="comCode" column="COM_CODE"/>
+        <result property="comDetCodeNm" column="COM_DET_CODE_NM"/>
+        <result property="comDetCodeRm" column="COM_DET_CODE_RM"/>
+    </resultMap>
+
+    <select id="frcsOrderDetailList" resultMap="frcsOrderMap">
+        SELECT
+            f.FRCS_ORDER_NO
+             , f.FRCS_ORDER_TYPE_CD
+             , f.FRCS_ORDER_ORDER_AMT
+             , a.FRCS_NO
+             , a.FRCS_ORDER_QY
+             , a.FRCS_ORDER_COST
+             , a.PRDCT_NO
+             , (
+            SELECT
+                P.PRDCT_CLSF_CD
+            FROM
+                PRODUCT P
+            WHERE
+                P.PRDCT_NO = a.PRDCT_NO) PRDCT_CLSF_CD
+             , (
+            SELECT
+                P.PRDCT_RCVN_AMT
+            FROM
+                PRODUCT P
+            WHERE
+                P.PRDCT_NO = a.PRDCT_NO) PRDCT_RCVN_AMT
+             , a.PRDCT_NM
+             , i.FRCS_INVEN_CNT
+             , i.FRCS_INVEN_PROPER_CNT
+             , i.FRCS_AUTO_ORDER_YN
+             , i.FRCS_AUTO_ORDER_CNT
+        FROM
+            FRCS_ORDER f
+                JOIN
+            FRCS_ORDER_DETAIL a ON
+                f.FRCS_ORDER_NO = a.FRCS_ORDER_NO
+                JOIN
+            FRCS_INVENTORY i ON
+                        a.PRDCT_NO = i.PRDCT_NO
+                    AND a.FRCS_NO = i.FRCS_NO
+        WHERE
+            f.FRCS_ORDER_NO = #{frcsOrderNo}
+    </select>
+
+    <select id="frcsOrderDetailLength" resultType="int" parameterType="kr.or.onesome.frcsorder.vo.FrcsOrderDetailVO">
+        SELECT COUNT(PRDCT_NO)
+        FROM FRCS_ORDER_DETAIL
+        WHERE FRCS_ORDER_NO = #{frcsOrderNo}
+    </select>
+
+    <delete id="deleteproduct" parameterType="kr.or.onesome.frcsorder.vo.FrcsOrderDetailVO">
+        DELETE
+        FROM
+            FRCS_ORDER_DETAIL
+        WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+          AND PRDCT_NO = #{prdctNo}
+    </delete>
+
+    <delete id="deleteFrcsOrder">
+        DELETE
+        FROM
+            FRCS_ORDER
+        WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+    </delete>
+
+    <delete id="cancelFrcsOrder">
+        DELETE
+        FROM
+            FRCS_ORDER_DETAIL
+        WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+    </delete>
+
+    <delete id="cancelFrcsOrderMaster">
+        DELETE
+        FROM
+            FRCS_ORDER
+        WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+    </delete>
+
+    <select id="frcsOrderList" resultType="kr.or.onesome.frcsorder.vo.FrcsOrderVO">
+        SELECT
+            FRCS_ORDER_NO
+             , FRCS_NO
+             , FRCS_ORDER_DT
+             , FRCS_ORDER_ORDER_AMT
+             , FRCS_ORDER_TYPE_CD
+        FROM
+            FRCS_ORDER
+        WHERE
+            FRCS_NO = #{crrFrcsNo}
+        ORDER BY FRCS_ORDER_NO DESC
+    </select>
+
+    <update id="updateFrcsDetailOrder">
+        <foreach collection="frcsOrderDetailVOList" item="frcsOrderDetail" open="DECLARE BEGIN" separator=";" close="; END;">
+            UPDATE
+            FRCS_ORDER_DETAIL
+            SET
+            FRCS_ORDER_QY = #{frcsOrderDetail.frcsOrderQy}
+            , FRCS_ORDER_COST = #{frcsOrderDetail.frcsOrderCost}
+            WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+            AND FRCS_NO = #{frcsNo}
+            AND PRDCT_NO = #{frcsOrderDetail.prdctNo}
+        </foreach>
+    </update>
+
+    <update id="updateFrcsOrder">
+        UPDATE
+            FRCS_ORDER
+        SET
+            FRCS_ORDER_DT = SYSDATE
+          , FRCS_ORDER_ORDER_AMT = #{frcsOrderOrderAmt}
+        WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+          AND FRCS_NO = #{frcsNo}
+    </update>
+
+    <select id="displayFrcsOrderInvoice" resultMap="frcsOrderMap">
+        SELECT
+            f.FRCS_ORDER_NO
+             , f.FRCS_ORDER_DT
+             , f.FRCS_ORDER_ORDER_AMT
+             , f.FRCS_ORDER_TYPE_CD
+             , a.FRCS_NO
+             , a.FRCS_ORDER_QY
+             , a.FRCS_ORDER_COST
+             , a.PRDCT_NO
+             , FN_GET_CODE_NM((
+            SELECT
+                P.PRDCT_CLSF_CD
+            FROM
+                PRODUCT P
+            WHERE
+                P.PRDCT_NO = a.PRDCT_NO)) PRDCT_CLSF_CD
+             , (
+            SELECT
+                P.PRDCT_RCVN_AMT
+            FROM
+                PRODUCT P
+            WHERE
+                P.PRDCT_NO = a.PRDCT_NO) PRDCT_RCVN_AMT
+             , a.PRDCT_NM
+             , i.FRCS_INVEN_CNT
+             , i.FRCS_INVEN_PROPER_CNT
+             , i.FRCS_AUTO_ORDER_YN
+             , i.FRCS_AUTO_ORDER_CNT
+        FROM
+            FRCS_ORDER f
+                JOIN
+            FRCS_ORDER_DETAIL a ON
+                f.FRCS_ORDER_NO = a.FRCS_ORDER_NO
+                JOIN
+            FRCS_INVENTORY i ON
+                        a.PRDCT_NO = i.PRDCT_NO
+                    AND a.FRCS_NO = i.FRCS_NO
+        WHERE
+            f.FRCS_ORDER_NO = #{frcsOrderNo}
+    </select>
+
+    <select id="franchiseInfo" resultType="kr.or.onesome.vo.FranchiseVO">
+        SELECT
+            FRCS_NO
+             , FRCS_NM
+             , FRCS_POST_NO
+             , FRCS_ADDR
+             , FRCS_DTL_ADDR
+             , FRCS_TEL
+        FROM
+            FRANCHISE
+        WHERE
+            FRCS_NO = #{frcsNo}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.ojt.mapper.OjtMapper">
+	<select id="getOjtNo" resultType="int">
+		select OJT_SEQ.nextval from DUAL
+	</select>
+	
+	<insert id="insert" parameterType="hashMap">
+	 <selectKey resultType="int" order="BEFORE" keyProperty="ojtSn">
+	 	select nvl(max(OJT_SN), 0)+1 from OJT where OJT_NO = #{ojtNo}
+	 </selectKey>
+		INSERT INTO OJT (
+		    OJT_NO,
+		    OJT_SN,
+		    OJT_STR_TIME,
+		    OJT_END_TIME,
+		    OJT_TYPE
+		) VALUES (
+		    #{ojtNo},
+		    #{ojtSn},
+		    TO_CHAR(TO_DATE(#{start}, 'YY-MM-DD') + INTERVAL '1' DAY, 'YYYY-MM-DD'),
+		    TO_CHAR(TO_DATE(#{end}, 'YY-MM-DD') + INTERVAL '1' DAY, 'YYYY-MM-DD'),
+		    #{ojtType}
+		)
+	</insert>
+	
+	<update id="update" parameterType="hashMap">
+		UPDATE
+			OJT
+		SET 
+			OJT_STR_TIME = TO_CHAR(TO_DATE(#{start}, 'YY-MM-DD') + INTERVAL '1' DAY, 'YYYY-MM-DD'),
+		    OJT_END_TIME = TO_CHAR(TO_DATE(#{end}, 'YY-MM-DD') + INTERVAL '1' DAY, 'YYYY-MM-DD')
+		WHERE 
+			OJT_NO = #{ojtNo}
+	</update>
+
+	<update id="reset" parameterType="hashMap">
+		UPDATE
+			OJT
+		SET 
+			OJT_STR_TIME = #{start},
+		    OJT_END_TIME = #{end}
+		WHERE 
+			OJT_NO = #{ojtNo}
+	</update>
+</mapper>

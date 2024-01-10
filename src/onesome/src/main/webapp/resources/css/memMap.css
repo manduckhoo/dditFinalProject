@@ -1,0 +1,272 @@
+@import
+	url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Roboto&display=swap")
+	;
+
+/* 지도 표시 */
+#map{
+	 width:70%;
+	 height:70%;
+	 position:relative;
+	 overflow:hidden;
+	 margin : 100px 400px;
+	 border: 1px solid #e2e2e2;
+	 border-radius: 10px;
+}
+
+/* 키워드 검색 창 */
+.map_wrap {
+	position: relative;
+	width: 100%;
+	height: 1080px;
+}
+
+/* 키워드 검색 창 글씨체 */
+.map_wrap, .map_wrap * {
+	margin: 0;
+	padding: 0;
+	font-family: 'Noto Sans KR', sans-serif;
+	font-size: 12px;
+}
+
+.map_wrap a, .map_wrap a:hover, .map_wrap a:active {
+	color: #000;
+	text-decoration: none;
+}
+
+#menu_wrap {
+	position: absolute;
+	top: -24px;
+	left: 0;
+	bottom: 0;
+	z-index: 1;
+	font-size: 15px;
+	border-radius: 10px;
+	/* 재람 수정,추가함요*/
+    height: 70%;
+	background: rgba(255, 255, 255, 100%);
+	width: 20%;
+    border: 1px solid #e2e2e2;
+    overflow: hidden;
+    margin: 24px 0 0px 16px;
+}
+.store_info {
+	overflow-y: auto;
+    height: 83%;
+    padding: 8px 16px;
+}
+
+div.item_box div.item_title {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+ul.item_list li {
+    padding: 10px 0px;
+    border-bottom: 1px solid #dedede;
+    cursor: pointer;
+}
+.item_box {
+    padding: 0px 8px;
+}
+div.item_box div.item_title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+.item_box .item_address, .item_phone_number {
+	color: #999;
+    font-size: 15px;
+}
+
+#menu_wrap .option {
+	/* text-align: center; */
+	background-color: #333;
+	padding: 16px;
+	border-radius: 10px 10px 0px 0;
+	margin-bottom: 3px;
+}
+/* 스크롤바 전체?? 바디?? */
+.store_info::-webkit-scrollbar {
+	width: 4px;
+}
+
+/* 스크롤바 막대 */
+.store_info::-webkit-scrollbar-thumb {
+	background-color:#000;
+	border-radius: 100px;
+}
+
+/* 스크롤바 배경 */
+.store_info::-webkit-scrollbar-track {
+	background-color: #fff;
+}
+
+#menu_wrap .option form {
+	display: flex;
+}
+
+#menu_wrap .option p {
+	color: #fff;
+	margin: 10px 0;/* ?? */
+	font-size:27px;
+}
+
+#menu_wrap .option .search_keyword {
+    height: 35px;
+    padding-left: 10px;
+    font-size: 14px;
+    width: 72%;
+}
+
+#menu_wrap .option button {
+	margin-left: 5px;
+    height: 35px;
+    background: #000;
+    color: #fff;
+    font-size: 14px;
+    border: 1px solid #fff;
+    padding: 0px 8px;
+    width: 70px;
+}
+
+#placesList li {
+	list-style: none;
+}
+
+#placesList .item {
+	position: relative;
+	overflow: hidden;
+	cursor: pointer;
+	min-height: 65px;
+}
+
+#placesList .item span {
+	display: block;
+	margin-top: 4px;
+}
+
+#placesList .item h5, #placesList .item .info {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+#placesList .item .info {
+	padding: 10px 0 10px 55px;
+}
+
+#placesList .info .gray {
+	color: #8a8a8a;
+}
+
+#placesList .info .jibun {
+	padding-left: 26px;
+	background:
+		url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png)
+		no-repeat;
+}
+
+#placesList .info .tel {
+	color: #009900;
+}
+
+#placesList .item .markerbg {
+	float: left;
+	position: absolute;
+	width: 36px;
+	height: 37px;
+	margin: 10px 0 0 10px;
+	background:
+		url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png)
+		no-repeat;
+}
+
+/* 표시할 장소 리스트들 */
+#placesList .item .marker_1 {
+	background-position: 0 -10px;
+}
+
+#placesList .item .marker_2 {
+	background-position: 0 -56px;
+}
+
+#placesList .item .marker_3 {
+	background-position: 0 -102px
+}
+
+#placesList .item .marker_4 {
+	background-position: 0 -148px;
+}
+
+#placesList .item .marker_5 {
+	background-position: 0 -194px;
+}
+
+#placesList .item .marker_6 {
+	background-position: 0 -240px;
+}
+
+#placesList .item .marker_7 {
+	background-position: 0 -286px;
+}
+
+#placesList .item .marker_8 {
+	background-position: 0 -332px;
+}
+
+#placesList .item .marker_9 {
+	background-position: 0 -378px;
+}
+
+#placesList .item .marker_10 {
+	background-position: 0 -423px;
+}
+
+#placesList .item .marker_11 {
+	background-position: 0 -470px;
+}
+
+#placesList .item .marker_12 {
+	background-position: 0 -516px;
+}
+
+#placesList .item .marker_13 {
+	background-position: 0 -562px;
+}
+
+#placesList .item .marker_14 {
+	background-position: 0 -608px;
+}
+
+#placesList .item .marker_15 {
+	background-position: 0 -654px;
+}
+
+/* 표시할 페이지네이션 */
+#pagination {
+	font-size: 14px;
+    margin: 20px auto;
+    text-align: center;
+    height: 18px;
+}
+#pagination ul li {
+	list-style: none;
+	margin-right: 16px;
+    display: inline-block;
+}
+
+#pagination ul li:hover {
+	font-weight: bold;
+	border-bottom: 2px solid #d50037;
+}
+
+#pagination a {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+#pagination .on {
+	font-weight: bold;
+	cursor: default;
+	color: #777;
+}

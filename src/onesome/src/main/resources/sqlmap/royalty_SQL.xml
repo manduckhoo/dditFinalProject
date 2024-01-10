@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.royalty.mapper.RoyaltyMapper">
+    
+    <select id="getNotClosedFrcsNo" resultType="int">
+        select FRCS_NO from FRANCHISE where FRCS_STS_CD != 'FRST04'
+    </select>
+
+    <select id="adminRoyaltyList" resultType="kr.or.onesome.royalty.vo.RoyaltyVO">
+        select r.RY_CLM_YM,
+               r.FRCS_NO,
+               r.RY_TOTAL_AMT,
+               r.RY_STATUS_YN,
+               r.RY_PAY_DT,
+               r.RY_FRCS_FEE_AMT,
+               r.RY_ORDER_AMT,
+               r.RY_NPMNT_AMT,
+               r.RY_OVRINT_AMT,
+               r.RY_ROYALTY_AMT,
+               f.FRCS_NM,
+               (select count(*) from ROYALTY where FRCS_NO = r.FRCS_NO and RY_NPMNT_AMT > 0) as accNpmntCnt
+        from ROYALTY r, FRANCHISE f
+        where r.FRCS_NO = f.FRCS_NO
+          and r.RY_CLM_YM = #{viewDate}
+    </select>
+
+    <select id="royaltyPayment" parameterType="hashMap" statementType="CALLABLE">
+        {
+            call ROYALTYPAYMENT(#{crrFrcsNo}, #{viewDate})
+        }
+    </select>
+
+    <select id="getNpmntDetail" parameterType="hashMap" resultType="kr.or.onesome.util.LowerKeyMap">
+        select
+            RY_CLM_YM as YM,
+            (RY_FRCS_FEE_AMT + RY_ORDER_AMT+ RY_OVRINT_AMT + RY_ROYALTY_AMT) as TOTAL,
+            RY_STATUS_YN as STATUS
+        from ROYALTY
+        where FRCS_NO = #{crrFrcsNo}
+        and RY_CLM_YM <![CDATA[<]]> #{viewDate}
+        and (RY_STATUS_YN = 'N' or RY_PAY_DT > TO_DATE('2023-12'|| '-15'))
+        order by RY_CLM_YM desc
+    </select>
+
+    <select id="getOrderDetail" parameterType="hashMap" resultType="kr.or.onesome.util.LowerKeyMap">
+        select
+            fod.PRDCT_NM as name,
+            sum(fod.FRCS_ORDER_QY) as qty,
+            sum(fod.FRCS_ORDER_COST) as price
+        from FRCS_ORDER fo,
+             FRCS_ORDER_DETAIL fod,
+             PRODUCT p
+        where fo.FRCS_ORDER_NO = fod.FRCS_ORDER_NO(+)
+          and fo.FRCS_NO = fod.FRCS_NO(+)
+          and fod.PRDCT_NO = p.PRDCT_NO
+          and fo.FRCS_ORDER_TYPE_CD = 'FODST02'
+          and fo.FRCS_NO = #{crrFrcsNo}
+          and TO_CHAR(fo.FRCS_ORDER_DT, 'yyyy-MM') = #{viewDate}
+        group by fod.PRDCT_NM
+    </select>
+
+    <select id="getRoyaltyDetail" parameterType="hashMap" resultType="kr.or.onesome.util.LowerKeyMap">
+        select
+            nvl(sum(PYNM_TOTAL_AMT),0) as pynmTotal,
+            nvl(sum(PYNM_TOTAL_AMT)*0.03,0) as royalty
+        from PAYMENT
+        where FRCS_NO = #{crrFrcsNo}
+          and TO_CHAR(PYNM_DT, 'yyyy-MM') = #{viewDate}
+    </select>
+
+    <select id="getRoyaltyByFrcsAndDate" parameterType="hashMap" resultType="kr.or.onesome.royalty.vo.RoyaltyVO">
+        select *
+        from ROYALTY where FRCS_NO = #{crrFrcsNo} and RY_CLM_YM = #{viewDate}
+    </select>
+
+    <select id="settingRoyalty" parameterType="hashMap" statementType="CALLABLE">
+        {
+            call SET_ROYALTY(#{crrFrcsNo}, #{viewDate})
+        }
+    </select>
+</mapper>

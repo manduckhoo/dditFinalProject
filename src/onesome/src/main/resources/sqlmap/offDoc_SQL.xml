@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="kr.or.onesome.offDoc.mapper.OffDocMapper">
+
+	<!-- 공문 작성-->
+	<insert id="offDocCreate" parameterType="OffDocVO">
+		<selectKey resultType="int" order="BEFORE"
+			keyProperty="offDocNo">
+			SELECT OFFICIAL_DOCUMENT_SEQ.NEXTVAL AS OFF_DOC_NO FROM DUAL
+		</selectKey>
+		INSERT INTO OFFICIAL_DOCUMENT (
+			  OFF_DOC_NO
+			, OFF_DOC_FROM
+			, OFF_DOC_TO
+			, OFF_DOC_TITLE
+			, OFF_DOC_CONTS
+			, OFF_DOC_FWD_DT
+			) VALUES (
+			  #{offDocNo}
+			, #{offDocFrom}
+			, #{offDocTo}
+			, #{offDocTitle}
+			, #{offDocConts}
+			, SYSDATE
+			)
+	</insert>
+	
+	<!-- 공문 발송 리스트 -->
+	<select id="offDocList" resultType="offDocVO">
+		SELECT
+	    A.ADMIN_NM AS OFF_DOC_FROM_NM,
+	    OD.OFF_DOC_NO,
+	    OD.OFF_DOC_FROM,
+	    F.FRCS_NM AS OFF_DOC_TO_NM,
+	    OD.OFF_DOC_TITLE,
+	    OD.OFF_DOC_CONTS,
+	    OD.OFF_DOC_FWD_DT,
+	    OD.OFF_DOC_REC_DT,
+	    OD.OFF_DOC_STATUS_YN
+	    FROM OFFICIAL_DOCUMENT OD
+	    JOIN ADMIN A ON A.ADMIN_NO = OD.OFF_DOC_FROM
+	    LEFT JOIN FRANCHISE F ON TO_NUMBER(OD.OFF_DOC_TO) = TO_NUMBER(F.FRCS_NO)
+	    ORDER BY OD.OFF_DOC_FWD_DT DESC
+	</select>
+	
+	<!-- 공문 수신 -->
+	<select id="ReceivedOffDocList" resultType="offDocVO">
+		select * 
+		from official_document
+		where OFF_DOC_TO = #{offDocTo}
+		ORDER BY OFF_DOC_FWD_DT DESC
+	</select>
+	
+	<!-- 공문 수신 디테일 -->
+	<select id="offDocToDetail" resultType="offDocVO">
+		SELECT *
+		FROM official_document
+		WHERE OFF_DOC_NO = #{offDocNo}
+	</select>
+
+	<!-- 공문(발신) 디테일 -->
+	<select id="offDocFromDetail" resultType="offDocVO">
+		SELECT OD.OFF_DOC_NO
+			, OD.OFF_DOC_FROM
+			, OD.OFF_DOC_TO
+			, OD.OFF_DOC_TITLE
+			, OD.OFF_DOC_CONTS
+			, OD.OFF_DOC_FWD_DT
+			, OD.OFF_DOC_REC_DT
+			, OD.OFF_DOC_STATUS_YN
+			, F.FRCS_NM AS OFF_DOC_TO_NM
+		FROM official_document OD
+		LEFT JOIN FRANCHISE F ON TO_NUMBER(OD.OFF_DOC_TO) = TO_NUMBER(F.FRCS_NO)
+		WHERE OD.OFF_DOC_NO = #{offDocNo}
+	</select>
+
+
+	<!-- 공문 수신 디테일 확인 후 상태 변화 -->
+	<update id="offDocStatusChange" parameterType="int">
+		UPDATE OFFICIAL_DOCUMENT
+		SET
+			OFF_DOC_STATUS_YN = 'Y'
+		WHERE
+			OFF_DOC_NO = #{offDocNo}
+	</update>
+
+</mapper>
+
+
+

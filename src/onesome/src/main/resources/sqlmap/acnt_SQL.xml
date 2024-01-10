@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.acnt.mapper.AcntMapper">
+
+    <select id="acntList" resultType="acntVO">
+        SELECT
+            ACNT_NO
+             , ACNT_NM
+             , ACNT_TEL
+             , ACNT_ZIP
+             , ACNT_ADDR
+             , ACNT_DTL_ADDR
+             , ACNT_MNGR_PSTN
+             , ACNT_MNGR_NM
+             , ACNT_EMAIL
+             , ACNT_CLSF_CD
+        FROM
+            ACNT
+    </select>
+    
+    <resultMap id="acntMap" type="acntVO">
+        <result property="acntNo" column="ACNT_NO"/>
+        <result property="acntNm" column="ACNT_NM"/>
+        <result property="acntTel" column="ACNT_TEL"/>
+        <result property="acntZip" column="ACNT_ZIP"/>
+        <result property="acntAddr" column="ACNT_ADDR"/>
+        <result property="acntDtlAddr" column="ACNT_DTL_ADDR"/>
+        <result property="acntMngrPstn" column="ACNT_MNGR_PSTN"/>
+        <result property="acntMngrNm" column="ACNT_MNGR_NM"/>
+        <result property="acntEmail" column="ACNT_EMAIL"/>
+        <result property="acntClsfCd" column="ACNT_CLSF_CD"/>
+
+        <association property="comDetCodeInfoVO" resultMap="comDetCodeInfoMap" />
+     </resultMap>
+
+    <resultMap id="comDetCodeInfoMap" type="comDetCodeInfoVO">
+        <result property="comDetCode" column="COM_DET_CODE"/>
+        <result property="comCode" column="COM_CODE"/>
+        <result property="comDetCodeNm" column="COM_DET_CODE_NM"/>
+        <result property="comDetCodeRm" column="COM_DET_CODE_RM"/>
+    </resultMap>
+
+    <select id="selectAjax" parameterType="HashMap" resultMap="acntMap">
+        SELECT
+            a.*
+             , b.COM_DET_CODE_NM
+        FROM
+            ACNT a
+           , COM_DET_CODE_INFO b
+        WHERE
+            a.ACNT_CLSF_CD = b.COM_DET_CODE
+          AND a.ACNT_NO = #{acntNo}
+    </select>
+
+    <select id="searchAjax" parameterType="HashMap" resultType="acntVO">
+        SELECT
+            ACNT_NO
+             , ACNT_NM
+             , ACNT_TEL
+             , ACNT_ZIP
+             , ACNT_ADDR
+             , ACNT_DTL_ADDR
+             , ACNT_MNGR_PSTN
+             , ACNT_MNGR_NM
+             , ACNT_EMAIL
+             , ACNT_CLSF_CD
+        FROM
+            ACNT
+        WHERE
+            ACNT_NM LIKE '%' || #{keyword} || '%'
+    </select>
+
+    <insert id="createAcnt" parameterType="acntVO">
+        INSERT
+        INTO
+            ACNT
+        (ACNT_NO
+        , ACNT_NM
+        , ACNT_TEL
+        , ACNT_ZIP
+        , ACNT_ADDR
+        , ACNT_DTL_ADDR
+        , ACNT_MNGR_PSTN
+        , ACNT_MNGR_NM
+        , ACNT_EMAIL
+        , ACNT_CLSF_CD)
+        VALUES(ACNT_SEQ.nextVal
+              , #{acntNm}
+              , #{acntTel}
+              , #{acntZip}
+              , #{acntAddr}
+              , #{acntDtlAddr}
+              , #{acntMngrPstn}
+              , #{acntMngrNm}
+              , #{acntEmail}
+              , #{acntClsfCd})
+    </insert>
+
+    <delete id="deleteAcnt" parameterType="acntVO">
+        DELETE
+        FROM
+            ACNT
+        WHERE
+            ACNT_NO = #{acntNo}
+    </delete>
+
+    <update id="modifyAcnt" parameterType="acntVO">
+        UPDATE
+            ACNT
+        SET
+            ACNT_NM = #{acntNm}
+          , ACNT_TEL = #{acntTel}
+          , ACNT_ZIP = #{acntZip}
+          , ACNT_ADDR = #{acntAddr}
+          , ACNT_DTL_ADDR = #{acntDtlAddr}
+          , ACNT_MNGR_PSTN = #{acntMngrPstn}
+          , ACNT_MNGR_NM = #{acntMngrNm}
+          , ACNT_EMAIL = #{acntEmail}
+          , ACNT_CLSF_CD = #{acntClsfCd}
+        WHERE
+            ACNT_NO = #{acntNo}
+    </update>
+
+</mapper>

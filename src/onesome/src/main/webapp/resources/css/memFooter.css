@@ -1,0 +1,105 @@
+/* ==================== footer를 위한 css 파일 ==================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Roboto&display=swap");
+
+/* 푸터 클래스 전체 색상, 간격 조절, 글자 적용 */
+.onesome-footer {
+    background-color: #222222;
+    color: #fff;
+    padding: 30px 60px;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 푸터 회색 선 긋기, 기업 및 단체구매안내 부터 ~ Customer Cetner 까지 간격 조정 */
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 0 50px 0 50px;
+}
+
+/* footer-section라인 최대 길이 조정 */
+.footer-section {
+    max-width: 300px;
+}
+
+/* footer-section라인 a태그 색상 변동하고 밑줄 없애기 */
+.footer-section a {
+    color: #fff;
+    text-decoration: inherit;
+}
+
+/* footer-section라인 a태그 갖다대면 밑줄 */
+.footer-section a:hover {
+    text-decoration: underline;
+    color: orange;
+}
+
+/* 기업 및 단체구매 안내 쪽 글씨 조정*/
+.footer-section li{
+	display : block;
+	font-size: 20px;
+	font-weight: 600;
+	color: #fff;
+	padding-bottom: 15px;
+}
+
+
+/* Follow Us 글씨 조절 */
+.footer-section p a{
+	font-size: 16px;
+	color: gray;
+}
+
+/* Address, Customer Center 글씨 조절 */
+.footer-sns{
+	font-size: 20px;
+	font-weight: 600;
+	color: white;
+	margin-top: -3px;
+}
+
+/* 주소, 고객센터 p태그 글씨 조절 */
+.footer-section p{
+	font-size: 16px;
+	color: gray;
+}
+
+/* 이용약관부터 사업자정보보호확인까지 */
+.footer-bottom-menu {
+    display: flex;
+    justify-content:center;
+    gap: 117px;
+}
+
+/* 이용약관부터 사업자정보보호확인까지 보이는 밑줄 없애기 */
+.footer-bottom-menu a{
+	color: #fff;
+	text-decoration: none;
+	margin-top: 0px;
+	margin-bottom: 10px;
+	font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 이용약관부터 사업자정보보호확인까지 갖다대면 밑줄 뜨게하기 */
+.footer-bottom-menu a:hover {
+    text-decoration: underline;
+}
+
+/* 개인정보처리방침 색상 오렌지*/
+.footer-bottom-personal {
+    color: orange !important;
+}
+
+/* copyright, 사업자 정보 위치 조정 */
+.copyright, .onesome-footer-info {
+    text-align: left;
+    margin-top: 20px;
+   	font-family: 'Noto Sans KR', sans-serif;
+   	margin-left: 318px;
+}
+
+/* copyright, 사업자 정보 p태그 글자 축소 */
+.copyright p, .onesome-footer-info p{
+	font-size : 14px;
+}

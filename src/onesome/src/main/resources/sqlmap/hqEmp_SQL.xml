@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.hqemp.mapper.HqEmpMapper">
+	
+	<resultMap type="hqEmpVO" id="hqEmpMap">
+		<result property="hqEmpNo" column="HQ_EMP_NO"/>
+		<result property="hqCd" column="HQ_CD"/>
+		<result property="hqEmpNm" column="HQ_EMP_NM"/>
+		<result property="hqEmpBrdt" column="HQ_EMP_BRDT"/>
+		<result property="hqEmpSal" column="HQ_EMP_SAL"/>
+		<result property="hqEmpTel" column="HQ_EMP_TEL"/>
+		<result property="hqEmpTaskCd" column="HQ_EMP_TASK_CD"/>
+		<result property="hqWkplCd" column="HQ_WKPL_CD"/>
+		<result property="hqPstnCd" column="HQ_PSTN_CD"/>
+		<result property="hqDeptCd" column="HQ_DEPT_CD"/>
+		<result property="hqEmpRemk" column="HQ_EMP_REMK"/>
+		<result property="hqEmpQuitYn" column="HQ_EMP_QUIT_YN"/>
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		
+		<association property="comDetCodeInfoVO" resultMap="comDetCodeMap" />
+		<collection property="atchFileVOList" resultMap="atchFileMap" />
+	</resultMap>
+	
+	<resultMap type="comDetCodeInfoVO" id="comDetCodeMap">
+		<result property="comDetCode" column="COM_DET_CODE"/>
+		<result property="comCode" column="COM_CODE"/>
+		<result property="comDetCodeNm" column="COM_DET_CODE_NM"/>
+		<result property="comDetCodeRm" column="COM_DET_CODE_RM"/>
+	</resultMap>
+	
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="fileSn" column="FILE_SN"/>
+		<result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+		<result property="fileStreCours" column="FILE_STRE_COURS"/>
+		<result property="streFileNm" column="STRE_FILE_NM"/>
+		<result property="fileThumYn" column="FILE_THUM_YN"/>
+		<result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+		<result property="fileExtsn" column="FILE_EXTSN"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+	</resultMap>
+	
+	<select id="hqEmpList" parameterType="map" resultMap="hqEmpMap">
+		SELECT A.*
+		FROM (
+		    SELECT 
+		        ROW_NUMBER() OVER (ORDER BY he.HQ_EMP_NO DESC) RNUM,
+		        he.HQ_EMP_NO,
+		        he.HQ_CD,
+		        he.HQ_EMP_NM,
+		        he.HQ_EMP_BRDT,
+		        he.HQ_EMP_SAL,
+		        he.HQ_EMP_TEL,
+		        he.HQ_EMP_TASK_CD,
+		        he.HQ_WKPL_CD,
+		        he.HQ_PSTN_CD,
+		        he.HQ_DEPT_CD,
+		        he.HQ_EMP_QUIT_YN,
+		        he.ATCH_FILE_NO,
+		        af.STRE_FILE_NM,
+		        comdet.COM_DET_CODE,
+		        comdet.COM_CODE,
+		        comdet.COM_DET_CODE_NM,
+		        comdet.COM_DET_CODE_RM
+		    FROM HQ_EMPLOYEE he
+		    LEFT OUTER JOIN ATCH_FILE af 
+		        ON he.ATCH_FILE_NO = af.ATCH_FILE_NO
+		    LEFT OUTER JOIN COM_DET_CODE_INFO comdet 
+		        ON he.HQ_EMP_TASK_CD = comdet.COM_DET_CODE
+		    OR he.HQ_WKPL_CD = comdet.COM_DET_CODE
+		    OR he.HQ_PSTN_CD = comdet.COM_DET_CODE
+		    OR he.HQ_DEPT_CD = comdet.COM_DET_CODE
+			WHERE he.HQ_EMP_NM LIKE '%' || #{keyword} || '%'
+		    ORDER BY he.HQ_EMP_QUIT_YN
+		) A
+		WHERE A.RNUM BETWEEN (#{currentPage} * 5) - (5 - 1) AND (#{currentPage} * 5)
+	</select>
+	
+	<select id="getTotal" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM HQ_EMPLOYEE
+		WHERE HQ_EMP_NM LIKE '%' || #{keyword} || '%'
+	</select>
+	
+	<select id="hqEmpDetail" parameterType="int" resultMap="hqEmpMap">
+		SELECT
+		    he.HQ_EMP_NO
+		  , he.HQ_CD
+		  , he.HQ_EMP_NM
+		  , he.HQ_EMP_BRDT
+		  , he.HQ_EMP_SAL
+		  , he.HQ_EMP_TEL
+		  , he.HQ_EMP_TASK_CD
+		  , he.HQ_WKPL_CD
+		  , he.HQ_PSTN_CD
+		  , he.HQ_DEPT_CD
+		  , he.HQ_EMP_REMK
+		  , he.HQ_EMP_QUIT_YN
+		  , he.ATCH_FILE_NO
+		  , af.STRE_FILE_NM
+		  , comdet.COM_DET_CODE
+	      , comdet.COM_CODE
+	      , comdet.COM_DET_CODE_NM
+	      , comdet.COM_DET_CODE_RM
+		FROM
+		    HQ_EMPLOYEE he, ATCH_FILE af,  COM_DET_CODE_INFO comdet
+		WHERE 
+		    he.ATCH_FILE_NO = af.ATCH_FILE_NO(+)
+		 AND
+   			he.HQ_EMP_TASK_CD = comdet.COM_DET_CODE(+)
+         AND
+			he.HQ_WKPL_CD = comdet.COM_DET_CODE(+)
+         AND
+			he.HQ_PSTN_CD = comdet.COM_DET_CODE(+)
+         AND
+			he.HQ_DEPT_CD = comdet.COM_DET_CODE(+)
+		 AND 
+		    he.HQ_EMP_NO = #{hqEmpNo}
+	</select>
+	
+	<insert id="regHqEmp" parameterType="hqEmpVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="hqEmpNo">
+			SELECT HQ_EMPLOYEE_SEQ.NEXTVAL AS hqEmpNo FROM DUAL
+		</selectKey>
+		INSERT INTO HQ_EMPLOYEE (
+			    HQ_EMP_NO
+			    , HQ_CD
+			    , HQ_EMP_NM
+			    , HQ_EMP_BRDT
+			    , HQ_EMP_SAL
+			    , HQ_EMP_TEL
+			    , HQ_EMP_TASK_CD
+			    , HQ_WKPL_CD
+			    , HQ_PSTN_CD
+			    , HQ_DEPT_CD
+			    , HQ_EMP_QUIT_YN
+			    , HQ_EMP_REMK
+			    , ATCH_FILE_NO
+			) VALUES (
+			    #{hqEmpNo}
+			  , 'OSPLCE'
+			  , #{hqEmpNm}
+			  , #{hqEmpBrdt}
+			  , #{hqEmpSal}
+			  , #{hqEmpTel}
+			  , #{hqEmpTaskCd}
+			  , #{hqWkplCd}
+			  , #{hqPstnCd}
+			  , #{hqDeptCd}
+			  , 'N'
+			  , #{hqEmpRemk}
+			  , #{atchFileNo}
+			)
+	</insert>
+	
+	<update id="modHqEmp" parameterType="hqEmpVO">
+		UPDATE HQ_EMPLOYEE
+		SET
+		      HQ_CD = #{hqCd}
+		    , HQ_EMP_NM = #{hqEmpNm}
+		    , HQ_EMP_BRDT = #{hqEmpBrdt}
+		    , HQ_EMP_SAL = #{hqEmpSal}
+		    , HQ_EMP_TEL = #{hqEmpTel}
+		    , HQ_EMP_TASK_CD = #{hqEmpTaskCd}
+		    , HQ_WKPL_CD = #{hqWkplCd}
+		    , HQ_PSTN_CD = #{hqPstnCd}
+		    , HQ_DEPT_CD = #{hqDeptCd}
+		    , HQ_EMP_REMK = #{hqEmpRemk}
+		    , HQ_EMP_QUIT_YN = #{hqEmpQuitYn}
+		    , ATCH_FILE_NO = #{atchFileNo}
+		WHERE
+		    HQ_EMP_NO = #{hqEmpNo}
+	</update>
+	
+	<delete id="delHqEmp" parameterType="hqEmpVO">
+		DELETE
+		FROM HQ_EMPLOYEE
+		WHERE HQ_EMP_NO = #{hqEmpNo}
+	</delete>
+</mapper>
+
+
+
+
+
+
+
+

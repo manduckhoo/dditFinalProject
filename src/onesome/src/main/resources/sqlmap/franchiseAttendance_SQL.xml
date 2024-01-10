@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.franchise.mapper.FranchiseAttendanceMapper">
+
+	<!-- DB에 저장된 값을 json으로 바로 변경할 수 있도록 풀캘린더의 속성명과 매칭 -->
+	<resultMap id="calendarMap" type="Map">
+		<result property="id" column="ATTNDCE_NO"/>
+		<result property="frcsEmpNo" column="FRCS_EMP_NO"/>
+<!-- 		<result property="frcsNo" column="FRCS_NO"/> -->
+		<result property="title" column="ATTNDCE_TYPE_CD"/>
+		<result property="start" column="ATTNDCE_STR_DT"/>
+		<result property="end" column="ATTNDCE_END_DT"/>
+	</resultMap>
+	
+	<!-- 근무일정 불러오기 -->
+	<select id="getFrcsEvents" resultMap="calendarMap" parameterType="attendanceManagementVO">
+		select
+			ATTNDCE_NO, FRCS_EMP_NO,
+			FRCS_NO, ATTNDCE_TYPE_CD,
+			ATTNDCE_STR_DT, ATTNDCE_END_DT
+		from ATTENDANCE_MANAGEMENT
+<!-- 		WHERE FRCS_EMP_NO=#{frcsEmpNo} 가맹점 번호-->
+	</select>
+	
+	<!-- 근무일정 추가히기 -->
+	<insert id="addFrcsEvent" parameterType="attendanceManagementVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="attndceNo">
+			select nvl(max(ATTNDCE_NO)+1, 1) from ATTENDANCE_MANAGEMENT
+		</selectKey>
+		insert into ATTENDANCE_MANAGEMENT(ATTNDCE_NO, FRCS_EMP_NO, FRCS_NO, ATTNDCE_TYPE_CD, ATTNDCE_STR_DT, ATTNDCE_END_DT)
+		values(#{attndceNo}, 101, 425367078, #{attndceTypeCd}, #{attndceStrDt}, #{attndceEndDt})
+	</insert>
+
+	<!-- 근무일정 변경하기 -->
+	<update id="updateFrcsEvent">
+		UPDATE attendance_management
+		SET
+		    ATTNDCE_TYPE_CD = #{attndceTypeCd},
+		    ATTNDCE_STR_DT = #{attndceStrDt},
+		    ATTNDCE_END_DT = #{attndceEndDt}
+		WHERE attndce_no = #{attndceNo}
+	</update>
+	
+	<!-- 근무일정 삭제하기 -->
+	<delete id="deleteFrcsEvent">
+		delete from attendance_management where attndce_no = #{attndceNo}
+	</delete>
+
+
+</mapper>

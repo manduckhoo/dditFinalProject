@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC 
+"-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" 
+"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<!-- tiles 설정 -->
+<tiles-definitions>
+	<!-- admin layout -->
+	<definition name="adminTiles-layout" template="/WEB-INF/views/adminTiles/index.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/adminTiles/header.jsp" />
+		<put-attribute name="aside" value="/WEB-INF/views/adminTiles/aside.jsp" />
+		<put-attribute name="body" value="" />
+	</definition>
+	<!-- name의 */*은 body의 value에서 1과 2에 해당 controller에서 forwarding 시 return 
+		"1/2"; -->
+	<definition name="admin/*/*" extends="adminTiles-layout">
+		<put-attribute name="body" value="/WEB-INF/views/admin/{1}/{2}.jsp" />
+	</definition>
+
+	<!-- franchise layout -->
+	<definition name="frcsTiles-layout" template="/WEB-INF/views/frcsTiles/index.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/frcsTiles/header.jsp" />
+		<put-attribute name="aside" value="/WEB-INF/views/frcsTiles/aside.jsp" />
+		<put-attribute name="body" value="" />
+	</definition>
+	<definition name="frcs/*/*" extends="frcsTiles-layout">
+		<put-attribute name="body" value="/WEB-INF/views/frcs/{1}/{2}.jsp" />
+	</definition>
+	
+	<!-- member layout -->
+	<definition name="memTiles-layout" template="/WEB-INF/views/memTiles/index.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/memTiles/header.jsp" />
+		<put-attribute name="aside" value="/WEB-INF/views/memTiles/aside.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/views/memTiles/footer.jsp" />
+	</definition>
+	<definition name="mem/*/*" extends="memTiles-layout">
+		<put-attribute name="body" value="/WEB-INF/views/mem/{1}/{2}.jsp" />
+	</definition>
+	
+</tiles-definitions>

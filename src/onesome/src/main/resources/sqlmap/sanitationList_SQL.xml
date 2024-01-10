@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.sanitation.mapper.SanitationListMapper">
+
+    <insert id="sanitationRegistration">
+        insert into SANITATION_LIST (FRCS_NO, SNT_SEAT_SCR, SNT_FCLT_SCR, SNT_FOOD_SCR, SNT_EMP_SCR, SNT_CHCK_DT)
+        values (#{frcsNo},#{sntSeatScr},#{sntFcltScr},#{sntFoodScr},#{sntEmpScr},#{sntChckDt})
+    </insert>
+
+    <select id="getFrcsSanitationListByDate" resultMap="sanitationListMap">
+        select FRCS_NO, SNT_SEAT_SCR, SNT_FCLT_SCR, SNT_FOOD_SCR, SNT_EMP_SCR, SNT_CHCK_DT
+        from SANITATION_LIST
+        where EXTRACT(YEAR FROM SNT_CHCK_DT) = EXTRACT(YEAR FROM #{sntChckDt})
+          and EXTRACT(MONTH FROM SNT_CHCK_DT) = EXTRACT(MONTH FROM #{sntChckDt})
+          and FRCS_NO = #{frcsNo}
+    </select>
+
+    <select id="getFranchiseName" resultType="string">
+        select FRCS_NM from FRANCHISE where FRCS_NO=#{crrFrcsNo}
+    </select>
+
+    <select id="getSanitationListByFrcsNo" parameterType="hashMap" resultMap="sanitationListMap">
+        SELECT T.*
+        FROM (SELECT ROW_NUMBER() OVER (ORDER BY SNT_CHCK_DT DESC) RNUM,
+                     FRCS_NO,
+                     SNT_SEAT_SCR,
+                     SNT_FCLT_SCR,
+                     SNT_FOOD_SCR,
+                     SNT_EMP_SCR,
+                     SNT_CHCK_DT,
+                     (SNT_SEAT_SCR + SNT_FCLT_SCR + SNT_FOOD_SCR + SNT_EMP_SCR) / 4 AS AVRSCR
+              FROM SANITATION_LIST
+              where FRCS_NO = #{crrFrcsNo}) T
+        WHERE T.RNUM BETWEEN (#{currentPage} * 10) - (10 - 1)
+                  AND (#{currentPage} * 10)
+    </select>
+    <select id="getTotal" resultType="int" parameterType="hashMap">
+        select count(*)
+        from SANITATION_LIST
+        where FRCS_NO=#{crrFrcsNo}
+    </select>
+
+    <resultMap id="sanitationListMap" type="kr.or.onesome.sanitation.vo.SanitationListVO">
+        <result property="sntChckDt" column="SNT_CHCK_DT"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="sntSeatScr" column="SNT_SEAT_SCR"/>
+        <result property="sntFcltScr" column="SNT_FCLT_SCR"/>
+        <result property="sntFoodScr" column="SNT_FOOD_SCR"/>
+        <result property="sntEmpScr" column="SNT_EMP_SCR"/>
+        <result property="rnum" column="RNUM"/>
+        <result property="avrScr" column="AVRSCR"/>
+    </resultMap>
+</mapper>

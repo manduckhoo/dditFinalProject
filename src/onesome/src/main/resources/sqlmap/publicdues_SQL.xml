@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.publicdues.mapper.PublicduesMapper">
+
+    <select id="oneYearRegistrations" resultType="kr.or.onesome.publicdues.vo.PublicduesVO">
+        select
+            DUES_CLM_YM,
+            DUES_TOTAL_AMT
+        from
+        (select *
+        from PUBLICDUES
+        where FRCS_NO = #{crrFrcsNo}
+        order by DUES_CLM_YM desc)
+        where ROWNUM <![CDATA[<]]>= 12
+    </select>
+
+    <update id="publicduesUpdate">
+        update PUBLICDUES
+        set DUES_ELECTRIC_AMT = #{duesElectricAmt},
+            DUES_WATER_AMT = #{duesWaterAmt},
+            DUES_GAS_AMT = #{duesGasAmt},
+            DUES_MTRT_AMT = #{duesMtrtAmt},
+            DUES_TOTAL_AMT = (#{duesElectricAmt} + #{duesWaterAmt} + #{duesGasAmt} + #{duesMtrtAmt})
+        where DUES_CLM_YM = #{duesClmYm} and FRCS_NO = #{frcsNo}
+    </update>
+
+    <insert id="publicduesRegistration">
+        insert into PUBLICDUES (DUES_CLM_YM,
+                                FRCS_NO,
+                                DUES_ELECTRIC_AMT,
+                                DUES_WATER_AMT,
+                                DUES_GAS_AMT,
+                                DUES_MTRT_AMT,
+                                DUES_PAY_DT,
+                                DUES_TOTAL_AMT)
+        values (#{duesClmYm},
+                #{frcsNo},
+                #{duesElectricAmt},
+                #{duesWaterAmt},
+                #{duesGasAmt},
+                #{duesMtrtAmt},
+                sysdate,
+                (#{duesElectricAmt} + #{duesWaterAmt} + #{duesGasAmt} + #{duesMtrtAmt}))
+    </insert>
+
+    <select id="getPublicdues" parameterType="hashMap" resultType="kr.or.onesome.publicdues.vo.PublicduesVO">
+        select * from PUBLICDUES where FRCS_NO=#{crrFrcsNo} and DUES_CLM_YM = #{viewDate}
+    </select>
+</mapper>

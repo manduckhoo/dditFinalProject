@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.admin.mapper.AdminMapper">
+    <resultMap id="adminMap" type="abminVO">
+        <result property="adminNo" column="ADMIN_NO"/>
+        <result property="adminEmail" column="ADMIN_EMAIL"/>
+        <result property="adminPw" column="ADMIN_PW"/>
+        <result property="adminNm" column="ADMIN_NM"/>
+        <result property="adminTel" column="ADMIN_TEL"/>
+        <result property="enabled" column="ENABLED"/>
+        
+        <collection property="adminAuthVOList" resultMap="adminAuthMap"/>
+    </resultMap>
+
+    <resultMap id="adminAuthMap" type="abminAuthVO">
+        <result property="adminAuthCd" column="ADMIN_AUTH_CD"/>
+        <result property="adminNo" column="ADMIN_NO"/>
+    </resultMap>
+
+    <select id="adminDetail" resultMap="adminMap">
+        select ad.ADMIN_NO,ADMIN_EMAIL,ADMIN_PW,ADMIN_NM,ADMIN_TEL,ENABLED,ADMIN_AUTH_CD
+        from ADMIN ad, ADMIN_AUTH ath
+        where ad.ADMIN_NO = ath.ADMIN_NO and ENABLED = '1' and ad.ADMIN_EMAIL = #{adminEmail}
+    </select>
+    
+    <select id="adminList" resultMap="adminMap">
+    	SELECT ADMIN_NO, ADMIN_EMAIL, ADMIN_PW, ADMIN_NM, ADMIN_TEL, ENABLED
+		FROM ADMIN
+		WHERE ADMIN_NO = #{adminNo}
+    </select>
+    
+    <!-- 가맹점 발주 대기 내역 -->
+    <resultMap id="frcsOrderMap" type="kr.or.onesome.frcsorder.vo.FrcsOrderVO">
+        <result property="frcsOrderNo" column="FRCS_ORDER_NO"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="frcsOrderDt" column="FRCS_ORDER_DT"/>
+        <result property="frcsOrderOrderAmt" column="FRCS_ORDER_ORDER_AMT"/>
+        <result property="frcsOrderTypeCd" column="FRCS_ORDER_TYPE_CD"/>
+        <result property="frcsNm" column="FRCS_NM"/>
+    </resultMap>
+
+    <select id="frcsOrderWaitList" parameterType="String" resultType="int">
+         SELECT
+            fo.FRCS_ORDER_NO
+             , fo.FRCS_NO
+             , fo.FRCS_ORDER_DT
+             , fo.FRCS_ORDER_ORDER_AMT
+             , fo.FRCS_ORDER_TYPE_CD
+             , (SELECT f.FRCS_NM FROM FRANCHISE f  WHERE f.FRCS_NO = fo.FRCS_NO  ) FRCS_NM
+        FROM
+            FRCS_ORDER fo
+        WHERE
+            fo.FRCS_ORDER_TYPE_CD = 'FODST01'
+        ORDER BY
+            fo.FRCS_ORDER_NO DESC
+    </select>
+    
+    <select id="adminNonPayRoyaltyList" resultType="kr.or.onesome.royalty.vo.RoyaltyVO">
+    	select r.RY_CLM_YM,
+		       r.FRCS_NO,
+		       r.RY_TOTAL_AMT,
+		       r.RY_STATUS_YN,
+		       r.RY_PAY_DT,
+		       r.RY_FRCS_FEE_AMT,
+		       r.RY_ORDER_AMT,
+		       r.RY_NPMNT_AMT,
+		       r.RY_OVRINT_AMT,
+		       r.RY_ROYALTY_AMT,
+		       f.FRCS_NM,
+		       (select count(*) from ROYALTY where FRCS_NO = r.FRCS_NO and RY_NPMNT_AMT > 0) as accNpmntCnt
+		from ROYALTY r, FRANCHISE f
+		where r.FRCS_NO = f.FRCS_NO
+		  and R.RY_STATUS_YN = 'N'
+		  and r.RY_CLM_YM = #{viewDate}
+    </select>
+    
+    <select id="getMonthlyInOut" parameterType="String" resultType="inOutVO">
+    	SELECT COALESCE(I.hqOrderDt, O.ryClmYm) AS month,
+		       COALESCE(I.hqOrderTotalAmt, 0) AS hqOrderTotalAmt,
+		       COALESCE(O.ryTotalAmt, 0) AS ryTotalAmt
+		FROM (
+		    SELECT to_char(hq_order_dt, 'yyyy-MM') AS hqOrderDt,
+		           sum(hq_order_total_amt) AS hqOrderTotalAmt
+		    FROM hq_order
+		    GROUP BY to_char(hq_order_dt, 'yyyy-MM')
+		) I
+		FULL OUTER JOIN (
+		    SELECT to_char(to_date(ry_clm_ym, 'yyyy-MM'), 'yyyy-MM') AS ryClmYm,
+		           sum(ry_total_amt) AS ryTotalAmt
+		    FROM royalty
+		    GROUP BY to_date(ry_clm_ym, 'yyyy-MM')
+		) O ON I.hqOrderDt = O.ryClmYm
+		WHERE I.hqOrderDt = #{viewDate2}
+		OR o.ryclmym = #{viewDate2}
+		ORDER BY month DESC
+    </select>
+    
+    <select id="salesList" parameterType="String" resultType="hashMap">
+		SELECT *
+		FROM (
+		    SELECT
+		        RANK() OVER (ORDER BY SUM(p.pynm_total_amt) DESC) AS rank,
+		        f.frcs_no as frcsNo,
+		        f.frcs_nm as frcsNm,
+		        f.frcs_opng_dt as frcsOpngDt,
+		        f.frcs_ownr_no as frcsOwnrNo,
+		        SUM(p.pynm_total_amt) as totalAmtSum
+		        
+		    FROM
+		        franchise f
+		    JOIN
+		        payment p ON f.frcs_no = p.frcs_no
+		    WHERE
+		        f.frcs_sts_cd = #{comDetCode} 
+		    GROUP BY
+		        f.frcs_no, f.frcs_nm, f.frcs_opng_dt, f.frcs_ownr_no
+		)
+		WHERE
+		    rank <![CDATA[<=]]> 3
+    </select>
+    
+</mapper>

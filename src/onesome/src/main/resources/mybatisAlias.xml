@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<!--Mybatis 설정 -->
+	<settings>
+		<!-- 전통적인 데이터베이스 컬럼명 형태인 A_COLUMN을 CamelCase형태의 자바 프로퍼티명 형태인 aColumn으로 자동으로 매핑하도록 함 -->
+		<setting name="mapUnderscoreToCamelCase" value="true"></setting>
+		<!--  파라미터에 Null 값이 있을 경우 에러 처리 -->
+		<setting name="jdbcTypeForNull" value="VARCHAR"></setting>
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="kr.or.onesome.vo.NoticeVO" alias="noticeVO"/>
+		<typeAlias type="kr.or.onesome.vo.InquirerVO" alias="inquirerVO"/>
+		<typeAlias type="kr.or.onesome.vo.AdminVO" alias="abminVO"/>
+		<typeAlias type="kr.or.onesome.vo.AdminAuthVO" alias="abminAuthVO"/>
+		<typeAlias type="kr.or.onesome.vo.FranchiseOwnerVO" alias="frcsOwVO"/>
+		<typeAlias type="kr.or.onesome.vo.FranchiseOwnerAuthVO" alias="frcsOwAuthVO"/>
+		<typeAlias type="kr.or.onesome.vo.MemberVO" alias="memberVO"/>
+		<typeAlias type="kr.or.onesome.vo.MemberAuthVO" alias="memberAuthVO"/>
+		<typeAlias type="kr.or.onesome.vo.MemberMenuVO" alias="memberMenuVO"/>
+		<typeAlias type="kr.or.onesome.vo.MemberCartVO" alias="memberCartVO"/>
+		<typeAlias type="kr.or.onesome.vo.MemberWishVO" alias="memberWishVO"/>
+		<typeAlias type="kr.or.onesome.vo.AtchFileVO" alias="atchFileVO"/>
+		<typeAlias type="kr.or.onesome.vo.FranchiseEmployeeVO" alias="franchiseEmployeeVO"/>
+		<typeAlias type="kr.or.onesome.vo.FranchiseDcmntVO" alias="franchiseDcmntVO"/>
+		<typeAlias type="kr.or.onesome.vo.FranchiseVO" alias="franchiseVO"/>
+		<typeAlias type="kr.or.onesome.vo.ComCodeInfoVO" alias="comCodeInfoVO"/>
+		<typeAlias type="kr.or.onesome.vo.ComDetCodeInfoVO" alias="comDetCodeInfoVO"/>		
+		<typeAlias type="kr.or.onesome.vo.FaqVO" alias="faqVO"/>
+		<typeAlias type="kr.or.onesome.vo.MovePageVO" alias="movePageVO"/>
+		<typeAlias type="kr.or.onesome.alarm.vo.AlarmVO" alias="alarmVO"/>
+		<typeAlias type="kr.or.onesome.vo.AttendanceManagementVO" alias="attendanceManagementVO"/>
+		<typeAlias type="kr.or.onesome.vo.AcntVO" alias="acntVO"/>
+		<typeAlias type="kr.or.onesome.inquiry.vo.InquiryVO" alias="inquiryVO"/>
+		<typeAlias type="kr.or.onesome.product.vo.ProductVO" alias="productVO"/>
+		<typeAlias type="kr.or.onesome.vo.PaymentVO" alias="paymentVO"/>
+		<typeAlias type="kr.or.onesome.vo.PaymentDetailVO" alias="paymentDetailVO"/>
+		<typeAlias type="kr.or.onesome.vo.PaymentMethodVO" alias="paymentMethodVO"/>
+		<typeAlias type="kr.or.onesome.vo.RefundVO" alias="refundVO"/>
+		<typeAlias type="kr.or.onesome.vo.FreeBoardVO" alias="freeBoardVO"/>
+		<typeAlias type="kr.or.onesome.vo.OjtVO" alias="ojtVO"/>
+		<typeAlias type="kr.or.onesome.vo.FranchiseDcmntVO" alias="franchiseDcmntVO"/>
+		<typeAlias type="kr.or.onesome.frcssalespurchase.vo.FrcsSalesPurchaseVO" alias="frcsSalesPurchaseVO"/>
+		<typeAlias type="kr.or.onesome.hqemp.vo.HqEmpVO" alias="hqEmpVO"/>
+		<typeAlias type="kr.or.onesome.frcssalespurchase.vo.FrcsOrderDetailVO" alias="frcsOrderDetailVO"/>
+		<typeAlias type="kr.or.onesome.frcssalespurchase.vo.FrcsOrderVO" alias="frcsOrderVO"/>
+		<typeAlias type="kr.or.onesome.frcssalespurchase.vo.PproductVO" alias="pproductVO"/>
+		<typeAlias type="kr.or.onesome.vo.CommentsVO" alias="commentsVO"/>
+		<typeAlias type="kr.or.onesome.frcssalespurchase.vo.PpublicduesVO" alias="ppublicduesVO"/>
+		<typeAlias type="kr.or.onesome.frcssalespurchase.vo.RroyaltyVO" alias="rroyaltyVO"/>
+		<typeAlias type="kr.or.onesome.vo.OffDocVO" alias="offDocVO"/>
+		<typeAlias type="kr.or.onesome.admin.vo.InOutVO" alias="inOutVO"/>
+	</typeAliases>
+	
+</configuration>

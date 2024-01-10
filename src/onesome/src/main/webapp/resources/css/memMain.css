@@ -1,0 +1,472 @@
+/* ==================== 모든 회원 페이지를 위한 css 파일 ==================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Roboto&display=swap");
+
+@font-face {
+	font-family: 'Pretendard1';
+	font-weight: 100;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Thin.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Thin.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Thin.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Thin.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Thin.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard2';
+	font-weight: 200;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraLight.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraLight.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraLight.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraLight.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraLight.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard3';
+	font-weight: 300;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Light.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Light.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Light.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Light.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Light.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard4';
+	font-weight: 400;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Regular.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Regular.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Regular.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Regular.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Regular.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard5';
+	font-weight: 500;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Medium.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Medium.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Medium.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Medium.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Medium.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard6';
+	font-weight: 600;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-SemiBold.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-SemiBold.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-SemiBold.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-SemiBold.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-SemiBold.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard7';
+	font-weight: 700;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Bold.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Bold.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Bold.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Bold.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Bold.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard8';
+	font-weight: 800;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraBold.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraBold.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraBold.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraBold.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-ExtraBold.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Pretendard9';
+	font-weight: 900;
+	font-style: normal;
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Black.eot');
+	src:
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Black.eot?#iefix')
+			format('embedded-opentype'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Black.woff2')
+			format('woff2'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Black.woff')
+			format('woff'),
+			url('https://cdn.jsdelivr.net/gh/webfontworld/pretendard/Pretendard-Black.ttf')
+			format("truetype");
+	font-display: swap;
+}
+
+/* 사진들 배경 마진 없애서 화면에 최대화 */
+image{
+	margin: 0px;
+	height: 100%;
+}
+
+/* 홈페이지 맨위로 가는 버튼 */
+/* #arrowBtn{ */
+/*     width: 40px; */
+/*     height: 40px; */
+/*     position: fixed; */
+/*     right: 20px; */
+/*     bottom: 20px; */
+/* } */
+
+/* ======================================= 메인 페이지 [시작] ======================================= */
+
+/* 1번째 메인 사진 뒷배경 */
+.mainSection {
+	height : 100vh;
+	background: url(https://mcdn.twosome.co.kr/upload/MODS0030/202106/MODS0030_20210617220407_xYuWGMXB);
+}
+
+/* 1번째 메인 사진 h1태그 글씨*/
+#mainText{
+	margin: 0;
+	font-size: 6em;
+	color : #2B2934;
+	width: 258px;
+	position: absolute;
+	top : 300px;
+	left : 300px;
+	animation : appear 1s ease-out;
+}
+
+/* 2번째 메인 MENU STORY 빈배경 */
+.secondText{
+	height : 1080px;
+	background: #fff;
+}
+
+/* 2번째 메인 MENU STORY 머그컵 사진 */
+.mugCup{
+	position : absolute;
+	top : 1470px;
+	left : 790px;
+	height : 400px;
+	width : 400px;
+}
+
+/* 2번째 메인 MENU STORY 머그컵 사진2 */
+.mugCup2{
+	position : absolute;
+	top : 1700px;
+	left : 1220px;
+	height : 170px;
+	width : 170px;
+}
+
+/* 2번째 메인 MENU STORY 머그컵 사진3 */
+.mugCup3{
+	position : absolute;
+	top : 1700px;
+	left : 1420px;
+	height : 170px;
+	width : 170px;
+}
+
+/* 2번째 메인 MENU STORY 머그컵 사진4 */
+.mugCup4{
+	position : absolute;
+	top : 1700px;
+	left : 1620px;
+	height : 170px;
+	width : 170px;
+}
+
+/* 2번째 메인 MENU STORY - 1번째 텍스트 */
+.secondText1{
+	position : absolute;
+	top : 1400px;
+	left : 290px;
+	margin : 0;
+	font-size : 96px;
+	font-weight: 800;
+	z-index: 1;
+	
+}
+
+/* 2번째 메인 MENU STORY - 2번째 텍스트 */
+.secondText2{
+	position : absolute;
+	top : 1600px;
+	left : 300px;
+	margin : 0;
+	font-size : 24px;
+	font-weight: 800;
+}
+
+/* 2번째 메인 MENU STORY - 3번째 텍스트 */
+.secondText3{
+	position : absolute;
+	top : 1650px;
+	left : 300px;
+	margin : 0;
+	font-size : 36px;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+/* 3번째 메인 에이리스트 사진 */
+.thirdText {
+	height : 1080px;
+	background: url(https://www.twosome.co.kr/resources/images/main/main_alist_pc.jpg);
+}
+
+/* 3번째 메인 에이리스트 - 1번째 텍스트 */
+.thirdText1{
+	position : absolute;
+	top : 2500px;
+	left : 300px;
+	margin : 0;
+	font-size : 96px;
+	font-weight: 800;
+}
+
+/* 3번째 메인 에이리스트 - 2번째 텍스트 */
+.thirdText2{
+	position : absolute;
+	top : 2650px;
+	left : 300px;
+	margin : 0;
+	width: 293px;
+	font-size : 32px;
+	font-weight: 800;
+}
+
+/* 3번째 메인 에이리스트 - 3번째 텍스트 */
+.thirdText3{
+	position : absolute;
+	top : 2750px;
+	left : 300px;
+	margin : 0;
+	font-size : 24px;
+	font-weight: 600;
+}
+
+/* 3번째 메인 에이리스트 - 4번째 텍스트 */
+.thirdText4{
+	position : absolute;
+	top : 2800px;
+	left : 300px;
+	font-size : 18px;
+	font-weight: 400;
+	color: #727272;
+}
+
+/* ======================================= 메인 페이지 [끝] ======================================= */
+
+
+/* ======================================= 브랜드 페이지 [시작] ======================================= */
+
+/* 브랜드 페이지 뒷배경 */
+.brandPhoto {
+	height : 1080px;
+	width : 100%;
+	background: url('/resources/image/brandBackPhoto.png');
+	background-size : cover;
+	background-position: center;
+}
+
+/* 브랜드 페이지 - 대표 텍스트 */
+#BrandText{
+	position : absolute;
+	top : 180px;
+	left : 100px;
+	margin : 0;
+	font-size : 64px;
+	font-weight: 600;
+	color : white;
+}
+
+/* 브랜드 페이지 - 1번째 텍스트 */
+.BrandText1{
+	position : absolute;
+	top : 500px;
+	left : 1300px;
+	margin : 0;
+	font-size : 28px;
+	font-weight: 500;
+	color : orange;
+}
+
+/* 브랜드 페이지 - 2번째 텍스트 */
+.BrandText2{
+	position : absolute;
+	top : 550px;
+	left : 1300px;
+	margin : 0;
+	font-size : 28px;
+	font-weight: 300;
+	color : white;
+}
+
+/* 브랜드 페이지 - 3번째 텍스트 */
+.BrandText3{
+	position : absolute;
+	top : 650px;
+	left : 1300px;
+	margin : 0;
+	font-size : 28px;
+	font-weight: 500;
+	color : orange;
+}
+
+/* 브랜드 페이지 - 4번째 텍스트 */
+.BrandText4{
+	position : absolute;
+	top : 700px;
+	left : 1300px;
+	margin : 0;
+	font-size : 28px;
+	font-weight: 300;
+	color : white;
+}
+
+/* 브랜드 페이지 - 5번째 텍스트 */
+.BrandText5{
+	position : absolute;
+	top : 800px;
+	left : 1300px;
+	margin : 0;
+	font-size : 28px;
+	font-weight: 500;
+	color : orange;
+}
+
+/* 브랜드 페이지 - 6번째 텍스트 */
+.BrandText6{
+	position : absolute;
+	top : 850px;
+	left : 1300px;
+	margin : 0;
+	font-size : 28px;
+	font-weight: 300;
+	color : white;
+}
+/* ======================================= 브랜드 페이지 [끝] ======================================= */
+
+
+/* ======================================= 메뉴 페이지 -> 음료 [시작] ======================================= */
+
+/* 음료 사진들 부모 요소 컨테이너 정렬 */
+.menuContainer{
+	display:flex; 
+	justify-content: center; 
+	align-items: center;
+}
+
+/* 음료 사진들 자식 요소 정렬 */
+.menuItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0px 0px;
+}
+
+/* ======================================= 메뉴 페이지 -> 음료 [끝] ======================================= */
+
+
+/* ======================================= 주문 상세보기 [시작] ======================================= */
+
+/* 주문상세보기 부모 요소 컨테이너 정렬 */
+.orderContainer{
+	display:flex; 
+	justify-content: left; 
+	align-items: center;
+}
+
+/* 주문상세보기 자식 요소 정렬 */
+.orderItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0 100px;
+	border: 1px solid gray;
+	padding: 10px;
+}
+
+/* 주문 상세보기 사진 */
+.orderMenu {
+	position: relative;
+	width: 400px; /* 원하는 너비로 설정 */
+	height: 400px; /* 원하는 높이로 설정 */
+	margin-top: 100px;	
+}
+
+/* 주문 상세보기 주문 옵션 */
+.orderOption{
+	border: 1px solid gray;
+	width : 500px;
+	padding: 10px;
+	margin-top: 80px;
+}
+
+/* ======================================= 주문 상세보기 [끝] ======================================= */

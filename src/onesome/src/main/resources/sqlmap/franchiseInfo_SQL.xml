@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.franchise.mapper.FranchiseInfoMapper">
+
+
+<!-- 가맹점 정보 관리/정보 불러오기 -->
+<select id="info" resultMap="FrcsMap">
+	SELECT
+	    frcs_no,
+	    frcs_nm,
+	    frcs_sts_cd,
+	    frcs_rgst_dt,
+	    frcs_end_dt,
+	    frcs_post_no,
+	    frcs_addr,
+	    frcs_dtl_addr,
+	    frcs_bsns_strt_tm,
+	    frcs_bsns_end_tm,
+	    frcs_ctrt_cncls_dt,
+	    frcs_expt_cmpl_dt,
+	    frcs_fnl_insp_dt,
+	    frcs_opng_dt,
+	    frcs_cpct_psn,
+	    frcs_region_cd,
+	    frcs_tel
+	From franchise
+    where frcs_no = #{frcsNo}
+<!--     where a.frcs_ownr_no = #{frcsOwnrNo} -->
+</select>
+
+
+
+<!--가맹점 지역분류 공통 코드  -->
+<select id="RegionList" parameterType="String" resultType="comDetCodeInfoVO">
+	SELECT 
+		COM_DET_CODE, 
+		COM_CODE, 
+		COM_DET_CODE_NM, 
+		COM_DET_CODE_RM            
+	FROM 
+		COM_DET_CODE_INFO
+	WHERE 
+		COM_CODE = #{comCode}
+</select>
+
+<select id="selectFrcOwnerVO" resultType="frcsOwVO">
+	SELECT
+	    frcs_ownr_no,
+	    frcs_ownr_email,
+	    frcs_ownr_pw,
+	    frcs_ownr_nm,
+	    frcs_ownr_brdt,
+	    frcs_ownr_tel,
+	    frcs_ownr_zip,
+	    frcs_ownr_addr,
+	    frcs_ownr_dtl_addr,
+	    frcs_ownr_join_dt,
+	    enabled
+	FROM
+	    frcs_owner
+	WHERE
+	    frcs_ownr_no=#{frcsOwnrNo}
+</select>
+
+<insert id="create" parameterType="franchiseVO">
+	<selectKey resultType="int" order="BEFORE" keyProperty="frcsNo">
+		SELECT NVL(MAX(FRCS_NO)+1,0)+1
+		FROM FRANCHISE
+	</selectKey>
+	
+	INSERT INTO franchise (
+	    frcs_no,
+	    frcs_nm,
+	    frcs_post_no,
+	    frcs_addr,
+	    frcs_dtl_addr,
+	    frcs_ctrt_cncls_dt,
+	    frcs_ownr_no,
+	    frcs_region_cd
+	) VALUES (
+	    #{frcsNo},
+	    #{frcsNm},
+	    #{frcsPostNo},
+	    #{frcsAddr},
+	    #{frcsDtlAddr},
+	    #{frcsCtrtCnclsDt},
+	    #{frcsOwnrNo},
+	    #{frcsRegionCd}
+	)
+	
+</insert>
+
+
+<select id="list" resultType="franchiseVO">
+	SELECT *
+	FROM
+		FRANCHISE
+</select>
+
+<!-- 풀캘린더 가맹점 조회  -->
+<select id="openList" resultMap="FrcsMap" parameterType="String">
+    	SELECT 
+    		ROWNUM rnum, A.FRCS_NO, A.FRCS_NM, A.FRCS_STS_CD, A.FRCS_RGST_DT, A.FRCS_END_DT, A.FRCS_POST_NO, 
+    		A.FRCS_ADDR, A.FRCS_DTL_ADDR, A.FRCS_BSNS_STRT_TM, A.FRCS_BSNS_END_TM, A.FRCS_CTRT_CNCLS_DT,
+    		A.FRCS_EXPT_CMPL_DT, A.FRCS_FNL_INSP_DT, A.FRCS_OPNG_DT, A.FRCS_CPCT_PSN, A.FRCS_OWNR_NO, A.FRCS_REGION_CD, A.FRCS_TEL,
+	    	B.FRCS_OWNR_EMAIL, B.FRCS_OWNR_PW, B.FRCS_OWNR_NM, B.FRCS_OWNR_BRDT, B.FRCS_OWNR_TEL, B.FRCS_OWNR_ZIP, 
+	    	B.FRCS_OWNR_ADDR, B.FRCS_OWNR_DTL_ADDR, B.FRCS_OWNR_JOIN_DT, B.ENABLED
+		FROM 
+		    franchise A , frcs_owner B
+		WHERE 
+			A.FRCS_OWNR_NO = B.FRCS_OWNR_NO
+			AND A.FRCS_STS_CD = #{comDetCode}
+</select>
+
+
+<select id="detail" parameterType="franchiseVO" resultMap="FrcsMap">
+	    SELECT 
+    		ROWNUM rnum, A.FRCS_NO, A.FRCS_NM, A.FRCS_STS_CD, A.FRCS_RGST_DT, A.FRCS_END_DT, A.FRCS_POST_NO, 
+    		A.FRCS_ADDR, A.FRCS_DTL_ADDR, A.FRCS_BSNS_STRT_TM, A.FRCS_BSNS_END_TM, A.FRCS_CTRT_CNCLS_DT,
+    		A.FRCS_EXPT_CMPL_DT, A.FRCS_FNL_INSP_DT, A.FRCS_OPNG_DT, A.FRCS_CPCT_PSN, A.FRCS_OWNR_NO, A.FRCS_REGION_CD, A.FRCS_TEL,
+	    	B.FRCS_OWNR_EMAIL, B.FRCS_OWNR_PW, B.FRCS_OWNR_NM, B.FRCS_OWNR_BRDT, B.FRCS_OWNR_TEL, B.FRCS_OWNR_ZIP, 
+	    	B.FRCS_OWNR_ADDR, B.FRCS_OWNR_DTL_ADDR, B.FRCS_OWNR_JOIN_DT, B.ENABLED,B.FRCS_OWNER_OJT,
+	    	C.OJT_NO,C.OJT_SN, C.OJT_STR_TIME, C.OJT_END_TIME, C.OJT_TYPE, C.OJT_YN, C.OJT_SCORE
+		FROM 
+		    franchise A , frcs_owner B, ojt C
+		WHERE 
+			A.FRCS_OWNR_NO = B.FRCS_OWNR_NO
+            AND B.FRCS_OWNER_OJT = C.OJT_NO(+)
+			AND A.FRCS_NO = #{frcsNo}
+</select>
+
+<update id="addEvent" parameterType="hashMap">
+	Update 
+		FRANCHISE
+	SET
+	<if test="type=='계약 체결 일자'">
+		FRCS_CTRT_CNCLS_DT = TO_DATE('${end}','YYYY-MM-DD')
+<!-- 		FRCS_CTRT_CNCLS_DT = '${end}' -->
+	</if>
+	<if test="type=='최종 점검 일자'">
+		FRCS_FNL_INSP_DT = TO_DATE('${end}','YYYY-MM-DD')
+<!-- 		FRCS_FNL_INSP_DT = '${end}' -->
+	</if>
+	<if test="type=='예상 완공 일자'">
+		FRCS_EXPT_CMPL_DT = TO_DATE('${end}','YYYY-MM-DD')
+<!-- 		FRCS_EXPT_CMPL_DT = '${end}' -->
+	</if>
+	<if test="type=='개점 일자'">
+		FRCS_OPNG_DT = TO_DATE('${end}','YYYY-MM-DD')
+<!-- 		FRCS_OPNG_DT = '${end}' -->
+	</if>
+	WHERE 
+		FRCS_NO = #{frcsNo}
+</update>
+<update id="updateOjtNo">
+	UPDATE 
+		FRCS_OWNER
+	SET
+		FRCS_OWNER_OJT = #{ojtNo}
+	WHERE
+		FRCS_OWNR_NO =#{frcsOwnrNo}
+</update>
+
+<update id="update">
+	UPDATE 
+		FRANCHISE
+	SET	
+		FRCS_BSNS_STRT_TM = #{frcsBsnsStrtTm},
+		FRCS_BSNS_END_TM  = #{frcsBsnsEndTm} ,
+		FRCS_CPCT_PSN	  = #{frcsCpctPsn},
+		FRCS_TEL		  = #{frcsTel}
+	WHERE
+		FRCS_NO = #{frcsNo}
+</update>
+
+<select id="frscStsCd" parameterType="String" resultType="comDetCodeInfoVO">
+	SELECT
+    com_det_code,
+    com_code,
+    com_det_code_nm,
+    com_det_code_rm
+FROM
+    com_det_code_info
+WHERE
+    com_code= #{comCode}
+</select>
+
+<!--가맹점 상세 페이지 수정  -->
+<update id="detailUpdate" >
+	UPDATE 
+		FRANCHISE
+	SET
+	    FRCS_NM = #{frcsNm},
+	    FRCS_TEL = #{frcsTel},
+	    FRCS_POST_NO = #{frcsPostNo},
+	    FRCS_ADDR = #{frcsAddr},
+	    FRCS_DTL_ADDR = #{frcsDtlAddr},
+	    FRCS_BSNS_STRT_TM = #{frcsBsnsStrtTm},
+	    FRCS_BSNS_END_TM = #{frcsBsnsEndTm},
+	    FRCS_CPCT_PSN = #{frcsCpctPsn},
+	    FRCS_CTRT_CNCLS_DT = #{frcsCtrtCnclsDt},
+	    FRCS_END_DT = #{frcsEndDt},
+	    FRCS_EXPT_CMPL_DT = #{frcsExptCmplDt},
+	    FRCS_FNL_INSP_DT = #{frcsFnlInspDt},
+	    FRCS_OPNG_DT = #{frcsOpngDt},
+	    FRCS_STS_CD = #{frcsStsCd}
+	WHERE
+		FRCS_OWNR_NO = #{frcsNo}
+	   
+</update>
+
+<!--가맹점 상세 페이지 수정  -->
+<update id="updateFrscOw">
+	UPDATE 
+		FRCS_OWNER
+	SET	
+		FRCS_OWNR_NM = #{franchiseOwnerVO.frcsOwnrNm}
+	WHERE
+		FRCS_OWNR_NO = #{frcsNo}
+</update>
+
+<!--매출분석 가맹점 리스트  -->
+<select id="salesList" resultType="hashMap">
+
+SELECT
+    f.frcs_no, f.frcs_nm, f.frcs_opng_dt,f.frcs_ownr_no ,  sum(p.pynm_total_amt) as total
+FROM
+    franchise f, payment p
+WHERE
+    frcs_sts_cd =  #{comDetCode}
+    and f.frcs_no = p.frcs_no
+<!--     and EXTRACT(YEAR FROM p.pynm_dt) = EXTRACT(YEAR FROM SYSDATE) -->
+group by f.frcs_no, f.frcs_nm , f.frcs_opng_dt ,f.frcs_ownr_no
+order by sum(p.pynm_total_amt) desc
+
+</select>
+
+<!-- 1) -->
+<select id="sales" parameterType="hashMap" resultType="hashMap">
+	SELECT 
+	    TO_CHAR(PYNM_DT, 'MM') AS "월", 
+	    TO_CHAR(ROUND(SUM(PYNM_TOTAL_AMT) / 1000), 'FM999,999,999,999') AS "월매출"
+	FROM payment
+	WHERE 
+	    PYNM_DT BETWEEN TO_DATE('2023-01-01', 'YYYY-MM-DD')
+	                AND TO_DATE('2023-12-27', 'YYYY-MM-DD')
+	    AND frcs_no = #{frcsNo}
+	GROUP BY TO_CHAR(PYNM_DT, 'MM')
+	ORDER BY "월"
+</select>
+
+<!-- 2) -->
+<select id="totalsales" resultMap="FrcsMap">
+	SELECT 
+ 	   TO_CHAR(ROUND(SUM(monthly_total) /1000 )/ COUNT(*), 'FM999,999,999,999,999') AS "월평균_매출",
+	   ROUND(SUM(monthly_total) , -3) AS "총매출"
+    FROM (
+		  SELECT 
+		   	TO_CHAR(PYNM_DT, 'MM') AS "월", 
+		    SUM(PYNM_TOTAL_AMT) AS monthly_total
+		  FROM payment
+			  WHERE 
+			  	PYNM_DT BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD')
+			                AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+			  	AND frcs_no = #{frcsNo}
+			  GROUP BY TO_CHAR(PYNM_DT, 'MM')
+		)
+</select>
+
+<!-- 3) -->
+<select id="detailOne" resultType="hashMap">
+	select 
+	FRCS_NO
+	,FRCS_NM
+	,FRCS_STS_CD
+	,FRCS_RGST_DT
+	,FRCS_END_DT
+	,FRCS_POST_NO
+	,FRCS_ADDR
+	,FRCS_DTL_ADDR
+	,FRCS_BSNS_STRT_TM
+	,FRCS_BSNS_END_TM
+	,FRCS_CTRT_CNCLS_DT
+	,FRCS_EXPT_CMPL_DT
+	,FRCS_FNL_INSP_DT
+	,FRCS_OPNG_DT
+	,FRCS_CPCT_PSN
+	,FRCS_OWNR_NO
+	,FRCS_REGION_CD
+	,FRCS_TEL
+	from franchise
+	where frcs_no = #{frcsNo}
+</select>
+
+<!-- 4) -->
+<select id="Laborcost" resultType="hashMap">
+	select frcs_no,sum(frcs_emp_sal)
+	from
+		frcs_employee
+	where frcs_no = #{frcsNo}
+		and FRCS_EMP_WKST_CD= 'CWST01'
+	group by frcs_no
+</select>
+
+<!-- 5) -->
+<select id="cost" resultType="hashMap">
+	SELECT 
+    RY_CLM_YM, 
+    SUM(RY_TOTAL_AMT) as "총납부금액", 
+    SUM(RY_FRCS_FEE_AMT) as "가맹비", 
+    SUM(RY_ORDER_AMT) as "제품 구입비", 
+    SUM(RY_ROYALTY_AMT) as "로열티"
+FROM
+    royalty
+WHERE 
+    TO_DATE(RY_CLM_YM, 'YYYY-MM') BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+    AND FRCS_NO = #{frcsNo}
+GROUP BY RY_CLM_YM
+</select>
+
+<select id="totalData" parameterType="hashMap" resultType="hashMap">
+	WITH Z AS(
+	     SELECT T.RY_CLM_YM, T.PYNM_TOTAL_AMT
+	         , S.RY_ORDER_AMT, U.FRCS_EMP_SAL, S.RY_FRCS_FEE_AMT, S.RY_ROYALTY_AMT, Q.GONGASUM
+	         , (S.RY_ORDER_AMT + U.FRCS_EMP_SAL + S.RY_FRCS_FEE_AMT + S.RY_ROYALTY_AMT + Q.GONGASUM) TOTAL_COST
+	         , T.PYNM_TOTAL_AMT - (S.RY_ORDER_AMT + U.FRCS_EMP_SAL + S.RY_FRCS_FEE_AMT + S.RY_ROYALTY_AMT + Q.GONGASUM) SONEIK
+	    FROM
+	    (
+	        SELECT TO_CHAR(PYNM_DT, 'YYYY-MM') RY_CLM_YM, 
+	            ROUND(SUM(PYNM_TOTAL_AMT)) AS PYNM_TOTAL_AMT
+	        FROM payment
+	        WHERE 
+	            PYNM_DT BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD')
+	                        AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            AND frcs_no = #{frcsNo}
+	        GROUP BY TO_CHAR(PYNM_DT, 'YYYY-MM')
+	        ORDER BY  TO_CHAR(PYNM_DT, 'YYYY-MM')
+	    ) T,
+	    (
+	        SELECT RY_CLM_YM, 
+	            SUM(RY_TOTAL_AMT) as RY_TOTAL_AMT, 
+	            SUM(RY_ORDER_AMT) as RY_ORDER_AMT,     
+	            SUM(RY_FRCS_FEE_AMT) as RY_FRCS_FEE_AMT,     
+	            SUM(RY_ROYALTY_AMT) as RY_ROYALTY_AMT
+	        FROM
+	            royalty
+	        WHERE 
+	            TO_DATE(RY_CLM_YM, 'YYYY-MM') BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+	            AND FRCS_NO = #{frcsNo}
+	        GROUP BY RY_CLM_YM
+	    ) S,
+	    (
+	        select sum(frcs_emp_sal) frcs_emp_sal
+	        from frcs_employee
+	        where frcs_no = #{frcsNo}
+	            and FRCS_EMP_WKST_CD= 'CWST01'
+	        group by frcs_no
+	    ) U,
+        (
+        SELECT 
+            DUES_CLM_YM AS RY_CLM_YM,
+            (DUES_ELECTRIC_AMT + DUES_WATER_AMT + DUES_GAS_AMT + DUES_MTRT_AMT) AS GONGASUM
+        FROM 
+            PUBLICDUES
+        WHERE 
+            TO_DATE(DUES_CLM_YM, 'YYYY-MM') BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            AND FRCS_NO = #{frcsNo}
+        )Q 
+	    WHERE T.RY_CLM_YM = S.RY_CLM_YM
+        AND T.RY_CLM_YM = Q.RY_CLM_YM
+	)
+	SELECT 
+	    CASE 
+	        WHEN GROUPING(Z.RY_CLM_YM) = 1 THEN 'Total'
+	        ELSE Z.RY_CLM_YM 
+	    END AS ryCklmYm,
+	    ROUND(SUM(Z.PYNM_TOTAL_AMT), -3) AS pynmTotalAmt,
+	    ROUND(SUM(Z.RY_ORDER_AMT), -3) AS ryOrderAmt,
+	    ROUND(SUM(Z.FRCS_EMP_SAL), -3) AS frcsEmpSal,
+	    ROUND(SUM(Z.RY_FRCS_FEE_AMT), -3) AS ryFrcsFeeAmt,
+	    ROUND(SUM(Z.RY_ROYALTY_AMT), -3) AS ryRoyaltyAmt,
+	    ROUND(SUM(Z.GONGASUM), -3) AS gonga, 
+	    ROUND(SUM(Z.TOTAL_COST), -3) AS totalCost,
+	    ROUND(SUM(Z.SONEIK), -3) AS soneik,
+	    ROUND((SUM(Z.SONEIK) / NULLIF(SUM(Z.PYNM_TOTAL_AMT), 0) * 100), 2) AS soneikRate
+	FROM Z
+	GROUP BY ROLLUP(Z.RY_CLM_YM)
+</select>
+
+<!--가맹점  -->
+<resultMap type="franchiseVO" id="FrcsMap">
+	<result property="frcsNo" column="FRCS_NO"/>
+	<result property="frcsNm" column="FRCS_NM"/>
+	<result property="frcsStsCd" column="FRCS_STS_CD"/>
+	<result property="frcsRgstDt" column="FRCS_RGST_DT"/>
+	<result property="frcsEndDt" column="FRCS_END_DT"/>
+	<result property="frcsPostNo" column="FRCS_POST_NO"/>
+	<result property="frcsAddr" column="FRCS_ADDR"/>
+	<result property="frcsDtlAddr" column="FRCS_DTL_ADDR"/>
+	<result property="frcsBsnsStrtTm" column="FRCS_BSNS_STRT_TM"/>
+	<result property="frcsBsnsEndTm" column="FRCS_BSNS_END_TM"/>
+	<result property="frcsCtrtCnclsDt" column="FRCS_CTRT_CNCLS_DT"/>
+	<result property="frcsExptCmplDt" column="FRCS_EXPT_CMPL_DT"/>
+	<result property="frcsFnlInspDt" column="FRCS_FNL_INSP_DT"/>
+	<result property="frcsOpngDt" column="FRCS_OPNG_DT"/>
+	<result property="frcsCpctPsn" column="FRCS_CPCT_PSN"/>
+	<result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+	<result property="frcsRegionCd" column="FRCS_REGION_CD"/>
+	<result property="frcsTel" column="FRCS_TEL"/>
+	<result property="rnum" column="rnum"/>
+	
+	<association property="franchiseOwnerVO" resultMap="frcsOWMap"></association>
+	<collection property="paymentVOList" resultMap="payMap"></collection>
+</resultMap>
+
+<!--판매  -->
+<resultMap type="paymentVO" id="payMap">
+	<result property="pynmNo" column="PYNM_NO"/>
+	<result property="memNo" column="MEM_NO"/>
+	<result property="frcsNo" column="FRCS_NO"/>
+	<result property="pynmMthdId" column="PYNM_MTHD_ID"/>
+	<result property="pynmDt" column="PYNM_DT"/>
+	<result property="pynmTotalAmt" column="PYNM_TOTAL_AMT"/>
+	<result property="setupMenuYn" column="SETUP_MENU_YN"/>
+</resultMap>
+
+<!--가맹점주 -->
+<resultMap type="frcsOwVO" id="frcsOWMap">
+    <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+    <result property="frcsOwnrEmail" column="FRCS_OWNR_EMAIL"/>
+    <result property="frcsOwnrPw" column="FRCS_OWNR_PW"/>
+    <result property="frcsOwnrNm" column="FRCS_OWNR_NM"/>
+    <result property="frcsOwnrBrdt" column="FRCS_OWNR_BRDT"/>
+    <result property="frcsOwnrTel" column="FRCS_OWNR_TEL"/>
+    <result property="frcsOwnrZip" column="FRCS_OWNR_ZIP"/>
+    <result property="frcsOwnrAddr" column="FRCS_OWNR_ADDR"/>
+    <result property="frcsOwnrDtlAddr" column="FRCS_OWNR_DTL_ADDR"/>
+    <result property="frcsOwnrJoinDt" column="FRCS_OWNR_JOIN_DT"/>
+    <result property="enabled" column="ENABLED"/>
+    
+    <collection property="frcsOwnerOjtList" resultMap="ojtMap"></collection>
+</resultMap>
+
+<!-- 교육 -->
+<resultMap type="ojtVO" id="ojtMap">
+	<result property="ojtNo" column="OJT_NO"/>
+	<result property="ojtSn" column="OJT_SN"/>
+	<result property="ojtStrTime" column="OJT_STR_TIME"/>
+	<result property="ojtEndTime" column="OJT_END_TIME"/>
+	<result property="ojtType" column="OJT_TYPE"/>
+	<result property="ojtYn" column="OJT_YN"/>
+	<result property="ojtScore" column="OJT_SCORE"/>
+</resultMap>
+
+
+</mapper>

@@ -1,0 +1,280 @@
+
+/* 음료 사진들 부모 요소 컨테이너 정렬 */
+.menuContainer{
+	margin-top: 68px;
+	display:flex; 
+	/* justify-content: center;  */
+	/* align-items: center;  */ /* 한줄에 들어가는 아이템 중앙정렬*/
+	align-items: flex-start;/* 한줄에 들어가는 아이템 상단정렬*/
+	width: 1120px;
+	flex-wrap: wrap;
+	margin: 0px auto;
+	/* justify-content: flex-start; */
+	justify-content: space-between;
+	gap: 64px 30px;
+	margin-bottom: 70px;
+}
+.menuContainer .menuItem p {
+	width: 250px;
+	word-wrap: break-word;
+}
+.menuContainer .menuItem:last-child {
+	margin-right: auto;
+}
+
+/* 음료 사진들 자식 요소 정렬 */
+.menuItem {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+/* 음료 사진들 */
+.menu-img {
+	position: relative;
+	width: 250px; /* 원하는 너비로 설정 */
+	height: 250px; /* 원하는 높이로 설정 */
+}
+/* ------------------------------------------------------- */
+
+section{
+	width: 1120px;
+	margin: 0 auto;
+	padding-top: 70px;
+	font-family: 'Noto Sans KR', sans-serif;
+}
+.sub-tit-name{
+	font-weight: bold;
+	margin-bottom: 20px;
+	font-size: 40px;
+}
+.menuItem .menu-name{
+	padding-top:16px;
+	text-align: center;
+	font-weight: bold;
+	margin-bottom: 8px;
+	font-size:24px;
+}
+.menuItem .menu-price{
+	color: #999;
+	font-size: 0.9em;
+	margin-top: 14px;
+	width: 250px;
+	text-align: center;
+}
+.menuItem .menu-detail{
+	color: #999;
+	font-size: 0.9em;
+	width: 250px;
+	text-align: center;
+}
+
+/*------------상품 목록에서 상품을 선택했을때 뜨는 상품 상세페이지[시작]------------*/
+section .menuContainer-detail{
+	display: flex;
+	/* margin-bottom: 70px; */
+}
+.menu-img-big{
+	width: 450px;
+	height: 470px;
+}
+.menuContainer-detail .menuItem-detail{
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 654px;
+	padding: 0px 50px 0px 16px;
+	margin-left: 16px;
+}
+.menuContainer-detail .menuItem-detail .menu_name{
+	font-size: 26px;
+	font-weight: bold;
+}
+.menuContainer-detail .menuItem-detail .menu-detail{
+	color: #999;
+	margin-bottom: 32px;
+}
+.menuItem-detail .menu-price{
+	text-align: right;
+	font-weight: bold;
+	font-size: 20px;
+}
+.accordion {
+	width: 100%;
+	background-color: #f2f2f2;
+    padding: 8px 14px;
+	border: none;
+	border-radius: 3px;
+	text-align: left;
+	margin-bottom: 16px;
+	display: flex;
+    justify-content: space-between;
+	align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.accordion-standard{
+	margin-left: 8px;
+	font-size: 0.8em;
+	color:#888888;
+	letter-spacing :0.06em;
+}
+.accordion .seeMore{
+	margin-left: 32px;
+	margin-right: 10px;
+	font-weight: bold;
+	color: #999;
+}
+/* 제품 영양정보 아코디언 메뉴[시작] */
+.panel {
+	display: flex;
+	flex-direction: column;
+    justify-content: space-between;
+	padding-left: 40px;
+    padding-right: 8px;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.2s ease-out;
+/* 	border-bottom: 1px solid #eeeeee; */
+	color: #888888;
+	font-size: 0.9em;
+}
+/*영양정보 상세*/
+.panel .inner-box1 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+/*     width: 480px; */
+/* 	padding-bottom: 16px; */
+}
+
+/* 1열로 있는 거 가로행으로 붙이기 */
+.panel .inner-box1>div {
+	width:100%;
+	display:grid;
+	grid-template-columns:1fr 1fr;
+}
+
+/* 영양정보 상세의 자식 요소 */
+.menuNtrInfo{
+	display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-direction: row;
+    gap: 0px 8px;
+}
+/* 영양정보 상세의 자식의 자식 요소 */
+.panel .inner-box1 div{
+	width: 200px;
+}
+
+.panel .inner-box1 p {
+	display: inline-block;
+	margin-left: 8px;
+    margin-bottom: -15px;
+}
+/* 제품 영양정보 아코디언 메뉴[끝] */
+
+/* 장바구니 담기, 주문하기 버튼 크기 조절*/
+.order-btn-containter{
+	display: flex;
+	justify-content: space-between;
+}
+
+/*------------상품 목록에서 상품을 선택했을때 뜨는 상품 상세페이지[끝]------------*/
+
+/* map.jsp 페이지 [시작]-------------------------------------------*/
+
+/* .storeContainer {
+	width: 100%;
+	margin-top: 68px;
+	display:flex; 
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 64px 30px;
+	margin-bottom: 70px;
+} */
+
+.content-map{
+	display: flex;
+	gap: 0px 4px;
+	height: 600px;
+}
+
+.map-api {
+	width: 780px;
+}
+.right_info{
+	width: 336px;
+	/* width: calc( 20% - 10px); */
+    /* float: left; */
+    margin-left: 5px;
+    border: 1px solid #e2e2e2;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: top;
+}
+.right_info_header{
+	background-color: #333;
+	padding: 16px;
+}
+.right_info .item_list {
+	height: 480px;
+	list-style: none;
+	padding-left: 16px;
+	padding-right: 16px;
+	overflow-y: auto;
+}
+
+	
+.right_info_title {
+	font-size: 27px;
+	color: #fff;
+}
+div.right_info_search {
+    margin-top: 16px;
+    position: relative;
+}
+input.search_keyword {
+    width: 100%;
+    height: 35px;
+    padding: 10px;
+    font-size: 14px;
+}
+div.region_search {
+    margin-top: 10px;
+    text-align: center;
+    padding: 5px;
+    padding-bottom: 13px;
+    border-bottom: 1px solid #e2e2e2;
+}
+/* ul.item_list {
+	padding-left: 16px;
+	padding-right: 16px;
+} */
+ul.item_list li {
+    padding: 10px 0px;
+    border-bottom: 1px solid #dedede;
+    cursor: pointer;
+}
+.item_box {
+    padding: 0px 8px;
+}
+.item_box .item_address, .item_phone_number{
+	color: #999;
+    font-size: 15px;
+}
+
+div.item_box div.item_title {
+    font-weight: bold;
+	margin-bottom: 8px;
+}
+
+.pagination {
+    margin-top: 16px;
+    margin-bottom: 34px;
+    text-align: center;
+}
+/*store 페이지 [끝]-------------------------------------------*/

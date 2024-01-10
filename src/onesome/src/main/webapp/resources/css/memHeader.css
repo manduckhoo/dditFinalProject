@@ -1,0 +1,111 @@
+/* ==================== nav바 헤더를 위한 css 파일 ==================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Roboto&display=swap");
+
+/* header(nav) 폰트, 배경, 위치, 선 적용하기 */
+#headerNav{
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: 700;
+	font-size: 20px;
+	color: #42424A;
+	background-color: #ffffff;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	padding: 0 70px;
+	border-bottom: 1px solid #dbdbdb;
+	z-index: 99;
+}
+
+/* 브랜드부터 nav아이콘들까지 쭉 왼쪽으로 밀기 */
+#headerNav1{
+	margin-left : 150px;
+}
+
+/* hedaer(nav) 안에 하위 메뉴들만 폰트 적용하기 */
+.submenu li{
+	font-family: 'Roboto', sans-serif;
+	font-weight: 400;
+	font-size: 16px;
+}
+
+/* 카테고리들 끼리 좌우 간격 조정 */
+header ul li{
+	display: inline-block;
+	list-style: none;
+	margin: 0 35px;
+}
+
+/* nav바 헤더쪽에 위아래 간격이랑 색상 조정*/
+header ul li a{
+	text-decoration: none;
+	color: #000000;
+	padding: 22px 0;
+	display: inline-block;
+	transition: all ease 0.3s; /* 드롭다운 속도 조절 */
+}
+
+/* 마우스 대면 text color 빨강으로 변함 */
+header ul li a:hover{
+	color: #d50037;
+}
+
+
+/* submenu style 가리는 용도, 서브메뉴 크기 줄이기 */
+header ul .submenu{
+	position: absolute;
+	width: 120px;
+	background-color: #ffffff;
+	box-shadow: 0 20px 45px #00000020;
+	margin-top: -50px;
+	opacity: 0; /* 이걸로 일단 투명도 가려놓고 */
+	z-index: -999; /* 이걸로 맨뒤로 보내놓음 */
+	transition: all ease 0.2s; /* 드롭다운 속도 조절 */
+}
+
+
+/* submenu style 나오게하는 용도 */
+header ul li:hover .submenu{
+	z-index: 99;
+	opacity: 1;
+	margin-top: 0;
+}
+/* 하위메뉴 글자 중앙 맞추기 */
+header ul .submenu li{
+	margin: 0;
+	width: 100%;
+}
+
+/* 하위메뉴 위아래 맞추기 */
+header ul .submenu li a{
+	padding: 15px 5px;
+	display: inline-block;
+	width: 100%;
+}
+
+/* 로그인 이름, 알림 등을 위해 창업상담 li기준으로 마진 띄워놓기 */
+#margin-inquirer{
+	margin-right: 100px;
+}
+
+/* 로그인버튼 간격 조정 */
+#loginBtn{
+	margin-left: 50px;
+	margin-right: 10px;
+}
+
+/* 회원가입버튼 간격 조정 */
+#joinBtn{
+	margin-right: 10px;
+}
+
+/* 장바구니 알림창(모달) 글씨 크기*/
+.fs-2-1{
+	font-size: 0.75rem !important;
+}
+
+/* 메뉴 내부 목록 중간으로 옮기기*/
+.textCenter{
+	text-align: center;
+}

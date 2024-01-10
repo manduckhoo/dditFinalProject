@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.FranChiseOwner.mapper.FranChiseOwnerMapper">
+
+    <resultMap id="frcsOwMap" type="frcsOwVO">
+        <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+        <result property="frcsOwnrEmail" column="FRCS_OWNR_EMAIL"/>
+        <result property="frcsOwnrPw" column="FRCS_OWNR_PW"/>
+        <result property="frcsOwnrNm" column="FRCS_OWNR_NM"/>
+        <result property="frcsOwnrBrdt" column="FRCS_OWNR_BRDT"/>
+        <result property="frcsOwnrTel" column="FRCS_OWNR_TEL"/>
+        <result property="frcsOwnrZip" column="FRCS_OWNR_ZIP"/>
+        <result property="frcsOwnrAddr" column="FRCS_OWNR_ADDR"/>
+        <result property="frcsOwnrDtlAddr" column="FRCS_OWNR_DTL_ADDR"/>
+        <result property="frcsOwnrJoinDt" column="FRCS_OWNR_JOIN_DT"/>
+        <result property="enabled" column="ENABLED"/>
+        
+        <collection property="franchiseOwnerAuthVOList" resultMap="frcsOwAuthMap"/>
+        <collection property="franchiseVOList" resultMap="frcsMap"/>
+    </resultMap>
+
+    <resultMap id="frcsOwAuthMap" type="frcsOwAuthVO">
+        <result property="frcsAuthCd" column="FRCS_AUTH_CD"/>
+        <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+    </resultMap>
+
+    <resultMap type="franchiseVO" id="frcsMap">
+       <result property="frcsNo" column="FRCS_NO"/>
+      <result property="frcsNm" column="FRCS_NM"/>
+      <result property="frcsStsCd" column="FRCS_STS_CD"/>
+      <result property="frcsRgstDt" column="FRCS_RGST_DT"/>
+      <result property="frcsEndDt" column="FRCS_END_DT"/>
+      <result property="frcsPostNo" column="FRCS_POST_NO"/>
+      <result property="frcsAddr" column="FRCS_ADDR"/>
+      <result property="frcsDtlAddr" column="FRCS_DTL_ADDR"/>
+      <result property="frcsBsnsStrtTm" column="FRCS_BSNS_STRT_TM"/>
+      <result property="frcsBsnsEndTm" column="FRCS_BSNS_END_TM"/>
+      <result property="frcsCtrtCnclsDt" column="FRCS_CTRT_CNCLS_DT"/>
+      <result property="frcsExptCmplDt" column="FRCS_EXPT_CMPL_DT"/>
+      <result property="frcsFnlInspDt" column="FRCS_FNL_INSP_DT"/>
+      <result property="frcsOpngDt" column="FRCS_OPNG_DT"/>
+      <result property="frcsCpctPsn" column="FRCS_CPCT_PSN"/>
+      <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+      <result property="frcsRegionCd" column="FRCS_REGION_CD"/>
+      <result property="frcsTel" column="FRCS_TEL"/>
+    </resultMap>
+   
+   <insert id="create" parameterType="frcsOwVO">
+      <selectKey resultType="int" order="BEFORE" keyProperty="frcsOwnrNo">
+        SELECT 
+        	NVL(MAX(FRCS_OWNR_NO)+1,1)
+      FROM 
+      	FRCS_OWNER
+      </selectKey>
+      
+      INSERT INTO FRCS_OWNER(FRCS_OWNR_NO, FRCS_OWNR_EMAIL, FRCS_OWNR_PW, FRCS_OWNR_NM, FRCS_OWNR_BRDT, FRCS_OWNR_TEL, FRCS_OWNR_ZIP, FRCS_OWNR_ADDR, FRCS_OWNR_DTL_ADDR)
+      VALUES(
+         #{frcsOwnrNo},
+         #{frcsOwnrEmail},
+         #{frcsOwnrPw},
+         #{frcsOwnrNm},
+         #{frcsOwnrBrdt},
+         #{frcsOwnrTel},
+         #{frcsOwnrZip},
+         #{frcsOwnrAddr},
+         #{frcsOwnrDtlAddr}
+      )
+   </insert>
+   
+   <select id="list" parameterType="frcsOwVO" resultType="frcsOwVO">
+      SELECT FRCS_OWNR_NO, FRCS_OWNR_EMAIL, FRCS_OWNR_PW, FRCS_OWNR_NM,FRCS_OWNR_BRDT, FRCS_OWNR_TEL, FRCS_OWNR_ZIP, FRCS_OWNR_ADDR, FRCS_OWNR_DTL_ADDR, to_char(FRCS_OWNR_JOIN_DT,'YYYY"년"MM"월"DD"일"')as FRCS_OWNR_JOIN_DT, ENABLED
+      FROM 
+         FRCS_OWNER
+   </select>
+   
+   <select id="detail" resultType="frcsOwVO">
+      SELECT FRCS_OWNR_NO, FRCS_OWNR_EMAIL, FRCS_OWNR_PW, FRCS_OWNR_NM,FRCS_OWNR_BRDT, FRCS_OWNR_TEL, FRCS_OWNR_ZIP, FRCS_OWNR_ADDR, FRCS_OWNR_DTL_ADDR, to_char(FRCS_OWNR_JOIN_DT,'YYYY"년"MM"월"DD"일" HH24"시"MI"분"')as FRCS_OWNR_JOIN_DT, ENABLED
+      FROM
+         FRCS_OWNER
+      WHERE 
+         FRCS_OWNR_NO = #{frcsOwnrNo}
+   </select>
+   
+   <update id="update" parameterType="frcsOwVO">
+      UPDATE
+         FRCS_OWNER
+      SET
+         FRCS_OWNR_NM = #{frcsOwnrNm},
+         FRCS_OWNR_TEL = #{frcsOwnrTel},
+         FRCS_OWNR_EMAIL = #{frcsOwnrEmail},
+         FRCS_OWNR_ZIP = #{frcsOwnrZip},
+         FRCS_OWNR_ADDR = #{frcsOwnrAddr},
+         FRCS_OWNR_DTL_ADDR = #{frcsOwnrDtlAddr},
+         ENABLED = #{enabled}
+      WHERE 
+         FRCS_OWNR_NO = #{frcsOwnrNo}
+   </update>
+   
+   
+   
+   
+</mapper>

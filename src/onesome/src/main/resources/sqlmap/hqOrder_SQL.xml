@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.hqOrder.mapper.HqOrderMapper">
+
+    <insert id="insertHqOrder" parameterType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        <selectKey resultType="int" order="BEFORE" keyProperty="hqOrderNo">
+            SELECT
+                TO_CHAR(SYSDATE, 'yyMMdd') || NVL(TRIM(TO_CHAR(SUBSTR(MAX(HQ_ORDER_NO), 7) + 1, '00')), '01')
+            FROM
+                HQ_ORDER
+        </selectKey>
+        INSERT ALL
+        INTO HQ_ORDER (HQ_ORDER_NO, HQ_ORDER_DT, HQ_ORDER_TOTAL_AMT, ADMIN_NO, HQ_ORDER_STS_CD)
+        VALUES (#{hqOrderNo}, sysdate, 0, 1, 'HODST01')
+        <foreach collection="productCheckBox" item="prdtNo">
+            INTO HQ_DETAIL_ORDER (HQ_ORDER_NO, HQ_ORDER_CNT, HQ_ORDER_COST_AMT, PRDCT_NO, PRDCT_NM)
+            VALUES (#{hqOrderNo}, 1, (SELECT PRDCT_RCVN_AMT FROM PRODUCT WHERE PRDCT_NO=#{prdtNo}), #{prdtNo}, (SELECT PRDCT_NM FROM PRODUCT WHERE PRDCT_NO=#{prdtNo}))
+        </foreach>
+        SELECT 1 FROM DUAL
+    </insert>
+
+    <resultMap id="hqOrderMap" type="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        <result property="hqOrderNo" column="HQ_ORDER_NO"/>
+        <result property="hqOrderDt" column="HQ_ORDER_DT"/>
+        <result property="hqOrderTotalAmt" column="HQ_ORDER_TOTAL_AMT"/>
+        <result property="adminNo" column="ADMIN_NO"/>
+        <result property="hqOrderStsCd" column="HQ_ORDER_STS_CD"/>
+
+        <collection property="hqDetailOrderVOList" resultMap="hqDetailOrderMap"></collection>
+    </resultMap>
+
+    <resultMap id="hqDetailOrderMap" type="kr.or.onesome.hqOrder.vo.HqDetailOrderVO">
+        <result property="hqOrderNo" column="HQ_ORDER_NO"/>
+        <result property="hqOrderCnt" column="HQ_ORDER_CNT"/>
+        <result property="hqOrderCostAmt" column="HQ_ORDER_COST_AMT"/>
+        <result property="prdctNo" column="PRDCT_NO"/>
+        <result property="prdctNm" column="PRDCT_NM"/>
+        <result property="hqOrderStsCd" column="HQ_ORDER_STS_CD" />
+        <result property="hqOrderDt" column="HQ_ORDER_DT" />
+        <result property="hqOrderTotalAmt" column="HQ_ORDER_TOTAL_AMT" />
+
+        <association property="productVO" resultMap="productMap"></association>
+        <collection property="acntVO" resultMap="acntMap"></collection>
+    </resultMap>
+
+    <resultMap id="productMap" type="kr.or.onesome.product.vo.ProductVO">
+        <result property="prdctNo" column="PRDCT_NO"/>
+        <result property="prdctClsfCd" column="PRDCT_CLSF_CD"/>
+        <result property="prdctNm" column="PRDCT_NM"/>
+        <result property="prdctRcvnAmt" column="PRDCT_RCVN_AMT"/>
+        <result property="prdctExpln" column="PRDCT_EXPLN"/>
+        <result property="prdctPrchsStrtDt" column="PRDCT_PRCHS_STRT_DT"/>
+        <result property="prdctPrchsEndDt" column="PRDCT_PRCHS_END_DT"/>
+        <result property="prdctDscnYn" column="PRDCT_DSCN_YN"/>
+        <result property="allergensYn" column="ALLERGENS_YN"/>
+        <result property="hqInvenCnt" column="HQ_INVEN_CNT"/>
+        <result property="hqInvenProperCnt" column="HQ_INVEN_PROPER_CNT"/>
+        <result property="acntNo" column="ACNT_NO"/>
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+
+        <association property="comDetCodeInfoVO" resultMap="comDetCodeInfoMap" />
+    </resultMap>
+
+    <resultMap id="comDetCodeInfoMap" type="kr.or.onesome.vo.ComDetCodeInfoVO">
+        <result property="comDetCode" column="COM_DET_CODE"/>
+        <result property="comCode" column="COM_CODE"/>
+        <result property="comDetCodeNm" column="COM_DET_CODE_NM"/>
+        <result property="comDetCodeRm" column="COM_DET_CODE_RM"/>
+    </resultMap>
+
+    <resultMap id="acntMap" type="kr.or.onesome.vo.AcntVO">
+        <result property="acntNo" column="ACNT_NO"/>
+        <result property="acntNm" column="ACNT_NM"/>
+        <result property="acntTel" column="ACNT_TEL"/>
+        <result property="acntZip" column="ACNT_ZIP"/>
+        <result property="acntAddr" column="ACNT_ADDR"/>
+        <result property="acntDtlAddr" column="ACNT_DTL_ADDR"/>
+        <result property="acntMngrPstn" column="ACNT_MNGR_PSTN"/>
+        <result property="acntMngrNm" column="ACNT_MNGR_NM"/>
+        <result property="acntEmail" column="ACNT_EMAIL"/>
+        <result property="acntClsfCd" column="ACNT_CLSF_CD"/>
+    </resultMap>
+
+    <select id="selectHqOrder" resultMap="hqOrderMap">
+        SELECT
+            a.HQ_ORDER_STS_CD
+             , b.HQ_ORDER_NO
+             , b.HQ_ORDER_CNT
+             , b.HQ_ORDER_COST_AMT
+             , b.PRDCT_NO
+             , b.PRDCT_NM
+             , c.ACNT_NO
+             , c.ACNT_NM
+             , d.HQ_INVEN_CNT
+             , d.HQ_INVEN_PROPER_CNT
+             , d.PRDCT_RCVN_AMT
+             , e.COM_DET_CODE
+             , e.COM_DET_CODE_NM
+        FROM
+            HQ_ORDER a
+           , HQ_DETAIL_ORDER b
+           , ACNT c
+           , PRODUCT d
+           , COM_DET_CODE_INFO e
+        WHERE
+            a.HQ_ORDER_NO = #{hqOrderNo}
+          AND a.HQ_ORDER_NO = b.HQ_ORDER_NO
+          AND b.PRDCT_NO = d.PRDCT_NO
+          AND c.ACNT_NO = d.ACNT_NO
+          AND d.PRDCT_CLSF_CD = e.COM_DET_CODE
+        ORDER BY
+            ACNT_NO
+    </select>
+
+    <select id="hqOrderAcntInfo" resultMap="hqDetailOrderMap">
+        SELECT
+            a.HQ_ORDER_NO
+             , p.ACNT_NO
+             , b.ACNT_NM
+             , b.ACNT_TEL
+             , b.ACNT_ZIP
+             , b.ACNT_ADDR
+             , b.ACNT_MNGR_PSTN
+             , b.ACNT_MNGR_NM
+             ,b.ACNT_DTL_ADDR
+             , (
+            SELECT
+                HQ_ORDER.HQ_ORDER_STS_CD
+            FROM
+                HQ_ORDER
+            WHERE
+                a.HQ_ORDER_NO = HQ_ORDER.HQ_ORDER_NO) AS HQ_ORDER_STS_CD
+             , (
+            SELECT
+                HQ_ORDER.HQ_ORDER_DT
+            FROM
+                HQ_ORDER
+            WHERE
+                a.HQ_ORDER_NO = HQ_ORDER.HQ_ORDER_NO) AS HQ_ORDER_DT
+             , (
+            SELECT
+                HQ_ORDER.HQ_ORDER_TOTAL_AMT
+            FROM
+                HQ_ORDER
+            WHERE
+                a.HQ_ORDER_NO = HQ_ORDER.HQ_ORDER_NO) AS HQ_ORDER_TOTAL_AMT
+        FROM
+            HQ_DETAIL_ORDER a
+                JOIN PRODUCT p ON
+                a.PRDCT_NO = p.PRDCT_NO
+                JOIN ACNT b ON
+                p.ACNT_NO = b.ACNT_NO
+        WHERE
+            a.HQ_ORDER_NO = #{hqOrderNo}
+        GROUP BY
+            a.HQ_ORDER_NO
+               , p.ACNT_NO
+               , b.ACNT_NM
+               , b.ACNT_TEL
+               , b.ACNT_ZIP
+               , b.ACNT_ADDR
+               ,b.ACNT_DTL_ADDR
+               , b.ACNT_MNGR_PSTN
+               , b.ACNT_MNGR_NM
+        ORDER BY
+            ACNT_NO
+    </select>
+
+    <delete id="deleteHqOrderDetail" parameterType="kr.or.onesome.hqOrder.vo.HqDetailOrderVO">
+        DELETE
+        FROM
+            HQ_DETAIL_ORDER
+        WHERE
+            HQ_ORDER_NO = #{hqOrderNo}
+          AND PRDCT_NO = #{prdctNo}
+    </delete>
+
+    <select id="hqOrderDetailLength" parameterType="kr.or.onesome.hqOrder.vo.HqDetailOrderVO" resultType="int">
+        SELECT
+            COUNT(PRDCT_NO)
+        FROM
+            HQ_DETAIL_ORDER
+        WHERE
+            HQ_ORDER_NO = #{hqOrderNo}
+    </select>
+
+    <delete id="deleteHqOrder" parameterType="kr.or.onesome.hqOrder.vo.HqDetailOrderVO">
+        DELETE
+        FROM
+            HQ_ORDER
+        WHERE
+            HQ_ORDER_NO = #{hqOrderNo}
+    </delete>
+
+    <delete id="cancelHqOrder" parameterType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        DELETE
+        FROM
+            HQ_DETAIL_ORDER
+        WHERE
+            HQ_ORDER_NO = #{hqOrderNo}
+    </delete>
+
+    <delete id="cancelHqOrderMaster" parameterType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        DELETE
+        FROM
+            HQ_ORDER
+        WHERE
+            HQ_ORDER_NO = #{hqOrderNo}
+    </delete>
+
+    <update id="updateHqDetailOrder" parameterType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        <foreach collection="hqDetailOrderVOList" item="hqDetailOrder" open="DECLARE BEGIN" separator=";" close="; END;">
+            UPDATE
+                HQ_DETAIL_ORDER
+            SET
+                HQ_ORDER_CNT = #{hqDetailOrder.hqOrderCnt}
+              , HQ_ORDER_COST_AMT = #{hqDetailOrder.hqOrderCostAmt}
+            WHERE
+                HQ_ORDER_NO = #{hqOrderNo}
+              AND PRDCT_NO = #{hqDetailOrder.prdctNo}
+        </foreach>
+    </update>
+
+    <update id="updateHqOrder" parameterType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        UPDATE
+            HQ_ORDER
+        SET
+            HQ_ORDER_DT = SYSDATE
+          , HQ_ORDER_TOTAL_AMT = #{hqOrderTotalAmt}
+        WHERE
+            HQ_ORDER_NO = #{hqOrderNo}
+    </update>
+
+    <select id="hqOrderInvoiceList" resultType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        SELECT
+            HQ_ORDER_NO
+             , HQ_ORDER_DT
+             , HQ_ORDER_TOTAL_AMT
+             , ADMIN_NO
+             , HQ_ORDER_STS_CD
+        FROM
+            HQ_ORDER
+        ORDER BY
+            HQ_ORDER_NO DESC
+    </select>
+
+    <select id="displayHqOrderInvoice" parameterType="HashMap" resultMap="hqOrderMap">
+        SELECT a.HQ_ORDER_NO
+             , a.HQ_ORDER_DT
+             , a.HQ_ORDER_TOTAL_AMT
+             , a.ADMIN_NO
+             , a.HQ_ORDER_STS_CD
+             , b.HQ_ORDER_NO
+             , b.HQ_ORDER_CNT
+             , b.HQ_ORDER_COST_AMT
+             , b.PRDCT_NO
+             , b.PRDCT_NM
+             , c.ACNT_NO
+             , c.ACNT_NM
+             , c.ACNT_TEL
+             , c.ACNT_ZIP
+             , c.ACNT_ADDR
+             , c.ACNT_DTL_ADDR
+             , c.ACNT_MNGR_PSTN
+             , c.ACNT_MNGR_NM
+             , c.ACNT_EMAIL
+             , c.ACNT_CLSF_CD
+             , d.PRDCT_NO
+             , d.PRDCT_CLSF_CD
+             , d.PRDCT_NM
+             , d.PRDCT_RCVN_AMT
+             , e.COM_DET_CODE
+             , e.COM_DET_CODE_NM
+        FROM
+            HQ_ORDER a
+           , HQ_DETAIL_ORDER b
+           , ACNT c
+           , PRODUCT d
+           , COM_DET_CODE_INFO e
+        WHERE
+            a.HQ_ORDER_NO = #{hqOrderNo}
+          AND a.HQ_ORDER_NO = b.HQ_ORDER_NO
+          AND b.PRDCT_NO = d.PRDCT_NO
+          AND c.ACNT_NO = d.ACNT_NO
+          AND d.PRDCT_CLSF_CD = e.COM_DET_CODE
+        ORDER BY
+            ACNT_NO
+    </select>
+
+    <update id="hqOrderFail" parameterType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        UPDATE
+            HQ_ORDER
+        SET
+            HQ_ORDER_STS_CD = 'HODST03'
+        WHERE
+            HQ_ORDER_NO = #{hqOrderNo}
+    </update>
+
+    <update id="hqOrderComplete" parameterType="kr.or.onesome.hqOrder.vo.HqOrderVO">
+        BEGIN
+            UPDATE
+                HQ_ORDER
+            SET
+                HQ_ORDER_STS_CD = 'HODST02'
+            WHERE
+                HQ_ORDER_NO = #{hqOrderNo};
+        <foreach collection="hqDetailOrderVOList" item="hqDetailOrder" separator=";" close="; END;">
+            UPDATE
+                PRODUCT B
+            SET
+                B.HQ_INVEN_CNT = B.HQ_INVEN_CNT + (
+                    SELECT
+                        A.HQ_ORDER_CNT
+                    FROM
+                        HQ_DETAIL_ORDER A
+                    WHERE A.PRDCT_NO = #{hqDetailOrder.prdctNo}
+                    AND
+                        A.HQ_ORDER_NO = #{hqOrderNo})
+            WHERE B.PRDCT_NO = #{hqDetailOrder.prdctNo}
+        </foreach>
+    </update>
+
+
+</mapper>

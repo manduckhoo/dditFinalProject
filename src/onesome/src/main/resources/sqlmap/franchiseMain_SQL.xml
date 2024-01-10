@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.franchise.mapper.FranchiseMainMapper">
+
+    <resultMap id="paymentMap" type="kr.or.onesome.vo.PaymentVO">
+        <result property="pynmNo" column="PYNM_NO"/>
+        <result property="memNo" column="MEM_NO"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="pynmMthdId" column="PYNM_MTHD_ID"/>
+        <result property="pynmDt" column="PYNM_DT"/>
+        <result property="pynmTotalAmt" column="PYNM_TOTAL_AMT"/>
+        <result property="setupMenuYn" column="SETUP_MENU_YN"/>
+        
+        <collection property="paymentDetailVOList" resultMap="paymentDetailMap"/>
+    </resultMap>
+    <resultMap id="paymentDetailMap" type="kr.or.onesome.vo.PaymentDetailVO">
+        <result property="menuSize" column="MENU_SIZE"/>
+        <result property="menuIceYn" column="MENU_ICE_YN"/>
+        <result property="pynmSeq" column="PYNM_SEQ"/>
+        <result property="pynmNo" column="PYNM_NO"/>
+        <result property="pynmCnt" column="PYNM_CNT"/>
+        <result property="menuNo" column="MENU_NO"/>
+        <result property="menuNm" column="MENU_NM"/>
+        <result property="menuPrice" column="MENU_PRICE"/>
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+    </resultMap>
+
+    <update id="changeOrderStatus" parameterType="hashMap">
+        update PAYMENT
+        set SETUP_MENU_YN = 'Y'
+        where FRCS_NO = #{crrFrcsNo}
+          and PYNM_NO = #{pynmNo}
+    </update>
+
+    <select id="getPendingOrder" parameterType="hashMap" resultMap="paymentMap">
+        select p.PYNM_NO,
+               PYNM_DT,
+               PYNM_TOTAL_AMT,
+               SETUP_MENU_YN,
+               PYNM_CNT,
+               MENU_NM,
+               MENU_PRICE,
+               ATCH_FILE_NO,
+               MENU_SIZE,
+               MENU_ICE_YN
+        from PAYMENT p, PAYMENT_DETAIL pd
+        where p.PYNM_NO = pd.PYNM_NO
+          and FRCS_NO = ${crrFrcsNo}
+          and SETUP_MENU_YN = 'N'
+        <if test="pynmNo != null">
+            and p.PYNM_NO = ${pynmNo}
+        </if>
+        order by PYNM_DT
+    </select>
+
+    <select id="getWeeklySalesTrend" parameterType="int" resultType="kr.or.onesome.util.LowerKeyMap">
+        select *
+        from (select TO_CHAR(PYNM_DT, 'YYYY-MM-DD') as PYNM_DT
+                   , sum(PYNM_TOTAL_AMT) as PYNM_TOTAL_AMT
+              from PAYMENT
+              where FRCS_NO = ${crrFrcsNo}
+              group by TO_CHAR(PYNM_DT, 'YYYY-MM-DD')
+              order by PYNM_DT desc)
+        where ROWNUM <![CDATA[<=]]> 7
+    </select>
+
+    <select id="getInventoryCntList" parameterType="int" resultType="kr.or.onesome.util.LowerKeyMap">
+        select
+        p.PRDCT_NM,
+        fi.FRCS_INVEN_CNT,
+        (fi.FRCS_INVEN_PROPER_CNT - fi.FRCS_INVEN_CNT) as insufficientCnt
+        from FRCS_INVENTORY fi, PRODUCT p
+        where fi.PRDCT_NO = p.PRDCT_NO
+        and FRCS_NO = ${crrFrcsNo}
+        and (FRCS_INVEN_CNT-FRCS_INVEN_PROPER_CNT) <![CDATA[<]]> 0
+        and PRDCT_DSCN_YN = 'N'
+    </select>
+
+    <select id="getFrcsMainHeader" parameterType="int" resultType="kr.or.onesome.util.LowerKeyMap">
+        select payment.paycnt, payment.paytotalAmt, frcs_order.ordercnt, offdoc.offdoccnt
+        from
+            (select count(*) as paycnt, nvl(sum(PYNM_TOTAL_AMT), 0) as paytotalAmt
+             from PAYMENT where FRCS_NO=${crrFrcsNo} and TRUNC(PYNM_DT) = TRUNC(sysdate)) payment,
+            (select count(*) as ordercnt
+             from FRCS_ORDER where FRCS_NO=${crrFrcsNo} and FRCS_ORDER_TYPE_CD = 'FODST01') frcs_order,
+            (select count(*) as offdoccnt from OFFICIAL_DOCUMENT where OFF_DOC_TO = ${crrFrcsNo} and OFF_DOC_STATUS_YN = 'N') offdoc
+    </select>
+
+</mapper>

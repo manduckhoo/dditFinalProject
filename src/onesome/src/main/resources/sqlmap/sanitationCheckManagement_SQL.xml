@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.sanitation.mapper.SanitationCheckManagementMapper">
+    <select id="getSanitationCheckManagementByFrcsNo" resultMap="adminSanitationMap">
+        select scm.FRCS_NO,
+               scm.SNT_CHCK_DT,
+               scm.SNT_CHCK_TOTAL_SCR,
+               scm.ATCH_FILE_NO,
+               af.ORIGNL_FILE_NM,
+               af.STRE_FILE_NM
+        from SANITATION_CHECK_MANAGEMENT scm,
+             ATCH_FILE af
+        where scm.ATCH_FILE_NO = af.ATCH_FILE_NO
+          and FRCS_NO = #{crrFrcsNo}
+    </select>
+
+    <delete id="sanitationDelete">
+        delete
+        from SANITATION_CHECK_MANAGEMENT
+        where FRCS_NO = #{frcsNo}
+        and SNT_CHCK_DT = #{sntChckDt}
+    </delete>
+
+    <insert id="sanitationRegistration">
+        insert into SANITATION_CHECK_MANAGEMENT (FRCS_NO,
+                                                 SNT_CHCK_DT,
+                                                 SNT_CHCK_TOTAL_SCR,
+                                                 ATCH_FILE_NO)
+                                        values (#{frcsNo},
+                                                #{sntChckDt},
+                                                #{sntChckTotalScr},
+                                                #{atchFileNo})
+    </insert>
+
+    <select id="adminSanitationList" parameterType="hashMap" resultMap="adminSanitationMap">
+        SELECT T.*
+        FROM (SELECT ROW_NUMBER() OVER (ORDER BY scm.SNT_CHCK_DT DESC) RNUM,
+                     scm.FRCS_NO,
+                     scm.SNT_CHCK_DT,
+                     scm.SNT_CHCK_TOTAL_SCR,
+                     scm.ATCH_FILE_NO,
+                     f.FRCS_NM,
+                     af.ORIGNL_FILE_NM,
+                     af.STRE_FILE_NM
+              FROM SANITATION_CHECK_MANAGEMENT scm,
+                   FRANCHISE f,
+                   ATCH_FILE af
+              where scm.FRCS_NO = f.FRCS_NO
+                and scm.ATCH_FILE_NO = af.ATCH_FILE_NO
+                and f.FRCS_NM LIKE '%' || #{keyword}  || '%') T
+        WHERE T.RNUM BETWEEN (#{currentPage} * 10) - (10 - 1) AND (#{currentPage} * 10)
+    </select>
+    <select id="getTotal" resultType="int" parameterType="hashMap">
+        select count(*)
+        from SANITATION_CHECK_MANAGEMENT scm, FRANCHISE f
+        where scm.FRCS_NO = f.FRCS_NO
+          and f.FRCS_NM LIKE '%' || #{keyword} || '%'
+    </select>
+
+    <select id="getFranchiseList" resultType="kr.or.onesome.vo.FranchiseVO">
+        select FRCS_NO,
+               FRCS_NM
+        from FRANCHISE
+        where not FRCS_STS_CD = 'FRST04'
+    </select>
+
+    <resultMap id="adminSanitationMap" type="kr.or.onesome.sanitation.vo.SanitationCheckManagementVO">
+        <result property="rnum" column="RNUM"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="sntChckDt" column="SNT_CHCK_DT"/>
+        <result property="sntChckTotalScr" column="SNT_CHCK_TOTAL_SCR"/>
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+
+        <association property="franchiseVO" resultMap="franchiseMap"/>
+        <association property="atchFileVO" resultMap="atchFileMap"/>
+    </resultMap>
+    <resultMap id="franchiseMap" type="kr.or.onesome.vo.FranchiseVO">
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="frcsNm" column="FRCS_NM"/>
+        <result property="frcsStsCd" column="FRCS_STS_CD"/>
+        <result property="frcsRgstDt" column="FRCS_RGST_DT"/>
+        <result property="frcsEndDt" column="FRCS_END_DT"/>
+        <result property="frcsPostNo" column="FRCS_POST_NO"/>
+        <result property="frcsAddr" column="FRCS_ADDR"/>
+        <result property="frcsDtlAddr" column="FRCS_DTL_ADDR"/>
+        <result property="frcsBsnsStrtTm" column="FRCS_BSNS_STRT_TM"/>
+        <result property="frcsBsnsEndTm" column="FRCS_BSNS_END_TM"/>
+        <result property="frcsCtrtCnclsDt" column="FRCS_CTRT_CNCLS_DT"/>
+        <result property="frcsExptCmplDt" column="FRCS_EXPT_CMPL_DT"/>
+        <result property="frcsFnlInspDt" column="FRCS_FNL_INSP_DT"/>
+        <result property="frcsOpngDt" column="FRCS_OPNG_DT"/>
+        <result property="frcsCpctPsn" column="FRCS_CPCT_PSN"/>
+        <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+        <result property="frcsRegionCd" column="FRCS_REGION_CD"/>
+        <result property="frcsTel" column="FRCS_TEL"/>
+    </resultMap>
+    <resultMap id="atchFileMap" type="kr.or.onesome.vo.AtchFileVO">
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+        <result property="fileSn" column="FILE_SN"/>
+        <result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+        <result property="fileStreCours" column="FILE_STRE_COURS"/>
+        <result property="streFileNm" column="STRE_FILE_NM"/>
+        <result property="fileThumYn" column="FILE_THUM_YN"/>
+        <result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+        <result property="fileExtsn" column="FILE_EXTSN"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+    </resultMap>
+</mapper>

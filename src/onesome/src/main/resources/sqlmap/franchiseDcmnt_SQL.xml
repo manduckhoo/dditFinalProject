@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.franchise.mapper.FranchiseDcmntMapper">
+
+<insert id="insertDcmnt" parameterType="franchiseDcmntVO">
+	INSERT INTO frcs_emp_dcmnt
+		(dcmnt_type_cd, frcs_emp_no, frcs_no, atch_file_no)
+	VALUES
+		(#{dcmntTypeCd}, #{frcsEmpNo}, #{frcsNo}, #{atchFileNo})
+</insert>
+
+
+	<resultMap type="franchiseDcmntVO" id="franchiseDcmntMap">
+		<result property="dcmntTypeCd" column="DCMNT_TYPE_CD"/>
+		<result property="frcsEmpNo" column="FRCS_EMP_NO"/>
+		<result property="frcsNo" column="FRCS_NO"/>
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<collection property="atchFileVOList" resultMap="atchFileMap"></collection>		
+	</resultMap>
+
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="fileSn" column="FILE_SN"/>
+		<result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+		<result property="fileStreCours" column="FILE_STRE_COURS"/>
+		<result property="streFileNm" column="STRE_FILE_NM"/>
+		<result property="fileThumYn" column="FILE_THUM_YN"/>
+		<result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+		<result property="fileExtsn" column="FILE_EXTSN"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+	</resultMap>
+
+	<select id="showCareer" parameterType="franchiseDcmntVO" resultMap="franchiseDcmntMap">
+	select
+		A.ATCH_FILE_NO,
+		A.FILE_SN,
+		A.ORIGNL_FILE_NM,
+		A.FILE_STRE_COURS,
+		A.STRE_FILE_NM,
+		A.FILE_THUM_YN,
+		A.FILE_UPLOAD_DT,
+		A.FILE_EXTSN,
+		A.FILE_SIZE,
+		B.DCMNT_TYPE_CD,
+		B.FRCS_EMP_NO,
+		B.FRCS_NO
+	from ATCH_FILE A left outer join FRCS_EMP_DCMNT B on(A.ATCH_FILE_NO=B.ATCH_FILE_NO)
+	where b.frcs_emp_no = #{frcsEmpNo} and b.dcmnt_type_cd = 'DCMNT01'
+	</select>
+	
+	<select id="showHealth" parameterType="franchiseDcmntVO" resultMap="franchiseDcmntMap">
+	select
+		A.ATCH_FILE_NO,
+		A.FILE_SN,
+		A.ORIGNL_FILE_NM,
+		A.FILE_STRE_COURS,
+		A.STRE_FILE_NM,
+		A.FILE_THUM_YN,
+		A.FILE_UPLOAD_DT,
+		A.FILE_EXTSN,
+		A.FILE_SIZE,
+		B.DCMNT_TYPE_CD,
+		B.FRCS_EMP_NO,
+		B.FRCS_NO
+	from ATCH_FILE A left outer join FRCS_EMP_DCMNT B on(A.ATCH_FILE_NO=B.ATCH_FILE_NO)
+	where b.frcs_emp_no = #{frcsEmpNo} and b.dcmnt_type_cd = 'DCMNT02'
+	</select>
+
+</mapper>

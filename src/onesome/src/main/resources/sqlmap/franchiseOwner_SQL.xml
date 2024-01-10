@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.franchise.mapper.FranchiseOwnerMapper">
+    <resultMap id="frcsOwMap" type="frcsOwVO">
+        <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+        <result property="frcsOwnrEmail" column="FRCS_OWNR_EMAIL"/>
+        <result property="frcsOwnrPw" column="FRCS_OWNR_PW"/>
+        <result property="frcsOwnrNm" column="FRCS_OWNR_NM"/>
+        <result property="frcsOwnrBrdt" column="FRCS_OWNR_BRDT"/>
+        <result property="frcsOwnrTel" column="FRCS_OWNR_TEL"/>
+        <result property="frcsOwnrZip" column="FRCS_OWNR_ZIP"/>
+        <result property="frcsOwnrAddr" column="FRCS_OWNR_ADDR"/>
+        <result property="frcsOwnrDtlAddr" column="FRCS_OWNR_DTL_ADDR"/>
+        <result property="frcsOwnrJoinDt" column="FRCS_OWNR_JOIN_DT"/>
+        <result property="enabled" column="ENABLED"/>
+        
+        <collection property="franchiseOwnerAuthVOList" resultMap="frcsOwAuthMap"/>
+        <collection property="franchiseVOList" resultMap="frcsMap"/>
+    </resultMap>
+    
+    <resultMap id="frcsOwAuthMap" type="frcsOwAuthVO">
+        <result property="frcsAuthCd" column="FRCS_AUTH_CD"/>
+        <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+    </resultMap>
+    
+    <resultMap id="frcsMap" type="franchiseVO">
+        <result property="frcsNo" column="FRCS_NO"/>
+		<result property="frcsNm" column="FRCS_NM"/>
+		<result property="frcsStsCd" column="FRCS_STS_CD"/>
+		<result property="frcsRgstDt" column="FRCS_RGST_DT"/>
+		<result property="frcsEndDt" column="FRCS_END_DT"/>
+		<result property="frcsPostNo" column="FRCS_POST_NO"/>
+		<result property="frcsAddr" column="FRCS_ADDR"/>
+		<result property="frcsDtlAddr" column="FRCS_DTL_ADDR"/>
+		<result property="frcsBsnsStrtTm" column="FRCS_BSNS_STRT_TM"/>
+		<result property="frcsBsnsEndTm" column="FRCS_BSNS_END_TM"/>
+		<result property="frcsCtrtCnclsDt" column="FRCS_CTRT_CNCLS_DT"/>
+		<result property="frcsExptCmplDt" column="FRCS_EXPT_CMPL_DT"/>
+		<result property="frcsFnlInspDt" column="FRCS_FNL_INSP_DT"/>
+		<result property="frcsOpngDt" column="FRCS_OPNG_DT"/>
+		<result property="frcsCpctPsn" column="FRCS_CPCT_PSN"/>
+		<result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+		<result property="frcsRegionCd" column="FRCS_REGION_CD"/>
+		<result property="frcsTel" column="FRCS_TEL"/>
+    </resultMap>
+
+    <select id="frcsOwDetail" resultMap="frcsOwMap">
+
+	SELECT
+		fo.FRCS_OWNR_NO, fo.FRCS_OWNR_EMAIL, fo.FRCS_OWNR_PW, fo.FRCS_OWNR_NM, fo.FRCS_OWNR_BRDT,
+		fo.FRCS_OWNR_TEL, fo.FRCS_OWNR_ZIP, fo.FRCS_OWNR_ADDR, fo.FRCS_OWNR_DTL_ADDR, fo.FRCS_OWNR_JOIN_DT,
+		fo.ENABLED, fa.FRCS_AUTH_CD, fr.FRCS_NO, fr.FRCS_NM, fr.FRCS_STS_CD, fr.FRCS_RGST_DT, fr.FRCS_END_DT,
+		fr.FRCS_POST_NO, fr.FRCS_ADDR, fr.FRCS_DTL_ADDR, fr.FRCS_BSNS_STRT_TM, fr.FRCS_BSNS_END_TM,
+		fr.FRCS_CTRT_CNCLS_DT, fr.FRCS_EXPT_CMPL_DT, fr.FRCS_FNL_INSP_DT, fr.FRCS_OPNG_DT, fr.FRCS_CPCT_PSN,
+		fr.FRCS_REGION_CD, fr.FRCS_TEL
+	FROM FRCS_OWNER fo
+		JOIN FRCS_AUTH fa ON fo.FRCS_OWNR_NO = fa.FRCS_OWNR_NO
+		JOIN FRANCHISE fr ON fo.FRCS_OWNR_NO = fr.FRCS_OWNR_NO
+	WHERE fo.ENABLED = '1'
+	AND fo.FRCS_OWNR_EMAIL = #{frcsOwnrEmail}
+	ORDER BY FR.FRCS_RGST_DT
+	
+<!--         select fo.FRCS_OWNR_NO, -->
+<!--                FRCS_OWNR_EMAIL, -->
+<!--                FRCS_OWNR_PW, -->
+<!--                FRCS_OWNR_NM, -->
+<!--                FRCS_OWNR_BRDT, -->
+<!--                FRCS_OWNR_TEL, -->
+<!--                FRCS_OWNR_ZIP, -->
+<!--                FRCS_OWNR_ADDR, -->
+<!--                FRCS_OWNR_DTL_ADDR, -->
+<!--                FRCS_OWNR_JOIN_DT, -->
+<!--                ENABLED, -->
+<!--                FRCS_AUTH_CD -->
+<!--         from FRCS_OWNER fo, -->
+<!--              FRCS_AUTH fa -->
+<!--         where fo.FRCS_OWNR_NO = fa.FRCS_OWNR_NO -->
+<!--           and ENABLED = '1' -->
+<!--           and FRCS_OWNR_EMAIL = #{frcsOwnrEmail} -->          
+          
+    </select>
+    
+    <select id="frcsOwSelectedDetail" resultMap="frcsOwMap">
+	SELECT
+		fo.FRCS_OWNR_NO, fo.FRCS_OWNR_EMAIL, fo.FRCS_OWNR_PW, fo.FRCS_OWNR_NM, fo.FRCS_OWNR_BRDT,
+		fo.FRCS_OWNR_TEL, fo.FRCS_OWNR_ZIP, fo.FRCS_OWNR_ADDR, fo.FRCS_OWNR_DTL_ADDR, fo.FRCS_OWNR_JOIN_DT,
+		fo.ENABLED, fa.FRCS_AUTH_CD, fr.FRCS_NO, fr.FRCS_NM, fr.FRCS_STS_CD, fr.FRCS_RGST_DT, fr.FRCS_END_DT,
+		fr.FRCS_POST_NO, fr.FRCS_ADDR, fr.FRCS_DTL_ADDR, fr.FRCS_BSNS_STRT_TM, fr.FRCS_BSNS_END_TM,
+		fr.FRCS_CTRT_CNCLS_DT, fr.FRCS_EXPT_CMPL_DT, fr.FRCS_FNL_INSP_DT, fr.FRCS_OPNG_DT, fr.FRCS_CPCT_PSN,
+		fr.FRCS_REGION_CD, fr.FRCS_TEL
+	FROM FRCS_OWNER fo
+		JOIN FRCS_AUTH fa ON fo.FRCS_OWNR_NO = fa.FRCS_OWNR_NO
+		JOIN FRANCHISE fr ON fo.FRCS_OWNR_NO = fr.FRCS_OWNR_NO
+	WHERE fo.ENABLED = '1'
+	AND fo.FRCS_OWNR_EMAIL = #{frcsOwnrEmail}
+	<if test="frcsNo!=null and frcsNo!=''">
+		AND fr.FRCS_NO = #{frcsNo}
+	</if>
+	ORDER BY FR.FRCS_RGST_DT          
+          
+    </select>
+    
+</mapper>

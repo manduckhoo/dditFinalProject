@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="customUserDetailService" class="kr.or.onesome.security.CustomUserDetailService"/>
+	<bean id="loginSuccessHandler" class="kr.or.onesome.security.LoginSuccessHandler"/>
+	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+<!--	일반회원 요청 인터셉트  -->
+	<security:http pattern="/mem/**">
+		<security:intercept-url pattern="/mem/login" access="permitAll()"/>
+		<security:intercept-url pattern="/mem/mypage" access="hasRole('ROLE_MEMBER')"/>
+		<security:intercept-url pattern="/mem/inquiry/**" access="hasRole('ROLE_MEMBER')"/>
+		<security:intercept-url pattern="/echo/**" access="hasRole('ROLE_MEMBER')"/>
+
+		<security:form-login login-page="/mem/login"
+							 login-processing-url="/mem/login"
+							 authentication-success-handler-ref="loginSuccessHandler"/>
+		<security:logout logout-url="/mem/logout" invalidate-session="true" logout-success-url="/mem/main"/>
+	</security:http>
+	
+<!--	어드민 요청 인터셉트  -->
+	<security:http pattern="/admin/**">
+		<security:intercept-url pattern="/admin/login" access="permitAll()"/>
+		<security:intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')"/>
+		<security:intercept-url pattern="/echo/**" access="hasRole('ROLE_ADMIN')"/>
+
+		<security:form-login login-page="/admin/login"
+							 login-processing-url="/admin/login"
+							 authentication-success-handler-ref="loginSuccessHandler"/>
+		<security:logout logout-url="/admin/logout" invalidate-session="true" logout-success-url="/admin/login"/>
+	</security:http>
+
+<!--	점주 요청 인터셉트   -->
+	<security:http pattern="/frcs/**">
+		<security:intercept-url pattern="/admin/login" access="permitAll()"/>
+		<security:intercept-url pattern="/frcs/**" access="hasRole('ROLE_OWNER')"/>
+		<security:intercept-url pattern="/echo/**" access="hasRole('ROLE_OWNER')"/>
+
+		<security:form-login login-page="/admin/login"
+							 login-processing-url="/admin/login"
+							 authentication-success-handler-ref="loginSuccessHandler"/>
+		<security:logout logout-url="/frcs/logout" invalidate-session="true" logout-success-url="/admin/login"/>
+	</security:http>
+
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="customUserDetailService">
+			<security:password-encoder ref="bcryptPasswordEncoder"/>
+		</security:authentication-provider>
+	</security:authentication-manager>
+</beans>

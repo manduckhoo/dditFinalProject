@@ -1,0 +1,69 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Roboto&display=swap");
+
+/* FAQ 질문 활성화 되기전 설정 */
+.collapsible {
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+/* 이거 없으면 아코디언 다 접어놨을 때 글자 보임 */
+p {
+    margin-top: 1rem !important;
+}
+
+/* FAQ 질문에 커서 올렸을 때, 활성화 시켰을 때 백그라운드 색 설정 */
+.active,
+.collapsible:hover {
+    background-color: #c5c5c5;
+    font-weight: bold;
+}
+
+/* 아코디언 활성화 됐을 때, 답변 공간 설정 */
+.content {
+    padding: 0px 20px 10px 20px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+/* 질문 앞에 Q 아이콘 */
+strong::before {
+    content: 'Q';
+    font-size: 24px;
+    color: #000;
+    font-weight: 600;
+    /*position: absolute;*/
+    top: 24px;
+    left: 32px;
+    margin-right: 10px;
+}
+
+/* 종류별 FAQ 버튼 */
+.myButton {
+    background-color: white;
+    border:none;
+    color:#666666;
+    font-weight:bold;
+    padding:10px 30px;
+    text-decoration:none;
+    width: 180px;
+}
+
+/* FAQ 제목 */
+#faqTitle {
+    margin-top: 90px;
+    margin-bottom: 30px;
+    font-weight: bolder;
+}
+
+.faqBtnActive {
+    border-bottom: 3px solid #2B2934;
+    color:#2B2934;
+}

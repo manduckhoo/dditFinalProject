@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<!-- Appenders -->
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %5p [%c] %m%n"/>
+		</Console>
+	</Appenders>
+
+	<!-- Application Loggers -->
+	<Loggers>
+
+		<Logger name="kr.or.onesome" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</Logger>
+
+		<!-- 3rdparty Loggers -->
+		<logger name="org.springframework.core" level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+		<logger name="org.springframework.beans" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+		<logger name="org.springframework.context" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+		<logger name="org.springframework.web" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</logger>
+
+
+		<!-- log4jdbc 관련 로거 설정-->
+  	 
+     	<logger name="jdbc.sqlonly" level="INFO"/>
+     	<logger name="jdbc.resultsettable" level="INFO"/>
+     	<logger name="jdbc.audit" level="OFF"/>
+     	<logger name="jdbc.resultset" level="OFF"/>
+     	<logger name="jdbc.connection" level="OFF"/>
+
+		<!-- Root Logger -->
+		<root level="WARN">
+			<appender-ref ref="console"/>
+		</root>
+	</Loggers>
+
+
+</Configuration>

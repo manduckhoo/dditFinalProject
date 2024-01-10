@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.hqempedu.mapper.HqEmpEduMapper">
+	
+	<resultMap type="ojtVO" id="ojtMap">
+		<result property="ojtNo" column="OJT_NO"/>
+		<result property="ojtSn" column="OJT_SN"/>
+		<result property="ojtStrTime" column="OJT_STR_TIME"/>
+		<result property="ojtEndTime" column="OJT_END_TIME"/>
+		<result property="ojtType" column="OJT_TYPE"/>
+		<result property="ojtYn" column="OJT_YN"/>
+		<result property="ojtScore" column="OJT_SCORE"/>
+		<result property="ojtDesc" column="OJT_DESC"/>
+		<result property="ojtTitle" column="OJT_TITLE"/>
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="ojtPurpose" column="OJT_PURPOSE"/>
+		<result property="ojtLecturer" column="OJT_LECTURER"/>
+		<result property="ojtSubTitle" column="OJT_SUB_TITLE"/>
+		
+		<association property="comDetCodeInfoVO" resultMap="comDetCodeMap" />
+		<collection property="atchFileVOList" resultMap="atchFileMap" />
+	</resultMap>
+	
+	<resultMap type="comDetCodeInfoVO" id="comDetCodeMap">
+		<result property="comDetCode" column="COM_DET_CODE"/>
+		<result property="comCode" column="COM_CODE"/>
+		<result property="comDetCodeNm" column="COM_DET_CODE_NM"/>
+		<result property="comDetCodeRm" column="COM_DET_CODE_RM"/>
+	</resultMap>
+	
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="fileSn" column="FILE_SN"/>
+		<result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+		<result property="fileStreCours" column="FILE_STRE_COURS"/>
+		<result property="streFileNm" column="STRE_FILE_NM"/>
+		<result property="fileThumYn" column="FILE_THUM_YN"/>
+		<result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+		<result property="fileExtsn" column="FILE_EXTSN"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+	</resultMap>
+	
+	<!-- 교육 리스트 -->	
+	<select id="eduList" resultMap="ojtMap">
+		SELECT
+		      OJT.OJT_NO
+		      , OJT.OJT_SN
+		      , OJT.OJT_SCORE
+		      , OJT.OJT_DESC
+		      , OJT.OJT_TITLE
+		      , OJT.OJT_SUB_TITLE
+		      , COMDET.COM_DET_CODE
+		      , COMDET.COM_CODE
+		      , COMDET.COM_DET_CODE_NM
+		      , COMDET.COM_DET_CODE_RM
+		      , ATCH.ATCH_FILE_NO
+		      , ATCH.FILE_SN
+		      , ATCH.ORIGNL_FILE_NM
+		      , ATCH.FILE_STRE_COURS
+		      , ATCH.STRE_FILE_NM
+		      , ATCH.FILE_THUM_YN
+		      , ATCH.FILE_UPLOAD_DT
+		      , ATCH.FILE_EXTSN
+		      , ATCH.FILE_SIZE
+		FROM OJT OJT 
+		LEFT OUTER JOIN COM_DET_CODE_INFO COMDET
+		    ON OJT.OJT_TYPE = COMDET.COM_DET_CODE
+		LEFT OUTER JOIN ATCH_FILE ATCH
+		    ON OJT.ATCH_FILE_NO = ATCH.ATCH_FILE_NO
+		WHERE OJT.OJT_TYPE in('OJT03', 'OJT04', 'OJT05', 'OJT06', 'OJT07')
+		ORDER BY OJT.OJT_NO ASC
+	</select>
+	
+	<select id="eduDetail" parameterType="int" resultMap="ojtMap">
+		SELECT
+		      OJT.OJT_NO
+		      , OJT.OJT_SN
+		      , OJT.OJT_STR_TIME
+		      , OJT.OJT_END_TIME
+		      , OJT.OJT_TYPE
+		      , OJT.OJT_YN
+		      , OJT.OJT_SCORE
+		      , OJT.OJT_PURPOSE
+		      , OJT.OJT_DESC
+		      , OJT.OJT_TITLE
+		      , OJT.OJT_LECTURER
+		      , OJT.OJT_SUB_TITLE
+		      , OJT.ATCH_FILE_NO
+		      , COMDET.COM_DET_CODE
+		      , COMDET.COM_CODE
+		      , COMDET.COM_DET_CODE_NM
+		      , COMDET.COM_DET_CODE_RM
+		      , ATCH.FILE_SN
+		      , ATCH.ORIGNL_FILE_NM
+		      , ATCH.FILE_STRE_COURS
+		      , ATCH.STRE_FILE_NM
+		      , ATCH.FILE_THUM_YN
+		      , ATCH.FILE_UPLOAD_DT
+		      , ATCH.FILE_EXTSN
+		      , ATCH.FILE_SIZE
+		FROM OJT OJT 
+		LEFT OUTER JOIN COM_DET_CODE_INFO COMDET
+		    ON OJT.OJT_TYPE = COMDET.COM_DET_CODE
+		LEFT OUTER JOIN ATCH_FILE ATCH
+		    ON OJT.ATCH_FILE_NO = ATCH.ATCH_FILE_NO
+		WHERE OJT.OJT_TYPE in('OJT03', 'OJT04', 'OJT05', 'OJT06', 'OJT07')
+		AND OJT_NO = #{ojtNo}
+		AND OJT.ATCH_FILE_NO = ATCH.ATCH_FILE_NO
+	</select>
+	
+	
+	<insert id="addEdu" parameterType="ojtVO">
+	<selectKey resultType="int" order="BEFORE" keyProperty="ojtSn">
+		SELECT nvl(max(OJT_SN), 0)+1 FROM OJT WHERE OJT_NO = #{ojtNo}
+	</selectKey>
+		INSERT INTO OJT (
+		    OJT_NO
+		    , OJT_SN
+		    , OJT_STR_TIME
+		    , OJT_END_TIME
+		    , OJT_TYPE
+		    , OJT_YN
+		    , OJT_DESC
+		    , OJT_TITLE
+		    , OJT_SUB_TITLE
+		    , ATCH_FILE_NO
+		    , OJT_PURPOSE
+		    , OJT_LECTURER
+		) VALUES (
+		    OJT_SEQ.NEXTVAL
+		  , #{ojtSn}
+		  , #{ojtStrTime}
+		  , #{ojtEndTime}
+		  , #{ojtType}
+		  , 0
+		  , #{ojtDesc}
+		  , #{ojtTitle}
+		  , #{ojtSubTitle}
+		  , #{atchFileNo}
+		  , #{ojtPurpose}
+		  , #{ojtLecturer}
+		)
+	</insert>
+	
+	<delete id="delEdu" parameterType="ojtVO">
+		DELETE
+		FROM OJT
+		WHERE OJT_NO = #{ojtNo}
+	</delete>
+	
+	<update id="updateEdu" parameterType="ojtVO">
+		UPDATE OJT
+		SET
+			 OJT_STR_TIME = #{ojtStrTime},
+			 OJT_END_TIME = #{ojtEndTime},  
+			 OJT_TYPE = #{ojtType},      
+			 OJT_DESC = #{ojtDesc},      
+			 OJT_TITLE = #{ojtTitle},     
+			 ATCH_FILE_NO = #{atchFileNo},  
+			 OJT_PURPOSE = #{ojtPurpose},  
+			 OJT_LECTURER = #{ojtLecturer}, 
+			 OJT_SUB_TITLE = #{ojtSubTitle}
+		WHERE
+		    OJT_NO = #{ojtNo}
+	</update>
+</mapper>

@@ -1,0 +1,72 @@
+/** {*/
+/*    font-family: 'Pretendard5';*/
+/*}*/
+
+.mem-inquiry-tit {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 40px;
+}
+
+.mem-inquiry-boby {
+    padding: 10px 0 50px;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+}
+
+.mem-inquiry-row {
+    position: relative;
+    padding: 40px 50px 0 0;
+}
+
+.inquiry-tit-bundle {
+    position: absolute;
+    margin: 10px 20px 0 20px;
+    line-height: 18px;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.inquiry-required {
+    font-size: 15px;
+    color: red;
+    vertical-align: top;
+}
+
+.inquiry-sel-store {
+    display: none;
+}
+
+.inquiry-textarea {
+    resize: none;
+    width: 100%;
+    box-sizing: border-box;
+    height: 300px;
+    padding: 15px;
+}
+
+.inquiry-atch-desc {
+    font-size: 14px;
+    color: grey;
+}
+
+.inquiry-submit-area {
+    padding: 40px 0 0;
+}
+
+.inquiry-submit-btn {
+    width: 400px;
+    height: 60px;
+    margin: 0 auto;
+    background-color: #ab9981;
+    border: 0 none;
+    font-size: 22px;
+    display: block;
+    vertical-align: middle;
+}
+
+select option[value=""][disabled]{
+    display: none;
+}

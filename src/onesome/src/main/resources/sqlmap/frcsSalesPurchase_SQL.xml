@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="kr.or.onesome.frcssalespurchase.mapper.FrcsSalesPurchaseMapper">
+
+	<resultMap type="FrcsSalesPurchaseVO" id="frcsSalesPurchaseMap">
+		<result property="pynmNo" column="PYNM_NO"/>
+		<result property="memNo" column="MEM_NO"/>
+		<result property="frcsNo" column="FRCS_NO"/>
+		<result property="pynmMthdId" column="PYNM_MTHD_ID"/>
+		<result property="pynmDt" column="PYNM_DT"/>
+		<result property="pynmTotalAmt" column="PYNM_TOTAL_AMT"/>
+		<result property="setupMenuYn" column="SETUP_MENU_YN"/>
+		<collection property="paymentDetailVOList" resultMap="paymentDetailMap"></collection>
+	</resultMap>
+
+	<resultMap type="PaymentDetailVO" id="paymentDetailMap">
+		<result property="pynmNum" column="PYNM_NUM"/>
+		<result property="pynmNo" column="PYNM_NO"/>
+		<result property="pynmCnt" column="PYNM_CNT"/>
+		<result property="menuNo" column="MENU_NO"/>
+		<result property="menuNm" column="MENU_NM"/>
+		<result property="menuPrice" column="MENU_PRICE"/>
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+	</resultMap>
+
+	<!-- 차트에 출력할 내용 -->
+	<select id="days" resultMap="frcsSalesPurchaseMap">
+		select sum(pynm_total_amt) as total, pynm_dt, frcs_no
+		from payment
+        where FRCS_NO = 425367078
+		group by PYNM_DT, FRCS_NO
+		order by PYNM_DT
+	</select>
+	
+	<!-- 파이차트에 출력할 내용 -->
+	<select id="pieChart" resultMap="paymentDetailMap">
+		select * from payment_detail
+		<!-- where 조건은 나중에 조금 더 완성되면 달아보도록 하겠습니다. -->
+	</select>
+	
+	<!-- 리스트에 출력할 내용 -->
+	<select id="list" resultMap="frcsSalesPurchaseMap">
+		select sum(pynm_total_amt) as total, pynm_dt, frcs_no
+		from payment
+        where FRCS_NO = 425367078
+		group by PYNM_DT, FRCS_NO
+		order by PYNM_DT DESC
+	</select>
+	
+	<!-- 리스트 상세 -->
+	<select id="detail" resultMap="paymentDetailMap">
+		SELECT *
+		FROM PAYMENT_DETAIL A
+		JOIN PAYMENT B ON A.PYNM_NO = B.PYNM_NO
+		where B.PYNM_DT = #{pynmDt}
+	</select>
+	
+	
+
+	
+	
+	
+</mapper>

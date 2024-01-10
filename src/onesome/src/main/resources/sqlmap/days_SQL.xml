@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.frcssalespurchase.mapper.DaysMapper">
+
+<resultMap type="PaymentVO" id="paymentMap">
+	<result property="pynmNo" column="PYNM_NO"/>
+	<result property="memNo" column="MEM_NO"/>
+	<result property="frcsNo" column="FRCS_NO"/>
+	<result property="pynmMthdId" column="PYNM_MTHD_ID"/>
+	<result property="pynmDt" column="PYNM_DT"/>
+	<result property="pynmTotalAmt" column="PYNM_TOTAL_AMT"/>
+	<result property="setupMenuYn" column="SETUP_MENU_YN"/>
+	<collection property="paymentDetailVOList" resultMap="paymentDetailMap"></collection>
+	<collection property="memberVOList" resultMap="memberMap"></collection>
+</resultMap>
+
+<resultMap type="PaymentDetailVO" id="paymentDetailMap">
+	<result property="menuSize" column="MENU_SIZE"/>
+	<result property="menuIceYn" column="MENU_ICE_YN"/>
+	<result property="pynmSeq" column="PYNM_SEQ"/>
+	<result property="pynmNo" column="PYNM_NO"/>
+	<result property="pynmCnt" column="PYNM_CNT"/>
+	<result property="menuNo" column="MENU_NO"/>
+	<result property="menuNm" column="MENU_NM"/>
+	<result property="menuPrice" column="MENU_PRICE"/>
+	<result property="atchFileNo" column="ATCH_FILE_NO"/>
+</resultMap>
+
+<resultMap type="MemberVO" id="memberMap">
+	<result property="memNo" column="MEM_NO"/>
+	<result property="memNm" column="MEM_NM"/>
+	<result property="memTel" column="MEM_TEL"/>
+</resultMap>
+
+
+<select id="daysList" resultType="paymentVO">
+SELECT TO_CHAR(PYNM_DT, 'YYYY-MM-DD') AS yyyymmdd,
+       SUM(PYNM_TOTAL_AMT) AS paymentTotal, 
+       MAX(PYNM_DT) AS pynm_dt,
+       MAX(FRCS_NO) AS frcs_no,
+       MAX(PYNM_NO) AS pynm_no
+FROM payment
+WHERE PYNM_DT BETWEEN TO_DATE('2023-01-01', 'YYYY-MM-DD') AND TO_DATE('2024-12-31', 'YYYY-MM-DD')
+  AND FRCS_NO = #{frcsNo}
+GROUP BY TO_CHAR(PYNM_DT, 'YYYY-MM-DD')
+ORDER BY yyyymmdd DESC
+</select>
+
+<select id="pieChart" resultMap="paymentMap">
+select
+    pd.MENU_NM as MENU_NM,
+    sum(pd.PYNM_CNT) as PYNM_CNT,
+    sum(pd.MENU_PRICE) as MENU_PRICE,
+    Max(p.PYNM_DT) as PYNM_DT
+    
+    
+from payment_detail pd, payment p
+
+where
+    pd.pynm_no = p.pynm_no
+
+<!--     and TO_CHAR(p.PYNM_DT, 'YYYY-MM-DD') = '2024-01-06' -->
+    and TO_CHAR(p.PYNM_DT, 'YYYY-MM-DD') = TO_CHAR(#{pynmDt}, 'YYYY-MM-DD')
+    and p.FRCS_NO = #{frcsNo}
+group by pd.MENU_NM
+</select>
+
+<select id="detailList" resultMap="paymentMap">
+SELECT
+	p.PYNM_NO,
+	p.MEM_NO,
+    m.MEM_NM,
+    m.MEM_TEL,
+	p.FRCS_NO,
+	p.PYNM_MTHD_ID,
+	p.PYNM_DT,
+	p.PYNM_TOTAL_AMT,
+	p.SETUP_MENU_YN
+    
+FROM payment p, member m
+WHERE
+    p.mem_no = m.mem_no and
+    TO_DATE(pynm_dt, 'YY/MM/DD') = TO_DATE (TO_CHAR(#{pynmDt},'YYYY-MM-DD'), 'YYYY-MM-DD')
+order by pynm_no desc
+</select>
+
+<select id="daysDetail" resultType="paymentDetailVO">
+select 
+    menu_nm,
+    pynm_cnt,
+    menu_price
+from payment_detail
+where PYNM_NO = #{pynmNo}
+</select>
+
+</mapper>

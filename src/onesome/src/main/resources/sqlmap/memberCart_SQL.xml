@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.cart.mapper.MemberCartMapper">
+	<!-- 장바구니 "음료" 메뉴 추가 -->
+	<insert id="cartInsert" parameterType="memberCartVO">
+	 	 insert into cart(cart_seq, mem_no, menu_no, cart_cnt, menu_size, menu_ice_yn)
+	 	 values(cart_seq.nextval, #{memNo}, #{menuNo}, #{cartCnt}, #{menuSize}, #{menuIceYn})
+	</insert>
+	
+	<!-- 장바구니 "푸드, 상품" 메뉴 추가 -->
+	<insert id="cartInsert2" parameterType="memberCartVO">
+	 	 insert into cart(cart_seq, mem_no, menu_no, cart_cnt)
+	 	 values(cart_seq.nextval, #{memNo}, #{menuNo}, #{cartCnt})
+	</insert>
+	
+	<!-- 장바구니 내역 조회 -->
+	<select id="cartList" resultType="memberCartVO" parameterType="memberCartVO">
+		select A.CART_SEQ, A.MEM_NO, A.MENU_NO, A.CART_CNT
+		       , A.MENU_SIZE, A.MENU_ICE_YN
+		       , B.MENU_NO, B.MENU_NM, B.MENU_PRICE, B.CTGRY_DETAIL_ID, B.MENU_DESCRIPTION, B.MENU_STRT_DT, B.MENU_END_DT, B.CALORIES
+		       , B.SUGAR, B.SODIUM, B.PROTEIN, B.SATURATED_FAT, B.CAFFEINE, B.ATCH_FILE_NO
+		       , C.ATCH_FILE_NO, C.FILE_SN, C.ORIGNL_FILE_NM, C.FILE_STRE_COURS, C.STRE_FILE_NM, C.FILE_THUM_YN, C.FILE_UPLOAD_DT, C.FILE_EXTSN, C.FILE_SIZE
+		from cart A left join menu B on(A.menu_no = B.menu_no)
+		               left join atch_file C on(B.atch_file_no = C.atch_file_no)
+		where mem_no = #{memNo}
+		order by B.CTGRY_DETAIL_ID, A.MENU_NO, A.MENU_ICE_YN, A.MENU_SIZE DESC
+	</select>
+	
+	<!-- 가맹점 정보 가져오기 -->
+	<select id="franchiseVOList" resultType="franchiseVO" parameterType="franchiseVO">
+		select * from franchise	
+	</select>
+	
+	<!-- 결제수단 ID 가져오기 -->
+	<select id="selectPayId" resultType="paymentMethodVO">
+		select * from PAYMENT_METHOD
+	</select>
+	
+	<!-- 장바구니 내역 삭제 -->
+	<delete id="cartListDelete" parameterType="memberCartVO">
+		delete from cart
+		where cart_seq = #{cartSeq}
+	</delete>
+	
+</mapper>

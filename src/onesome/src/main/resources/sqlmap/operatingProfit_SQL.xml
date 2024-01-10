@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.frcssalespurchase.mapper.OperatingProfitMapper">
+
+	<resultMap id="PurchaseAnalysisMap" type="frcsOrderDetailVO">
+		<id property="frcsOrderNo" column="FRCS_ORDER_NO" />
+		<id property="frcsNo" column="FRCS_NO" />
+		<result property="frcsOrderQy" column="FRCS_ORDER_QY" />
+		<result property="prdctNo" column="PRDCT_NO" />
+		<!-- <result property="frcsOrderCost" column="FRCS_ORDER_COST"/> -->
+		<!-- <result property="prdctNm" column="PRDCT_NM"/> -->
+		<!-- <result property="prdctExpln" column="PRDCT_EXPLN"/> -->
+		<association property="productVO" resultMap="pproductMap"></association>
+		<collection property="frcsOrderVOList" resultMap="frcsOrderMap"></collection>
+	</resultMap>
+
+	<resultMap type="frcsOrderVO" id="frcsOrderMap">
+		<result property="frcsOrderNo" column="FRCS_ORDER_NO" />
+		<result property="frcsNo" column="FRCS_NO" />
+		<result property="frcsOrderDt" column="FRCS_ORDER_DT" />
+		<result property="frcsOrderOrderAmt" column="FRCS_ORDER_ORDER_AMT" />
+		<!-- <result property="frcsOrderTypeCd" column="FRCS_ORDER_TYPE_CD"/> -->
+	</resultMap>
+
+	<resultMap type="pproductVO" id="pproductMap">
+		<result property="prdctNo" column="PRDCT_NO" />
+		<result property="prdctRcvnAmt" column="PRDCT_RCVN_AMT" />
+		<result property="prdctNm" column="PRDCT_NM" />
+		<!-- <result property="prdctClsfCd" column="PRDCT_CLSF_CD"/> -->
+		<!-- <result property="atchFileNo" column="ATCH_FILE_NO"/> -->
+		<!-- <result property="acntNo" column="ACNT_NO"/> -->
+		<!-- <result property="hqInvenProperCnt" column="HQ_INVEN_PROPER_CNT"/> -->
+		<!-- <result property="hqInvenCnt" column="HQ_INVEN_CNT"/> -->
+		<!-- <result property="allergensYn" column="ALLERGENS_YN"/> -->
+		<!-- <result property="prdctDscnYn" column="PRDCT_DSCN_YN"/> -->
+		<!-- <result property="prdctPrchsEndDt" column="PRDCT_PRCHS_END_DT"/> -->
+		<!-- <result property="prdctPrchsStrtDt" column="PRDCT_PRCHS_STRT_DT"/> -->
+		<!-- <result property="prdctExpln" column="PRDCT_EXPLN"/> -->
+	</resultMap>
+
+	<!-- 1개월 짜리 -->
+	<!-- 월별 매출액 뽑기 -->
+	<select id="paymentList" parameterType="hashMap" resultType="paymentVO">
+		select TO_CHAR(PYNM_DT,
+		'YYYY-MM') AS yyyymm, sum(PYNM_TOTAL_AMT) as
+		paymentTotal
+		from payment
+		where PYNM_DT between to_date('2023-01-01', 'YYYY-MM-DD') AND
+		TO_DATE('2024-12-31','YYYY-MM-DD')
+		<!-- 이 자리에 parameter 값 몇 월인지 입력 -->
+		and TO_CHAR(PYNM_DT, 'yyyy-MM') = #{viewDate}
+		AND FRCS_NO = #{frcsNo}
+		GROUP BY
+		TO_CHAR(PYNM_DT, 'YYYY-MM')
+		order BY yyyymm
+	</select>
+
+	<!-- 1개월 짜리 -->
+	<!-- 월별 매입내역 뽑기 -->
+	<select id="frcsOrderList" parameterType="hashMap" resultType="frcsOrderVO">
+		SELECT
+		TO_CHAR(FRCS_ORDER_DT, 'YYYY-MM') AS yyyymm
+		, SUM(FRCS_ORDER_ORDER_AMT)
+		as total
+		FROM FRCS_ORDER
+		WHERE FRCS_ORDER_DT BETWEEN
+		TO_DATE('2023-01-01', 'YYYY-MM-DD')
+		AND TO_DATE('2024-12-31',
+		'YYYY-MM-DD')
+		<!-- 이 자리에 parameter 값 몇 월인지 입력 -->
+		and TO_CHAR(FRCS_ORDER_DT, 'yyyy-MM') = #{viewDate}
+		and frcs_no = #{frcsNo}
+		GROUP BY TO_CHAR(FRCS_ORDER_DT,
+		'YYYY-MM')
+		ORDER BY yyyymm
+	</select>
+
+	<!-- 월별 공과금 합계 뽑기 -->
+	<select id="publicduesList" parameterType="hashMap" resultType="ppublicduesVO">
+	SELECT
+		TO_CHAR(DUES_PAY_DT, 'YYYY-MM') AS yyyymm, DUES_ELECTRIC_AMT, DUES_WATER_AMT, DUES_GAS_AMT, DUES_MTRT_AMT
+		, DUES_ELECTRIC_AMT + DUES_WATER_AMT + DUES_GAS_AMT + DUES_MTRT_AMT
+		as publicduesTotal
+		FROM PUBLICDUES
+		WHERE DUES_PAY_DT BETWEEN
+		TO_DATE('2023-01-01', 'YYYY-MM-DD')
+		AND TO_DATE('2024-12-31',
+		'YYYY-MM-DD')
+		
+		and TO_CHAR(DUES_PAY_DT, 'yyyy-MM') = #{viewDate}
+		and frcs_no = #{frcsNo}
+		GROUP BY TO_CHAR(DUES_PAY_DT,
+		'YYYY-MM'), DUES_ELECTRIC_AMT, DUES_WATER_AMT, DUES_GAS_AMT, DUES_MTRT_AMT
+		ORDER BY yyyymm
+	</select>
+	
+	<!-- 로얄티 가져오기 -->
+	<select id="royaltyList" parameterType="hashMap" resultType="rroyaltyVO">
+	        select RY_TOTAL_AMT from(
+        SELECT RY_CLM_YM, RY_TOTAL_AMT
+        FROM royalty
+        where TO_CHAR(RY_PAY_DT, 'yyyy-MM') = #{viewDate} and frcs_no = #{frcsNo}
+        order by ry_clm_ym desc)
+        <![CDATA[where rownum <=1]]>
+	</select>
+	
+	<!-- 매입액 차트 -->
+	<select id="frcsOrderDetailPie" resultMap="PurchaseAnalysisMap">
+		select
+			fod.FRCS_ORDER_NO,
+            fod.FRCS_NO,
+			fod.prdct_nm,
+			fod.frcs_order_qy,
+			p.prdct_rcvn_amt,
+		    fo.frcs_order_order_amt,
+			fo.frcs_order_dt
+		    
+		from frcs_order_detail fod, product p, frcs_order fo
+		where fod.prdct_nm = p.prdct_nm and fod.frcs_order_no = fo.frcs_order_no and fod.frcs_no = fo.frcs_no
+		
+		and fo.frcs_order_dt BETWEEN TO_DATE('2023-12-01', 'YYYY-MM-DD') AND TO_DATE('2024-12-31', 'YYYY-MM-DD')
+		and TO_CHAR(fo.frcs_order_dt, 'yyyy-MM') = #{viewDate}
+		and fod.frcs_no = #{frcsNo}
+	</select>
+	
+	<!-- 공과금 차트-->
+	<select id="publicduesPie" parameterType="hashMap" resultType="ppublicduesVO">
+	select
+		DUES_ELECTRIC_AMT,
+		DUES_WATER_AMT,
+		DUES_GAS_AMT,
+		DUES_MTRT_AMT
+	from PUBLICDUES
+	where TO_CHAR(DUES_PAY_DT, 'yyyy-MM') = #{viewDate} and frcs_no = #{frcsNo}
+	</select>
+	
+	<!-- 로얄티 차트-->
+	<select id="royaltyPie" parameterType="hashMap" resultType="rroyaltyVO">
+	select
+		RY_FRCS_FEE_AMT,
+		RY_ORDER_AMT,
+		RY_NPMNT_AMT,
+		RY_OVRINT_AMT,
+		RY_ROYALTY_AMT from(
+        
+        	SELECT
+        		RY_FRCS_FEE_AMT,
+        		RY_ORDER_AMT,
+        		RY_NPMNT_AMT,
+        		RY_OVRINT_AMT,
+        		RY_ROYALTY_AMT
+       		FROM royalty
+        where TO_CHAR(RY_PAY_DT, 'yyyy-MM') = #{viewDate} and frcs_no = #{frcsNo}
+        order by ry_clm_ym desc)
+        <![CDATA[where rownum <=1]]>
+	</select>
+	
+
+</mapper>

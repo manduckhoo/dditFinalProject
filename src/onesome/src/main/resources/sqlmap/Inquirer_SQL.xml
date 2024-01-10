@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.inquirer.mapper.InquirerMapper">
+	
+	
+	<insert id="createPost" parameterType="inquirerVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="inqrNo">
+		SELECT NVL(TO_CHAR(MAX(INQR_NO)+1,'00000'),'00001')
+		FROM INQUIRER
+		</selectKey>
+				
+		INSERT INTO 
+		INQUIRER(INQR_NO, INQR_NM, INQR_TEL, INQR_REQ_DT, INQR_EMAIL, INQR_RGNL_HOPE, INQR_EXPCT_COST, INQR_STORE_YN, INQR_STORE_ADDR, INQR_STRTP_XP)
+		VALUES (
+				#{inqrNo}, 
+				#{inqrNm}, 
+				#{inqrTel}, 
+				 SYSDATE, 
+				#{inqrEmail}, 
+				#{inqrRgnlHope}, 
+				#{inqrExpctCost}, 
+				#{inqrStoreYn}, 
+				#{inqrStoreAddr}, 
+				#{inqrStrtpXp})
+	</insert>
+	
+	<select id="list" resultType="inquirerVO">
+	 	SELECT INQR_NO, INQR_NM, INQR_TEL, TO_CHAR(INQR_REQ_DT, 'yy-mm-dd am hh12:mi') AS INQR_REQ_DT, INQR_EMAIL, INQR_RGNL_HOPE
+    			, INQR_EXPCT_COST, INQR_STORE_YN, INQR_STORE_ADDR, INQR_STRTP_XP, INQR_STATUS_YN, INQR_RM
+		FROM 
+			INQUIRER
+		WHERE 
+			INQR_STATUS_YN IN ('N', 'Y')
+	</select>
+
+	<select id="waitList" resultType="inquirerVO">
+	 	SELECT INQR_NO, INQR_NM, INQR_TEL, TO_CHAR(INQR_REQ_DT,'yy-mm-dd am hh12:mm') INQR_REQ_DT, INQR_EMAIL, INQR_RGNL_HOPE
+	 		 , INQR_EXPCT_COST, INQR_STORE_YN, INQR_STORE_ADDR, INQR_STRTP_XP, INQR_STATUS_YN, INQR_RM
+		FROM INQUIRER
+			WHERE INQR_STATUS_YN ='P' 
+	</select>
+	
+	<update id="updatePost" parameterType="inquirerVO">
+		UPDATE 
+			INQUIRER
+		SET 
+			INQR_NM 		= #{inqrNm},
+			INQR_TEL 		= #{inqrTel},
+			INQR_RGNL_HOPE  = #{inqrRgnlHope},
+			INQR_EXPCT_COST = #{inqrExpctCost}, 
+			INQR_STORE_YN   = #{inqrStoreYn},
+			INQR_STRTP_XP 	= #{inqrStrtpXp},
+			INQR_STATUS_YN  = #{inqrStatusYn}
+		WHERE
+			INQR_NO = #{inqrNo}
+			
+	</update>
+
+	<update id="update" parameterType="inquirerVO">
+		UPDATE 
+			INQUIRER
+		SET 
+			INQR_NM 		= #{inqrNm},
+			INQR_TEL 		= #{inqrTel},
+			INQR_RGNL_HOPE  = #{inqrRgnlHope},
+			INQR_EXPCT_COST = #{inqrExpctCost}, 
+			INQR_STORE_YN   = #{inqrStoreYn},
+			INQR_STRTP_XP 	= #{inqrStrtpXp},
+			INQR_STATUS_YN  = #{inqrStatusYn},
+			INQR_EMAIL      = #{inqrEmail},
+			INQR_STORE_ADDR = #{inqrStoreAddr},
+			INQR_RM 		= #{inqrRm}
+		WHERE
+			INQR_NO = #{inqrNo}
+			
+	</update>
+	
+	<delete id="deletePost">
+		DELETE 
+			FROM INQUIRER
+		WHERE
+			INQR_NO = #{inqrNo}
+	</delete>
+	
+	<select id="detail" resultType="inquirerVO">
+		SELECT INQR_NO, INQR_NM, INQR_TEL,TO_CHAR(INQR_REQ_DT, 'YYYY-MM-DD HH24:MI') AS inqrReqDt, INQR_EMAIL, INQR_RGNL_HOPE, INQR_EXPCT_COST, INQR_STORE_YN, INQR_STORE_ADDR, INQR_STRTP_XP, INQR_STATUS_YN, INQR_RM
+		FROM 
+			INQUIRER
+		WHERE
+			INQR_NO = #{inqrNo}
+	</select>
+	
+	<update id="status" parameterType="inquirerVO">
+		UPDATE
+			INQUIRER
+		SET
+			INQR_STATUS_YN  = #{inqrStatusYn}
+		WHERE 
+			INQR_NO = #{inqrNo}
+	</update>
+	
+	
+</mapper>

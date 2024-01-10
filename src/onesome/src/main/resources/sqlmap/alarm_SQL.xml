@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.alarm.mapper.AlarmMapper">
+
+	<resultMap type="alarmVO" id="alarmMap">
+		<result property="alarmNo" column="ALARM_NO"/>
+		<result property="alarmRcverId" column="ALARM_RCVER_NO"/>
+		<result property="alarmConts" column="ALARM_CONTS"/>
+		<result property="alarmChecked" column="ALARM_CHECKED"/>
+		<result property="movUrl" column="MOV_URL"/>
+	</resultMap>
+
+	<select id="selectAlarm" resultMap="alarmMap">
+		SELECT
+		    ALARM_NO
+		  , ALARM_RCVER_ID
+		  , ALARM_CONTS
+		  , ALARM_CHECKED
+		  , MOV_URL
+		FROM
+		    ALARM
+		WHERE
+			ALARM_RCVER_ID = #{alarmRcverId}
+		AND
+			ALARM_CHECKED = 'N'
+	</select>
+	
+	<insert id="saveAlarm" parameterType="alarmVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="alarmNo">
+			SELECT ALARM_SEQ.NEXTVAL AS alarmNo FROM DUAL
+		</selectKey>
+		INSERT INTO alarm (
+		    alarm_no,
+		    alarm_rcver_id,
+		    alarm_conts,
+		    alarm_checked,
+		    mov_url
+		) VALUES (
+		    #{alarmNo},
+		    #{alarmRcverId},
+		    #{alarmConts},
+		    'N',
+		    #{movUrl}
+		    
+		)
+	</insert>
+</mapper>

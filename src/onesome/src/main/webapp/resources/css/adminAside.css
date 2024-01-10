@@ -1,0 +1,47 @@
+.brand-logo {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar-nav .has-arrow::after{
+    position: absolute;
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-width: 1px 0 0 1px;
+    border-style: solid;
+    margin-left: 10px;
+    transform: rotate(135deg) translate(0, -50%);
+    transform-origin: top;
+    top: 22px;
+    right: 15px;
+    transition: all 0.3s ease-out;
+}
+
+.sidebar-nav li.active > .has-arrow::after, .sidebar-nav li > .has-arrow.active::after, .sidebar-nav .has-arrow[aria-expanded=true]::after {
+    top: 18px;
+    margin-top: 1px;
+    border-color: var(--bs-white);
+    transform: rotate(-135deg) translate(0, -50%);
+}
+
+.ti-circle{
+    width: 16px;
+    height: 16px;
+}
+
+.sidebar-nav ul .sidebar-item .first-level .sidebar-link .ti {
+    font-size: 7px;
+}
+
+.round-16 {
+    padding-left: 30px;
+    margin-top: 10px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}

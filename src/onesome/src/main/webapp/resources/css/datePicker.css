@@ -1,0 +1,214 @@
+ .ui-widget-header { border: 0px solid #dddddd; background: #fff; } 
+
+ .ui-datepicker-calendar>thead>tr>th { font-size: 14px !important; } 
+
+ .ui-datepicker .ui-datepicker-header { position: relative; padding: 10px 0; } 
+
+ .ui-state-default,
+ .ui-widget-content .ui-state-default,
+ .ui-widget-header .ui-state-default,
+ .ui-button,
+ html .ui-button.ui-state-disabled:hover,
+ html .ui-button.ui-state-disabled:active { border: 0px solid #c5c5c5; background-color: transparent; font-weight: normal; color: #454545; text-align: center; } 
+
+ .ui-datepicker .ui-datepicker-title { margin: 0 0em; line-height: 16px; text-align: center; font-size: 14px; padding: 0px; font-weight: bold; } 
+
+ .ui-datepicker { display: none; background-color: #fff; border-radius: 4px; margin-top: 10px; margin-left: 0px; margin-right: 0px; padding: 20px; padding-bottom: 10px; width: 300px; box-shadow: 10px 10px 40px rgba(0, 0, 0, 0.1); } 
+
+ .ui-widget.ui-widget-content { border: 1px solid #eee; } 
+
+ #datepicker:focus>.ui-datepicker { display: block; } 
+
+ .ui-datepicker-prev,
+ .ui-datepicker-next { cursor: pointer; } 
+
+ .ui-datepicker-next { float: right; } 
+
+ .ui-state-disabled { cursor: auto; color: hsla(0, 0%, 80%, 1); } 
+
+ .ui-datepicker-title { text-align: center; padding: 10px; font-weight: 100; font-size: 20px; } 
+
+ .ui-datepicker-calendar { width: 100%; } 
+
+ .ui-datepicker-calendar>thead>tr>th { padding: 5px; font-size: 20px; font-weight: 400; } 
+
+ .ui-datepicker-calendar>tbody>tr>td>a { color: #000; font-size: 12px !important; font-weight: bold !important; text-decoration: none;}
+
+ .ui-datepicker-calendar>tbody>tr>.ui-state-disabled:hover { cursor: auto; background-color: #fff; } 
+
+ .ui-datepicker-calendar>tbody>tr>td { border-radius: 100%; width: 44px; height: 30px; cursor: pointer; padding: 5px; font-weight: 100; text-align: center; font-size: 12px; } 
+
+ .ui-datepicker-calendar>tbody>tr>td:hover { background-color: transparent; opacity: 0.6; } 
+
+ .ui-state-hover,
+ .ui-widget-content .ui-state-hover,
+ .ui-widget-header .ui-state-hover,
+ .ui-state-focus,
+ .ui-widget-content .ui-state-focus,
+ .ui-widget-header .ui-state-focus,
+ .ui-button:hover,
+ .ui-button:focus { border: 0px solid #cccccc; background-color: transparent; font-weight: normal; color: #2b2b2b; } 
+
+ .ui-widget-header .ui-icon { background-image: url('../images/admin/btns.png'); } 
+
+ .ui-icon-circle-triangle-e { background-position: -20px 0px; background-size: 36px; } 
+
+ .ui-icon-circle-triangle-w { background-position: -0px -0px; background-size: 36px; } 
+
+ .ui-datepicker-calendar>tbody>tr>td:first-child a { color: red !important; } 
+
+ .ui-datepicker-calendar>tbody>tr>td:last-child a { color: #0099ff !important; } 
+
+ .ui-datepicker-calendar>thead>tr>th:first-child { color: red !important; } 
+
+ .ui-datepicker-calendar>thead>tr>th:last-child { color: #0099ff !important; } 
+
+ .ui-state-highlight,
+ .ui-widget-content .ui-state-highlight,
+ .ui-widget-header .ui-state-highlight { border: 0px; background: #f1f1f1; border-radius: 50%; padding-top: 10px; padding-bottom: 10px; } 
+
+ .inp { padding: 10px 10px; background-color: #f1f1f1; border-radius: 4px; border: 0px; } 
+
+ .inp:focus { outline: none; background-color: #eee; } 
+ 
+ 
+ 
+ 
+ 
+.w-25 {
+    width: 20% !important;
+}
+.apexcharts-legend {	
+  display: flex;	
+  overflow: auto;	
+  padding: 0 10px;	
+}	
+.apexcharts-legend.apx-legend-position-bottom, .apexcharts-legend.apx-legend-position-top {	
+  flex-wrap: wrap	
+}	
+.apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {	
+  flex-direction: column;	
+  bottom: 0;	
+}	
+.apexcharts-legend.apx-legend-position-bottom.apexcharts-align-left, .apexcharts-legend.apx-legend-position-top.apexcharts-align-left, .apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {	
+  justify-content: flex-start;	
+}	
+.apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, .apexcharts-legend.apx-legend-position-top.apexcharts-align-center {	
+  justify-content: center;  	
+}	
+.apexcharts-legend.apx-legend-position-bottom.apexchart s-align-right, .apexcharts-legend.apx-legend-position-top.apexcharts-align-right {	
+  justify-content: flex-end;	
+}	
+.apexcharts-legend-series {	
+  cursor: pointer;	
+  line-height: normal;	
+}	
+.apexcharts-legend.apx-legend-position-bottom .apexcharts-legend-series, .apexcharts-legend.apx-legend-position-top .apexcharts-legend-series{	
+  display: flex;	
+  align-items: center;	
+}	
+.apexcharts-legend-text {	
+  position: relative;	
+  font-size: 14px;	
+}	
+.apexcharts-legend-text *, .apexcharts-legend-marker * {	
+  pointer-events: none;	
+}	
+.apexcharts-legend-marker {	
+  position: relative;	
+  display: inline-block;	
+  cursor: pointer;	
+  margin-right: 3px;	
+  border-style: solid;
+}	
+	
+.apexcharts-legend.apexcharts-align-right .apexcharts-legend-series, .apexcharts-legend.apexcharts-align-left .apexcharts-legend-series{	
+  display: inline-block;	
+}	
+.apexcharts-legend-series.apexcharts-no-click {	
+  cursor: auto;	
+}	
+.apexcharts-legend .apexcharts-hidden-zero-series, .apexcharts-legend .apexcharts-hidden-null-series {	
+  display: none !important;	
+}	
+.apexcharts-inactive-legend {	
+  opacity: 0.45;	
+}
+.jaeram tr > td:nth-child(2), 
+.jaeram tr > th:nth-child(2), 
+.jaeram tr > td:nth-child(4), 
+.jaeram tr > th:nth-child(4) {
+    background-color: transparent; /* 배경색을 투명하게 설정 */
+    color: black; /* 글자색을 검은색으로 설정 */
+    width : 400px;
+}
+/* .jaeram tr th:nth-child(odd){ */
+/* 	background-color:Red; */
+/* 	width : 150px; */
+/* } */
+ 
+ body .ui-state-highlight {
+    position: relative;
+    border-color: var(--bs-primary);
+    height: inherit;
+    margin-bottom: inherit;
+    border-radius: 15px;
+    border: 2px dashed var(--bs-primary);
+    background-color: var(--bs-body-bg);
+    box-shadow: var(--card-box-shadow);
+    background-image: linear-gradient(45deg, rgba(93, 135, 255, 0.09) 25%, transparent 25%, transparent 50%, rgba(93, 135, 255, 0.09) 50%, rgba(93, 135, 255, 0.09) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+    animation: progress-bar-stripes 1s linear infinite;
+}
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
+    border: 0px;
+    background: #f1f1f1;
+    border-radius: 50%;
+    padding-top: inherit;
+    padding-bottom: inherit;
+}
+.ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year {
+    width: 22%;
+}
+
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2개의 컬럼을 가진 그리드 */
+  gap: 20px; /* 카드 사이의 간격 */
+  height: 100%;
+}
+
+.stat-card {
+  border: 1px solid #ccc; /* 경계선 스타일 */
+  padding: 20px; /* 내부 간격 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  padding-top: 50px;
+}
+
+.stat-title {
+  font-size: 1em; /* 제목 글자 크기 */
+  color: #888; /* 제목 글자 색상 */
+}
+
+.stat-value {
+  font-size: 2em; /* 값 글자 크기 */
+  color: #000; /* 값 글자 색상 */
+}
+
+.stat-subtitle {
+  font-size: 0.8em; /* 부제 글자 크기 */
+  color: #888; /* 부제 글자 색상 */
+}
+.table > :not(caption) > * > * {
+    padding: 16px 16px;
+    color: var(--bs-table-color-state, var(--bs-table-color-type, var(--bs-table-color))); 
+    border-bottom-width: var(--bs-border-width);
+    box-shadow: inset 0 0 0 9999px var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+.tableColor{
+background-color : rgb(221, 235, 255);
+}
+.border-dark {
+   --bs-border-opacity: 0; 
+}

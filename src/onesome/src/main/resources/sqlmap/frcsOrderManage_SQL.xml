@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.frcsordermanage.mapper.FrcsOrderManageMapper">
+
+    <resultMap id="frcsOrderMap" type="kr.or.onesome.frcsorder.vo.FrcsOrderVO">
+        <result property="frcsOrderNo" column="FRCS_ORDER_NO"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="frcsOrderDt" column="FRCS_ORDER_DT"/>
+        <result property="frcsOrderOrderAmt" column="FRCS_ORDER_ORDER_AMT"/>
+        <result property="frcsOrderTypeCd" column="FRCS_ORDER_TYPE_CD"/>
+        <result property="frcsNm" column="FRCS_NM"/>
+    </resultMap>
+
+    <select id="frcsOrderList" resultMap="frcsOrderMap">
+        SELECT
+            fo.FRCS_ORDER_NO
+             , fo.FRCS_NO
+             , fo.FRCS_ORDER_DT
+             , fo.FRCS_ORDER_ORDER_AMT
+             , fo.FRCS_ORDER_TYPE_CD
+             , (SELECT f.FRCS_NM FROM FRANCHISE f  WHERE f.FRCS_NO = fo.FRCS_NO  ) FRCS_NM
+        FROM
+            FRCS_ORDER fo
+        ORDER BY
+            fo.FRCS_ORDER_NO DESC
+    </select>
+
+    <update id="frcsOrderManageCancel">
+        UPDATE
+            FRCS_ORDER
+        SET
+            FRCS_ORDER_TYPE_CD = 'FODST03'
+        WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+    </update>
+
+    <select id="confirmTypeCd" resultType="String">
+        SELECT
+            FRCS_ORDER_TYPE_CD
+        FROM
+            FRCS_ORDER
+        WHERE
+            FRCS_ORDER_NO = #{frcsOrderNo}
+    </select>
+
+    <update id="frcsOrderManageSubmit">
+    UPDATE
+        FRCS_ORDER
+    SET
+        FRCS_ORDER_TYPE_CD = 'FODST02'
+    WHERE
+        FRCS_ORDER_NO = #{frcsOrderNo}
+    </update>
+
+    <!--    가맹점 주문 관리 목록에서 승인 버튼 눌렀을 때, 본사 재고 수량 감소-->
+    <update id="frcsOrderManageAdminPrdctMinus">
+        UPDATE
+            PRODUCT a
+        SET
+            HQ_INVEN_CNT = HQ_INVEN_CNT - (
+                SELECT
+                    FRCS_ORDER_QY
+                FROM
+                    FRCS_ORDER_DETAIL
+                WHERE
+                    FRCS_ORDER_NO = #{frcsOrderNo}
+                  AND PRDCT_NO = a.PRDCT_NO)
+        WHERE
+                PRDCT_NO IN (
+                SELECT
+                    PRDCT_NO
+                FROM
+                    FRCS_ORDER_DETAIL
+                WHERE
+                    FRCS_ORDER_NO = #{frcsOrderNo})
+    </update>
+
+    <!--    가맹점 주문 관리 목록에서 승인 버튼 눌렀을 때, 가맹점 재고 수량 증가-->
+    <update id="frcsOrderManageFrcsPrdctPlus">
+        UPDATE FRCS_INVENTORY FI
+        SET
+            FRCS_INVEN_CNT = FRCS_INVEN_CNT + (
+                SELECT
+                    FRCS_ORDER_QY
+                FROM
+                    FRCS_ORDER_DETAIL
+                WHERE
+                    FRCS_ORDER_NO = #{frcsOrderNo}
+                  AND PRDCT_NO = FI.PRDCT_NO
+                  AND FRCS_NO = FI.FRCS_NO)
+        WHERE
+                PRDCT_NO IN (
+                SELECT
+                    PRDCT_NO
+                FROM
+                    FRCS_ORDER_DETAIL
+                WHERE
+                    FRCS_ORDER_NO = #{frcsOrderNo}
+            )
+          AND FRCS_NO IN (
+            SELECT
+                FRCS_NO
+            FROM
+                FRCS_ORDER_DETAIL
+            WHERE
+                FRCS_ORDER_NO = #{frcsOrderNo}
+        )
+    </update>
+
+</mapper>

@@ -1,0 +1,316 @@
+
+/* 일반회원 공지사항 리스트[시작] --------------------------------- */
+body {
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+a{
+   text-decoration-line : none;
+}
+
+button {
+   border: 0;
+     background-color: transparent;
+}
+input, optgroup, select, textarea {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.sub-tit-name{
+   font-weight: bold;
+   margin-bottom: 56px;
+   font-size:40px;
+}
+
+.noticeContainer {
+   margin-bottom: 70px;
+}
+
+.noticeContainer fieldset {
+   text-align:  right;
+   margin-bottom: 40px;
+}
+
+.search {
+   display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.search .search-board-wrap {
+   height: 56px;
+   display: flex;
+    align-items: center;
+/*     order: 3; */
+/*     flex: 0 0 452px; */
+}
+
+.search-board-wrap .input {
+    padding-left: 24px;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+}
+
+.search-board-wrap button {
+    position: absolute;
+    top: 28%;
+    right: 0;
+}
+
+.search-board-wrap button .ti {
+    font-family: "tabler-icons" !important;
+   font-weight: bold;
+}
+
+.search-board-wrap select, .search-board-wrap input {
+    width: 320px;
+    height: 56px;
+    padding: 0;
+    border: none;
+    border-bottom: 1px solid #000;
+    font-size: 16px;
+}
+
+input::placeholder {
+   color:#999;
+}
+
+#searchType {
+    width: 100px;
+}
+
+.noticeContainer .notice-list {
+   border-top: 1px solid #ebebeb;
+   width: 100%;
+   display: table;
+    table-layout: fixed;
+}
+
+.notice-list .is-notice {
+    height: 90px;
+    border-bottom: 1px solid #ebebeb;
+   display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 마우스 올렸을때 나타나는 화살표 */
+.notice-list .is-notice .list-title:hover .ti-arrow-right:before {
+     display: inline-block;
+     color: #000;
+}
+
+/* 화살표 디스플레이 논 처리 */
+.ti-arrow-right:before {
+    display: none;
+}
+
+
+/* 뱃지, 게시글 번호 간격 */
+.point-dot,  .list-num{
+   padding:0 32px;
+   text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+}
+
+/* 뱃지 크기, 색상 */
+.point-dot {
+   color: #d50037;
+    font-size: 30px;
+}
+
+/* 게시글 번호 */
+.notice-list .list-num {
+   width: 94px;
+}
+
+/* 게시글 제목 */
+.notice-list .list-title {
+   position: relative;
+    padding-right: 24px;
+    width: 100%;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 24px;
+    font-weight: 400;
+    color: #000;
+    display: table-cell;
+}
+
+/* 등록일 */
+.notice-list .list-date {
+   width: 145px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
+    font-weight: 400;
+    color: #333;
+}
+
+/* ------------------------ 페이지네이션[시작] ------------------------ */
+.col-sm-12 {
+    width: 100%;
+}
+
+div#dataTable_paginate {
+   margin-top: 40px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+/* ------------------------ 페이지네이션[끝] ------------------------ */
+
+/* 일반회원 공지사항 리스트[끝] ----------------------------------- */
+
+
+/* 일반회원 공지사항 디테일[시작] ----------------------------------- */
+
+.title-wrap {
+   padding-bottom: 36px;
+   border-bottom: 1px solid #ebebeb;
+}
+/* 공지사항 제목 */
+.title-wrap .title-h3 {
+   font-size: 24px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.5;
+}
+
+/* 공지사항 날짜 */
+.title-wrap .list-date{
+   display: block;
+    font-size: 14px;
+    color: #333;
+    margin-top: 12px;
+}
+
+/* 공지사항  내용+다운로드버튼  영역 */
+.noticeDetailContainer {
+   padding-top: 40px;
+    padding-bottom: 64px;
+    border-bottom: 1px solid #ebebeb;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* 공지사항 본문 */
+.noticeDetailContainer .notice-con {
+   width: 100%;
+}
+
+/* 첨부파일 다운로드 영역 */
+.notice-FileDl{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.notice-FileDl a {
+	margin: 8px 16px;
+}
+.notice-FileDl a:hover {
+	color : #d50037;
+	text-decoration: underline;
+}
+
+/* 파일 다운로드 버튼 */
+.btn-FileDl{
+    border: 1px solid #000;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    width: fit-content;
+    padding: 4px 16px;
+    color: #000;
+}
+
+/* 목록으로 버튼 */
+.btn-Nlist {
+   display: flex;
+    justify-content: center;
+}
+
+.btn-Nlist a {
+   margin-top: 64px;
+    margin-bottom: 80px;
+   background-color: #000;
+   color:#fff;
+   text-align: center;
+   min-width: 240px;
+    height: 64px;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+/* 이전,다음글 네비 */
+.list-nav {
+   margin-bottom : 70px;
+   display: flex;
+    flex-direction: column;
+    border-top: 1px solid #ebebeb;
+}
+/* 이전글, 다음글 */
+.list-nav .nav-prev, .nav-next {
+    height: 90px;
+    padding: 0px 32px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ebebeb;
+    font-size: 14px;
+}
+
+.btn-prev, .btn-next{
+   width: 94px;
+   color: #999;
+}
+
+/* 이전글, 다음글 */
+.nav-prev a, .nav-next a {
+    width: 100%;
+   padding: 0px 32px;
+    font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    color: #000;
+}
+
+/* 이전, 다음글이 없을 떄 */
+.btn-none-list {
+   width: 100%;
+   padding: 0px 32px;
+    font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+
+.list-nav a .list-title:hover {
+    text-decoration: underline;
+}
+
+.list-date, .next-date{
+   font-size: 14px;
+}
+
+
+/* 일반회원 공지사항 디테일[끝] ----------------------------------- */

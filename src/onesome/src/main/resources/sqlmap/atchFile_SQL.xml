@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.atchFile.mapper.AtchFileMapper">
+	
+	<!-- ATCH_FILE_DETAIL 테이블에 insert
+	파라미터 : AtchFileDetailVO[atchFileId=BS0757, fileSn=0 ...
+	 -->
+	<select id="getAtchFileNo" resultType="int">
+		select ATCH_FILE_SEQ.nextval from DUAL
+	</select>
+
+	<insert id="insertAtchFile" parameterType="atchFileVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="fileSn">
+			select nvl(max(file_sn), 0)+1 from ATCH_FILE where ATCH_FILE_NO = #{atchFileNo}
+		</selectKey>
+	
+		INSERT INTO atch_file
+				(atch_file_no, file_sn, orignl_file_nm, file_stre_cours,
+    			 stre_file_nm, file_thum_yn, file_upload_dt, file_extsn, file_size)
+    	VALUES
+    			(#{atchFileNo}, #{fileSn}, #{orignlFileNm}, #{fileStreCours},
+    			#{streFileNm}, 'y', sysdate, #{fileExtsn}, #{fileSize})
+
+	</insert>
+	
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="fileSn" column="FILE_SN"/>
+		<result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+		<result property="fileStreCours" column="FILE_STRE_COURS"/>
+		<result property="streFileNm" column="STRE_FILE_NM"/>
+		<result property="fileThumYn" column="FILE_THUM_YN"/>
+		<result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+		<result property="fileExtsn" column="FILE_EXTSN"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+	</resultMap>
+	
+	<!-- 첨부파일 상세조회 -->
+	<select id="getAttachDetail" parameterType="int" resultMap="atchFileMap">
+		SELECT ATCH_FILE_NO, FILE_SN, ORIGNL_FILE_NM, FILE_STRE_COURS, STRE_FILE_NM, 
+		       FILE_THUM_YN, FILE_UPLOAD_DT, FILE_EXTSN, FILE_SIZE
+		FROM ATCH_FILE
+		WHERE ATCH_FILE_NO = #{atchFileNo}
+	</select>
+	
+	<!-- 기촌파일정보  -->
+	<select id="getFilesByAtchFileNo" resultMap="atchFileMap">
+		SELECT ATCH_FILE_NO, FILE_SN, ORIGNL_FILE_NM, FILE_STRE_COURS, STRE_FILE_NM, FILE_THUM_YN, FILE_UPLOAD_DT, FILE_EXTSN, FILE_SIZE
+		FROM ATCH_FILE
+		WHERE ATCH_FILE_NO = #{atchFileNo}
+	</select>
+	
+	<delete id="deleteFile" parameterType="int">
+		DELETE
+		FROM ATCH_FILE
+		WHERE ATCH_FILE_NO = #{atchFileNo}
+	</delete>
+
+	<delete id="removeFile" parameterType="int">
+		DELETE
+		FROM ATCH_FILE
+		WHERE ATCH_FILE_NO = #{atchFileNo}
+	</delete>
+</mapper>

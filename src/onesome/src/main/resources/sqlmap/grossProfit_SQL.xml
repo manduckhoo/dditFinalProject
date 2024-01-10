@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.onesome.frcssalespurchase.mapper.GrossProfitMapper">
+
+	<!-- 1년 짜리 -->
+	<!-- 월별 매출액 뽑기 -->
+	<select id="paymentList" resultType="paymentVO">
+		select TO_CHAR(PYNM_DT,
+		'YYYY-MM') AS yyyymm, sum(PYNM_TOTAL_AMT) as
+		paymentTotal
+		from payment
+		where PYNM_DT between to_date('2023-01-01', 'YYYY-MM-DD') AND
+		TO_DATE('2024-12-31','YYYY-MM-DD')
+		<!-- 12월로 일단 한정 나중에 지워 -->
+<!-- 	and PYNM_DT between to_date('2023-12-01', 'YYYY-MM-DD') AND TO_DATE('2023-12-31','YYYY-MM-DD') -->
+		AND FRCS_NO = #{frcsNo}
+		GROUP BY
+		TO_CHAR(PYNM_DT, 'YYYY-MM')
+		order BY yyyymm
+	</select>
+
+	<!-- 1년 짜리 -->
+	<!-- 월별 매입내역 뽑기 -->
+	<select id="frcsOrderList" resultType="frcsOrderVO">
+		SELECT
+		TO_CHAR(FRCS_ORDER_DT, 'YYYY-MM') AS yyyymm
+		, SUM(FRCS_ORDER_ORDER_AMT)
+		as total
+		FROM FRCS_ORDER
+		WHERE FRCS_ORDER_DT BETWEEN
+		TO_DATE('2023-01-01', 'YYYY-MM-DD')
+		AND TO_DATE('2024-12-31',
+		'YYYY-MM-DD')
+		<!-- 12월로 일단 한정 나중에 지워 -->
+<!-- 		and FRCS_ORDER_DT between to_date('2023-12-01', 'YYYY-MM-DD') AND TO_DATE('2023-12-31','YYYY-MM-DD') -->
+		and frcs_no = #{frcsNo}
+		GROUP BY TO_CHAR(FRCS_ORDER_DT,
+		'YYYY-MM')
+		ORDER BY yyyymm
+	</select>
+	
+	<!-- 1개월 짜리 -->
+	<!-- 월별 매출액 뽑기 -->
+	<select id="monthPaymentList" parameterType="hashMap" resultType="paymentVO">
+		select TO_CHAR(PYNM_DT,
+		'YYYY-MM') AS yyyymm, sum(PYNM_TOTAL_AMT) as
+		paymentTotal
+		from payment
+		where PYNM_DT between to_date('2023-01-01', 'YYYY-MM-DD') AND
+		TO_DATE('2024-12-31','YYYY-MM-DD')
+		<!-- 이 자리에 parameter 값 몇 월인지 입력 -->
+		and TO_CHAR(PYNM_DT, 'yyyy-MM') = #{viewDate}
+		AND FRCS_NO = #{frcsNo}
+		GROUP BY
+		TO_CHAR(PYNM_DT, 'YYYY-MM')
+		order BY yyyymm
+	</select>
+
+	<!-- 1개월 짜리 -->
+	<!-- 월별 매입내역 뽑기 -->
+	<select id="monthFrcsOrderList" parameterType="hashMap" resultType="frcsOrderVO">
+		SELECT
+		TO_CHAR(FRCS_ORDER_DT, 'YYYY-MM') AS yyyymm
+		, SUM(FRCS_ORDER_ORDER_AMT)
+		as total
+		FROM FRCS_ORDER
+		WHERE FRCS_ORDER_DT BETWEEN
+		TO_DATE('2023-01-01', 'YYYY-MM-DD')
+		AND TO_DATE('2024-12-31',
+		'YYYY-MM-DD')
+		<!-- 이 자리에 parameter 값 몇 월인지 입력 -->
+		and TO_CHAR(FRCS_ORDER_DT, 'yyyy-MM') = #{viewDate}
+		and frcs_no = #{frcsNo}
+		GROUP BY TO_CHAR(FRCS_ORDER_DT,
+		'YYYY-MM')
+		ORDER BY yyyymm
+	</select>
+
+	<!-- 판매 수량 내림차순 -->
+	<select id="paymentTopList" parameterType="hashMap" resultMap="PaymentMap">
+		select totalCnt, menu
+		from
+		(select
+		    sum(pd.PYNM_CNT) as totalCnt,
+		    pd.MENU_NM as menu
+		from PAYMENT p, PAYMENT_DETAIL pd
+		where p.PYNM_NO = pd.PYNM_NO
+		and p.FRCS_NO = #{frcsNo}
+		and p.pynm_dt BETWEEN TO_DATE('2023-01-01', 'YYYY-MM-DD') AND
+						TO_DATE('2024-12-31', 'YYYY-MM-DD')
+		<!-- 이 자리에 parameter 값 몇 월인지 입력 -->
+		and TO_CHAR(p.pynm_dt, 'yyyy-MM') = #{viewDate}
+		group by pd.MENU_NO, pd.MENU_NM
+		order by totalCnt desc)
+		<![CDATA[where rownum <= 5]]>
+		
+	</select>
+	
+	<resultMap id="PaymentMap" type="paymentVO">
+		<result property="pynmNo" column="PYNM_NO"/>
+		<result property="memNo" column="MEM_NO"/>
+		<result property="frcsNo" column="FRCS_NO"/>
+		<result property="pynmMthdId" column="PYNM_MTHD_ID"/>
+		<result property="pynmDt" column="PYNM_DT"/>
+		<result property="pynmTotalAmt" column="PYNM_TOTAL_AMT"/>
+		<result property="setupMenuYn" column="SETUP_MENU_YN"/>
+<!-- 		<result property="totalCnt" column=""/> -->
+<!-- 		<result property="menu" column=""/> -->
+		<collection property="paymentDetailVOList" resultMap="paymentDetailVOList"></collection>
+	</resultMap>
+	
+	<resultMap id="paymentDetailVOList" type="paymentDetailVO">
+		<result property="menuSize" column="MENU_SIZE"/>
+		<result property="menuIceYn" column="MENU_ICE_YN"/>
+		<result property="pynmSeq" column="PYNM_SEQ"/>
+		<result property="pynmNo" column="PYNM_NO"/>
+		<result property="pynmCnt" column="PYNM_CNT"/>
+		<result property="menuNo" column="MENU_NO"/>
+		<result property="menuNm" column="MENU_NM"/>
+		<result property="menuPrice" column="MENU_PRICE"/>
+		<result property="totalCnt" column="totalCnt"/>
+		<result property="menu" column="menu"/>
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+	</resultMap>
+	
+	
+</mapper>

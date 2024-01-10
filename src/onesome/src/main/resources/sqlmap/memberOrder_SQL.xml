@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.payment.mapper.MemberOrderMapper">
+	
+	<!-- 주문된 메뉴를 구성하는 레시피에서 상품의 재고수와 주문한 수를 따져서 주문가능여부 체킹 -->
+	<select id="cartStockCheck" resultType="memberCartVO" parameterType="memberCartVO">
+		select A.CART_SEQ, A.MEM_NO, A.MENU_NO, A.CART_CNT, FN_STOCK_YN(A.MENU_NO, A.CART_CNT, #{frcsNo}) STOCK_YN
+		       , A.MENU_SIZE, A.MENU_ICE_YN
+		       , B.MENU_NO, B.MENU_NM, B.MENU_PRICE, B.CTGRY_DETAIL_ID, B.MENU_DESCRIPTION, B.MENU_STRT_DT, B.MENU_END_DT, B.CALORIES
+		       , B.SUGAR, B.SODIUM, B.PROTEIN, B.SATURATED_FAT, B.CAFFEINE, B.ATCH_FILE_NO
+		       , C.ATCH_FILE_NO, C.FILE_SN, C.ORIGNL_FILE_NM, C.FILE_STRE_COURS, C.STRE_FILE_NM, C.FILE_THUM_YN, C.FILE_UPLOAD_DT, C.FILE_EXTSN, C.FILE_SIZE
+		from cart A 
+		     left join menu B on(A.menu_no = B.menu_no)
+		     left join atch_file C on(B.atch_file_no = C.atch_file_no)
+		where mem_no = #{memNo}
+		order by B.CTGRY_DETAIL_ID, A.MENU_NO, A.MENU_ICE_YN, A.MENU_SIZE DESC
+	</select>
+	
+	<!-- 결제 API 완료 시 주문 테이블에 insert하기 -->
+	<insert id="orderInsert" parameterType="paymentVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="pynmNo">
+			select NVL(MAX(PYNM_NO),0)+1 FROM payment
+		</selectKey>
+		insert into payment(pynm_no, mem_no, frcs_no, pynm_mthd_id, pynm_dt, pynm_total_amt, setup_menu_yn)
+		values (#{pynmNo}, #{memNo}, #{frcsNo}, #{pynmMthdId}, SYSDATE, #{pynmTotalAmt}, 'N')
+	</insert>
+	
+	<!-- 결제 API 완료 시 주문 테이블에서 => 주문 상세테이블로 insert하기  -->
+	<insert id="orderDetailInsert" parameterType="map">
+		INSERT INTO PAYMENT_DETAIL ( PYNM_SEQ, PYNM_NO, PYNM_CNT, MENU_NO, MENU_NM
+									, MENU_PRICE ,ATCH_FILE_NO, MENU_SIZE , MENU_ICE_YN) 
+							VALUES (pynm_seq.nextval, #{pynmNo}, #{pynmCnt}, #{menuNo}, #{menuNm}
+									, #{menuPrice}, #{atchFileNo}, #{menuSize}, #{menuIceYn})
+	</insert>
+	
+	<!-- 주문 상세로 가기전에 가맹점 재고 떨구기 -->
+	<select id="frcsInventoryUpdate" parameterType="int">
+		{
+            CALL PROC_FRCS_INVENTORY_UPDATE(#{pynmNo})
+        }
+	</select>
+	
+	<!-- 주문한 메뉴들만 장바구니에서 삭제하기 -->
+	<delete id="cartOrderListDelete" parameterType="paymentDetailVO">
+		DELETE FROM CART
+  		WHERE MEM_NO = #{memNo}
+     	AND CART_SEQ IN (
+            SELECT
+                A.CART_SEQ
+            FROM
+                CART A
+                LEFT JOIN PAYMENT_DETAIL B ON A.MENU_NO = B.MENU_NO
+            WHERE A.MEM_NO = #{memNo}
+            AND PYNM_NO = #{pynmNo}
+     	)
+	</delete>
+	
+	<!-- 주문상세내역들 가져오기 -->
+	<select id="orderDetailList" parameterType="int" resultType="paymentDetailVO">
+		SELECT A.*, B.STRE_FILE_NM
+		FROM PAYMENT_DETAIL A
+		LEFT JOIN ATCH_FILE B
+		ON A.ATCH_FILE_NO = B.ATCH_FILE_NO 
+		WHERE PYNM_NO = #{pynmNo}
+	</select>
+	
+	<!-- 주문상세내역에 가맹점 번호 가져오기 -->
+	<select id="orderFrcsDetail" parameterType="int" resultType="franchiseVO">
+		SELECT * FROM FRANCHISE WHERE FRCS_NO = #{orderFrcsNo}
+	</select>
+	
+	<!-- 주문상세내역에 주문번호 가져오기 -->
+	<select id="orderDetail" parameterType="int" resultType="paymentVO">
+		SELECT * FROM payment WHERE pynm_no = #{pynmNo}
+	</select>
+	
+	<!-- 마이페이지에서 내가 주문한 내역 확인하기, (2024.01.08 수정 : 시퀀스가 0인곳에 행 하나 더 질러서 합계 표시)  -->
+	<select id="myOrderList" parameterType="paymentDetailVO" resultType="paymentDetailVO">
+<!-- 		SELECT A.PYNM_SEQ, A.PYNM_NO, A.PYNM_CNT, A.MENU_NO, A.MENU_NM, A.MENU_PRICE, A.ATCH_FILE_NO, A.MENU_SIZE , A.MENU_ICE_YN -->
+<!-- 	          , B.MEM_NO, B.FRCS_NO, B.PYNM_MTHD_ID,  B.PYNM_DT, B.PYNM_TOTAL_AMT, B.SETUP_MENU_YN -->
+<!-- 	          , C.STRE_FILE_NM, D.FRCS_NM -->
+<!-- 		FROM PAYMENT_DETAIL A -->
+<!-- 		LEFT JOIN PAYMENT B ON A.PYNM_NO = B.PYNM_NO -->
+<!-- 		LEFT JOIN ATCH_FILE C ON A.ATCH_FILE_NO = C.ATCH_FILE_NO -->
+<!-- 		LEFT JOIN FRANCHISE D ON B.FRCS_NO = D.FRCS_NO -->
+<!-- 		WHERE B.MEM_NO = #{memNo} -->
+<!-- 		UNION ALL -->
+<!-- 		SELECT 0, A.PYNM_NO, 0,0,'', SUM(A.MENU_PRICE) MENU_PRICE,0,'','' -->
+<!-- 	           ,0,0,null,null,null,null -->
+<!-- 	           ,null,null -->
+<!-- 		FROM PAYMENT_DETAIL A -->
+<!-- 		LEFT JOIN PAYMENT B ON A.PYNM_NO = B.PYNM_NO -->
+<!-- 		LEFT JOIN ATCH_FILE C ON A.ATCH_FILE_NO = C.ATCH_FILE_NO -->
+<!-- 		LEFT JOIN FRANCHISE D ON B.FRCS_NO = D.FRCS_NO -->
+<!-- 		WHERE B.MEM_NO = #{memNo} -->
+<!-- 		GROUP BY A.PYNM_NO -->
+<!-- 		ORDER BY 2 DESC, 1 desc -->
+	
+		SELECT A.*, B.*, C.STRE_FILE_NM, D.FRCS_NM
+		FROM PAYMENT_DETAIL A
+		LEFT JOIN PAYMENT B ON A.PYNM_NO = B.PYNM_NO
+		LEFT JOIN ATCH_FILE C ON A.ATCH_FILE_NO = C.ATCH_FILE_NO
+		LEFT JOIN FRANCHISE D ON B.FRCS_NO = D.FRCS_NO
+		WHERE B.MEM_NO = #{memNo}
+		ORDER BY A.PYNM_NO DESC
+	</select>
+	
+	<!-- 주문내역 취소 -->
+	<delete id="orderListCancel" parameterType="paymentDetailVO">
+		delete from payment_DETAIL
+		where PYNM_NO = #{pynmNo}
+	</delete>
+	
+</mapper>

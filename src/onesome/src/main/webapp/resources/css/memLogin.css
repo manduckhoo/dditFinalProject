@@ -1,0 +1,149 @@
+/* ==================== 일반회원 로그인을 위한 css 파일 ==================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Poppins&family=Roboto&display=swap");
+
+login {
+    background: url('/resources/image/일반회원로그인배경.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* login form */
+.wraaper{
+	width: 420px;
+	background: transparent;
+	border: 2px solid rgba(255,255,255.2);
+	backdrop-filter: blur(13px);
+	box-shadow: 0 0 10px rgba(0,0,0,.1);
+	border-radius: 10px;
+	padding: 30px 40px;
+	color: #fff;
+}
+
+/* login 이름 크기, 위치 조정 */
+.wraaper h2{
+	font-size: 36px;
+	text-align: center;
+}
+
+/* 아이디, 비밀번호 입력창 바깥쪽 */
+.wraaper .input-box {
+	width: 100%;
+	height: 50px;
+	margin: 30px 0;
+}
+
+/* 아이디, 비밀번호 입력창 안쪽 */
+.input-box input {
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	border: none;
+	outline: none;
+	border: 2px solid rgba(255,255,255.2);
+	border-radius: 40px;
+	font-size: 16px;
+	color: #fff;
+	padding: 20px 45px 20px 20px;
+}
+
+/* 필수 입력값 폰트 색상 화이트*/
+.input-box input::placeholder{
+	color: #fff;
+}
+
+
+/* 유저 icon위치 조정*/
+.input-box #usericon{
+	position: absolute;
+	right: 50px;
+	top: 28%;
+	transform: translateY(27%);
+	font-size: 20px;
+}
+
+/* 비밀번호 icon위치 조정*/
+.input-box #passwordicon{
+	position: absolute;
+	right: 50px;
+	top: 49%;
+	transform: translateY(10%);
+	font-size: 20px;
+}
+
+/* 로그인 기억하기 바깥쪽 */
+.wraaper .remember-forgot {
+	display: flex;
+	justify-content: space-between;
+	font-size: 14.5px;
+	margin: -15px 0 15px;
+}
+
+/* 로그인 기억하기 안쪽 라벨의 입력값 */
+.remember-forgot label input {
+	accent-color : #fff;
+	margin-right: 3px;
+}
+
+/* 비밀번호 찾기 a태그*/
+.remember-forgot a{
+	color: #fff;
+	text-decoration: none;
+}
+
+/* 비밀번호 찾기 a태그 밑줄치기*/
+.remember-forgot a:hover{
+	text-decoration: underline;
+}
+
+/* 로그인 버튼 */
+.wraaper .btn {
+	width: 100%;
+	height: 45px;
+	background: #fff;
+	border: none;
+	outline: none;
+	border-radius: 40px;
+	box-shadow: 0 0 10px rgba(0,0,0,.1);
+	cursor: pointer;
+	font-size: 16px;
+	color: #333;
+	font-weight: 600;
+}
+
+/* 회원가입 링크 */
+.wraaper .register-link {
+	font-size: 14.5px;
+	text-align: center;
+	margin-top: 20px;
+}
+
+/* 회원가입 글씨 */
+.register-link a {
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	margin: 10px;
+}
+
+/* 회원가입 글씨 밑줄 */
+.register-link a:hover{
+	text-decoration: underline;
+}
+
+/* 로그인버튼 간격 조정 */
+#loginBtn{
+	margin-left: 50px;
+	margin-right: 10px;
+}
+
+/* 회원가입버튼 간격 조정 */
+#joinBtn{
+	margin-right: 10px;
+}

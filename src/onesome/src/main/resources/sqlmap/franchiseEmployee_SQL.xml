@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.franchise.mapper.FranchiseEmployeeMapper">
+
+	<!-- 직원 리스트 -->
+	<select id="list" parameterType="Map" resultMap="franchiseEmployeeMap">
+		SELECT * FROM (
+			SELECT ROWNUM AS R, N.*
+			FROM
+				(select
+						A.FRCS_EMP_NO,
+						A.FRCS_NO,
+						A.FRCS_EMP_NM,
+						A.FRCS_EMP_BRDT,
+						A.FRCS_EMP_TEL,
+						A.FRCS_EMP_SAL,
+						A.FRCS_EMP_WKST_CD,
+						A.FRCS_EMP_TYPE_CD,
+						A.FRCS_EMP_STR_TIME,
+						A.FRCS_EMP_END_TIME,
+						A.ATCH_FILE_NO,
+						B.FILE_SN,
+						B.ORIGNL_FILE_NM,
+						B.FILE_STRE_COURS,
+						B.STRE_FILE_NM,
+						B.FILE_THUM_YN,
+						B.FILE_UPLOAD_DT,
+						B.FILE_EXTSN,
+						B.FILE_SIZE
+				from FRCS_EMPLOYEE A LEFT OUTER JOIN ATCH_FILE B ON(A.ATCH_FILE_NO=B.ATCH_FILE_NO))N)
+			WHERE R BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
+	<!-- 실험용 -->
+<!-- 	<select id="getFrcsNo" resultMap="fcsNoMap"> -->
+<!-- 		select frcs_No from frcs_Employee where frcs_No = #{frcsNo} -->
+<!-- 	</select> -->
+	<!--실험용 -->
+<!-- 	<resultMap type="int" id="fcsNoMap"> -->
+<!-- 		<result property="frcsNo" column="FRCS_NO"/> -->
+<!-- 	</resultMap> -->
+	
+	<!-- 전체 직원 수 -->
+	<select id="getCount" resultType="int">
+		SELECT COUNT(*) FROM FRCS_EMPLOYEE
+	</select>
+	
+	<resultMap type="franchiseEmployeeVO" id="franchiseEmployeeMap">
+		<result property="frcsEmpNo" column="FRCS_EMP_NO"/>
+		<result property="frcsNo" column="FRCS_NO"/>
+		<result property="frcsEmpNm" column="FRCS_EMP_NM"/>
+		<result property="frcsEmpBrdt" column="FRCS_EMP_BRDT"/>
+		<result property="frcsEmpTel" column="FRCS_EMP_TEL"/>
+		<result property="frcsEmpSal" column="FRCS_EMP_SAL"/>
+		<result property="frcsEmpWkstCd" column="FRCS_EMP_WKST_CD"/>
+		<result property="frcsEmpTypeCd" column="FRCS_EMP_TYPE_CD"/>
+		<result property="frcsEmpStrTime" column="FRCS_EMP_STR_TIME"/>
+		<result property="frcsEmpEndTime" column="FRCS_EMP_END_TIME"/>
+		<collection property="atchFileVOList" resultMap="atchFileMap"></collection>		
+	</resultMap>
+	
+	<resultMap type="atchFileVO" id="atchFileMap">
+		<result property="atchFileNo" column="ATCH_FILE_NO"/>
+		<result property="fileSn" column="FILE_SN"/>
+		<result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+		<result property="fileStreCours" column="FILE_STRE_COURS"/>
+		<result property="streFileNm" column="STRE_FILE_NM"/>
+		<result property="fileThumYn" column="FILE_THUM_YN"/>
+		<result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+		<result property="fileExtsn" column="FILE_EXTSN"/>
+		<result property="fileSize" column="FILE_SIZE"/>
+	</resultMap>
+	
+	<select id="detail" parameterType="franchiseEmployeeVO" resultMap="franchiseEmployeeMap">
+		select
+			A.FRCS_EMP_NO,
+			A.FRCS_NO,
+			A.FRCS_EMP_NM,
+			A.FRCS_EMP_BRDT,
+			A.FRCS_EMP_TEL,
+			A.FRCS_EMP_SAL,
+			A.FRCS_EMP_WKST_CD,
+			A.FRCS_EMP_TYPE_CD,
+			A.FRCS_EMP_STR_TIME,
+			A.FRCS_EMP_END_TIME,
+			A.ATCH_FILE_NO,
+			B.FILE_SN,
+			B.ORIGNL_FILE_NM,
+			B.FILE_STRE_COURS,
+			B.STRE_FILE_NM,
+			B.FILE_THUM_YN,
+			B.FILE_UPLOAD_DT,
+			B.FILE_EXTSN,
+			B.FILE_SIZE
+		from FRCS_EMPLOYEE A LEFT OUTER JOIN ATCH_FILE B ON(A.ATCH_FILE_NO=B.ATCH_FILE_NO)
+		WHERE A.FRCS_EMP_NO=#{frcsEmpNo}
+	</select>
+	
+	<!-- 가맹점 가져오기 -->
+	<select id="getFranchise" resultType="franchiseVO">
+		select
+			FRCS_NO, FRCS_NM, FRCS_STS_CD, FRCS_RGST_DT, FRCS_END_DT, FRCS_POST_NO, FRCS_ADDR, FRCS_DTL_ADDR,
+			FRCS_BSNS_STRT_TM, FRCS_BSNS_END_TM, FRCS_CTRT_CNCLS_DT,
+			FRCS_EXPT_CMPL_DT, FRCS_FNL_INSP_DT, FRCS_OPNG_DT, FRCS_CPCT_PSN, FRCS_OWNR_NO
+		from
+			franchise
+		order by frcs_nm
+	</select>
+	
+	<!-- 근무 상태 정보 가져오기 -->
+	<select id="getCWST" resultType="comDetCodeInfoVO">
+		select *
+		from COM_DET_CODE_INFO
+		where com_code='CWST'
+	</select>
+	
+	<!-- 근무 타입 정보 가져오기 -->
+	<select id="getWKTP" resultType="comDetCodeInfoVO">
+		select *
+		from COM_DET_CODE_INFO
+		where com_code='WKTP'
+	</select>
+	
+	
+	<insert id="createPost" parameterType="franchiseEmployeeVO">
+	
+	<selectKey resultType="int" order="BEFORE" keyProperty="frcsEmpNo">
+		select frcs_emp_seq.nextval from DUAL
+	</selectKey>
+	
+		INSERT INTO frcs_employee (frcs_emp_no, frcs_no, frcs_emp_nm, frcs_emp_brdt, frcs_emp_tel, frcs_emp_sal,
+								   frcs_emp_wkst_cd, frcs_emp_type_cd, frcs_emp_str_time, frcs_emp_end_time, atch_file_no)
+								   
+		VALUES (#{frcsEmpNo}, #{frcsNo}, #{frcsEmpNm}, #{frcsEmpBrdt}, #{frcsEmpTel}, #{frcsEmpSal}, #{frcsEmpWkstCd},
+		#{frcsEmpTypeCd}, #{frcsEmpStrTime}, #{frcsEmpEndTime}, #{atchFileNo})
+	</insert>
+	
+	<!-- 수정 모드에서 첨부파일을 수정하고자 할 때 ATCH_FILE_DETAIL테이블의 데이터를 먼저 삭제함 
+	파라미터 : String atchFileId
+	-->
+	<delete id="delAtch" parameterType="int">
+		DELETE FROM ATCH_FILE
+		WHERE  ATCH_FILE_NO = #{atchFileNo}
+	</delete>
+	
+	<!-- 가맹점 직원 정보 수정 -->
+	<update id="update" parameterType="franchiseEmployeeVO">
+		UPDATE frcs_employee
+		SET
+		    FRCS_EMP_NM = #{frcsEmpNm},
+		    FRCS_EMP_BRDT = #{frcsEmpBrdt},
+		    FRCS_EMP_TEL = #{frcsEmpTel},
+		    FRCS_EMP_SAL = #{frcsEmpSal},
+		    FRCS_EMP_TYPE_CD = #{frcsEmpTypeCd},
+		    FRCS_EMP_STR_TIME = #{frcsEmpStrTime},
+		    FRCS_EMP_END_TIME = #{frcsEmpEndTime}
+		    		    
+		WHERE
+		        frcs_emp_no = #{frcsEmpNo}
+	</update>
+	
+	<!-- 가맹점 직원 정보 삭제 -->
+	<delete id="delete" parameterType="franchiseEmployeeVO">
+		DELETE FROM frcs_employee WHERE frcs_emp_no = #{frcsEmpNo}
+	</delete>
+	
+	<!-- DB에 저장된 값을 json으로 바로 변경할 수 있도록 풀캘린더의 속성명과 매칭 -->
+	<resultMap id="calendarMap" type="Map">
+		<result property="id" column="ATTNDCE_NO"/>
+		<result property="frcsEmpNo" column="FRCS_EMP_NO"/>
+		<result property="frcsNo" column="FRCS_NO"/>
+		<result property="title" column="ATTNDCE_TYPE_CD"/>
+		<result property="start" column="ATTNDCE_STR_DT"/>
+		<result property="end" column="ATTNDCE_END_DT"/>
+	</resultMap>
+	
+	<!-- 근무일정 불러오기 -->
+	<select id="getEvents" resultMap="calendarMap" parameterType="attendanceManagementVO">
+		select
+			ATTNDCE_NO, FRCS_EMP_NO,
+			FRCS_NO, ATTNDCE_TYPE_CD,
+			ATTNDCE_STR_DT, ATTNDCE_END_DT
+		from ATTENDANCE_MANAGEMENT
+		WHERE FRCS_EMP_NO=#{frcsEmpNo}
+	</select>
+	
+	<!-- 근무일정 추가히기 -->
+	<insert id="addEvent" parameterType="attendanceManagementVO">
+		<selectKey resultType="int" order="BEFORE" keyProperty="attndceNo">
+			select nvl(max(ATTNDCE_NO)+1, 1) from ATTENDANCE_MANAGEMENT
+		</selectKey>
+		insert into ATTENDANCE_MANAGEMENT(ATTNDCE_NO, FRCS_EMP_NO, FRCS_NO, ATTNDCE_TYPE_CD, ATTNDCE_STR_DT, ATTNDCE_END_DT)
+		values(#{attndceNo}, #{frcsEmpNo}, #{frcsNo}, #{attndceTypeCd}, #{attndceStrDt}, #{attndceEndDt})
+	</insert>
+
+	<!-- 근무일정 변경하기 -->
+	<update id="updateEvent">
+		UPDATE attendance_management
+		SET
+		    ATTNDCE_TYPE_CD = #{attndceTypeCd},
+		    ATTNDCE_STR_DT = #{attndceStrDt},
+		    ATTNDCE_END_DT = #{attndceEndDt}
+		WHERE attndce_no = #{attndceNo}
+	</update>
+	
+	<!-- 근무일정 삭제하기 -->
+	<delete id="deleteEvent">
+		delete from attendance_management where attndce_no = #{attndceNo}
+	</delete>
+	
+ </mapper>

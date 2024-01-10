@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.member.mapper.MemberMapper">
+    <resultMap id="memberMap" type="memberVO">
+        <result property="memNo" column="MEM_NO"/>
+        <result property="memId" column="MEM_ID"/>
+        <result property="memPw" column="MEM_PW"/>
+        <result property="memNick" column="MEM_NICK"/>
+        <result property="memNm" column="MEM_NM"/>
+        <result property="memTel" column="MEM_TEL"/>
+        <result property="memMail" column="MEM_MAIL"/>
+        <result property="memZip" column="MEM_ZIP"/>
+        <result property="memAddr" column="MEM_ADDR"/>
+        <result property="memAddr2" column="MEM_ADDR2"/>
+        <result property="memJoinDt" column="MEM_JOIN_DT"/>
+        <result property="memBirth" column="MEM_BIRTH"/>
+        <result property="enabled" column="ENABLED"/>
+        <result property="mbsCd" column="MBS_CD"/>
+        <result property="memMileage" column="MEM_MILEAGE"/>
+
+        <collection property="memberAuthVOList" resultMap="memAuthMap"/>
+    </resultMap>
+
+    <resultMap id="memAuthMap" type="memberAuthVO">
+        <result property="memAuthCd" column="MEM_AUTH_CD"/>
+        <result property="memNo" column="MEM_NO"/>
+    </resultMap>
+
+    <select id="memDetail" resultMap="memberMap">
+        select m.MEM_NO,
+               MEM_ID,
+               MEM_PW,
+               MEM_NICK,
+               MEM_NM,
+               MEM_TEL,
+               MEM_MAIL,
+               MEM_ZIP,
+               MEM_ADDR,
+               MEM_ADDR2,
+               MEM_JOIN_DT,
+               MEM_BIRTH,
+               ENABLED,
+               MBS_CD,
+               MEM_MILEAGE,
+               MEM_AUTH_CD
+        from MEMBER m,
+             MEM_AUTH ma
+        where m.MEM_NO = ma.MEM_NO
+          and m.ENABLED = '1'
+          and MEM_ID = #{memId}
+    </select>
+
+    <select id="duplicateMemberCheck" resultType="int">
+        select count(*) from MEMBER where MEM_ID = #{memId}
+    </select>
+
+    <select id="duplicateTelCheck" resultType="int">
+        select count(*) from MEMBER where MEM_TEL = #{memTel}
+    </select>
+    
+    <!-- 메뉴(음료)조회 쿼리 -->
+    <select id="MemMenuDrinkList" resultType="memberMenuVO">
+    	SELECT * FROM
+    	MENU A
+		LEFT OUTER JOIN ATCH_FILE B
+		ON A.ATCH_FILE_NO = B.ATCH_FILE_NO
+	    WHERE CTGRY_DETAIL_ID in ('ctg0101', 'ctg0102', 'ctg0103', 'ctg0104', 'ctg0105')
+    </select>
+    
+    <!-- 메뉴(푸드)조회 쿼리 -->
+    <select id="MemMenuFoodList" resultType="memberMenuVO">
+    	SELECT * FROM
+    	MENU A
+		LEFT OUTER JOIN ATCH_FILE B
+		ON A.ATCH_FILE_NO = B.ATCH_FILE_NO
+	    WHERE CTGRY_DETAIL_ID in ('ctg0201', 'ctg0202', 'ctg0203')
+    </select>
+    
+    <!-- 메뉴(상품)조회 쿼리 -->
+    <select id="MemMenuProductList" resultType="memberMenuVO">
+    	SELECT * FROM
+    	MENU A
+		LEFT OUTER JOIN ATCH_FILE B
+		ON A.ATCH_FILE_NO = B.ATCH_FILE_NO
+	    WHERE CTGRY_DETAIL_ID in ('ctg0301', 'ctg0302', 'ctg0303')
+    </select>
+    
+    <!-- 메뉴 상세조회 쿼리 -->
+    <select id="selectMenuDetail" resultType="memberMenuVO">
+    	SELECT * FROM
+    	MENU A
+		LEFT OUTER JOIN ATCH_FILE B
+		ON A.ATCH_FILE_NO = B.ATCH_FILE_NO
+		where MENU_NO = #{menuNo}
+    </select>
+    
+	<!-- 메뉴 카테고리 상세 ID 조회를 위한 메서드 -->
+	<select id="selectCtgList" resultType="memberMenuVO" parameterType="memberMenuVO">
+		SELECT MENU_NO, CTGRY_DETAIL_ID FROM MENU
+		WHERE menu_No = #{menuNo}
+	</select>
+    
+
+    <insert id="signUpMember">
+        insert into MEMBER (MEM_NO, MEM_ID, MEM_PW, MEM_NICK, MEM_NM, MEM_TEL, MEM_MAIL, MEM_ZIP, MEM_ADDR, MEM_ADDR2,
+                            MEM_BIRTH)
+        values (MEMBER_SEQ.nextval, #{memId}, #{memPw}, #{memNick}, #{memNm}, #{memTel}, #{memMail}, #{memZip}, #{memAddr}, #{memAddr2}, #{memBirth})
+    </insert>
+</mapper>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.onesome.inquiry.mapper.InquiryMapper">
+    
+    <update id="answerRegistration">
+        update INQUIRY
+        set ANS_TITLE=#{ansTitle},
+            ANS_CONTS=#{ansConts},
+            ANS_WRT_DT=sysdate,
+            ANS_WRTR_NO=#{ansWrtrNo}
+        where INQ_NO=#{inqNo}
+    </update>
+
+    <select id="adminInqList" resultMap="inquiryMap">
+        select inq.INQ_NO,
+               inq.INQ_TYPE_CD,
+               inq.MEM_NO,
+               inq.INQ_TITLE,
+               inq.INQ_CONTS,
+               inq.FRCS_NO,
+               inq.INQ_WRT_DT,
+               inq.ANS_TITLE,
+               inq.ANS_CONTS,
+               inq.ANS_WRTR_NO,
+               inq.ANS_WRT_DT,
+               inq.ATCH_FILE_NO,
+               cd.COM_DET_CODE_NM,
+               m.MEM_NM
+        from INQUIRY inq, COM_DET_CODE_INFO cd, MEMBER m
+        where inq.INQ_TYPE_CD = cd.COM_DET_CODE
+        and inq.MEM_NO = m.MEM_NO
+        order by INQ_NO desc
+    </select>
+
+     <select id="inqDetail" resultMap="inquiryMap">
+         select inq.INQ_NO,
+                inq.INQ_TYPE_CD,
+                inq.MEM_NO,
+                inq.INQ_TITLE,
+                inq.INQ_CONTS,
+                inq.INQ_WRT_DT,
+                inq.ANS_TITLE,
+                inq.ANS_CONTS,
+                inq.ANS_WRTR_NO,
+                inq.ANS_WRT_DT,
+                cd.COM_DET_CODE,
+                cd.COM_CODE,
+                cd.COM_DET_CODE_NM,
+                cd.COM_DET_CODE_RM,
+                af.ATCH_FILE_NO,
+                af.FILE_SN,
+                af.ORIGNL_FILE_NM,
+                af.FILE_STRE_COURS,
+                af.STRE_FILE_NM,
+                af.FILE_THUM_YN,
+                af.FILE_UPLOAD_DT,
+                af.FILE_EXTSN,
+                af.FILE_SIZE,
+                fc.FRCS_NO,
+                fc.FRCS_NM
+         from INQUIRY inq,
+              COM_DET_CODE_INFO cd,
+              ATCH_FILE af,
+              FRANCHISE fc
+         where inq.INQ_TYPE_CD = cd.COM_DET_CODE
+           and inq.FRCS_NO = fc.FRCS_NO(+)
+           and inq.ATCH_FILE_NO = af.ATCH_FILE_NO(+)
+           and INQ_NO = #{inqNo}
+     </select>
+
+    <select id="memberInqList" resultMap="inquiryMap">
+        select inq.INQ_NO,
+               inq.INQ_TYPE_CD,
+               inq.MEM_NO,
+               inq.INQ_TITLE,
+               inq.INQ_CONTS,
+               inq.FRCS_NO,
+               inq.INQ_WRT_DT,
+               inq.ANS_TITLE,
+               inq.ANS_CONTS,
+               inq.ANS_WRTR_NO,
+               inq.ANS_WRT_DT,
+               inq.ATCH_FILE_NO,
+               cd.COM_DET_CODE_NM
+        from INQUIRY inq, COM_DET_CODE_INFO cd
+        where inq.INQ_TYPE_CD = cd.COM_DET_CODE
+          and MEM_NO = #{memNo}
+        order by INQ_NO desc
+    </select>
+
+    <select id="getFranchiseList" resultType="franchiseVO">
+        select FRCS_NO,
+               FRCS_NM
+        from FRANCHISE where FRCS_STS_CD = 'FRST02'
+    </select>
+
+    <insert id="insertInquiry">
+        insert into INQUIRY (
+                 INQ_NO,
+                 INQ_TYPE_CD,
+                 MEM_NO,
+                 INQ_TITLE,
+                 INQ_CONTS,
+             <if test="frcsNo != 0">
+                 FRCS_NO,
+             </if>
+                 ATCH_FILE_NO
+        )
+        values (
+                INQUIRY_SEQ.nextval,
+                #{inqTypeCd},
+                #{memNo},
+                #{inqTitle},
+                #{inqConts},
+            <if test="frcsNo != 0">
+                #{frcsNo},
+            </if>
+                #{atchFileNo}
+               )
+    </insert>
+
+    <resultMap id="inquiryMap" type="inquiryVO">
+        <result property="inqNo" column="INQ_NO"/>
+        <result property="inqTypeCd" column="INQ_TYPE_CD"/>
+        <result property="memNo" column="MEM_NO"/>
+        <result property="inqTitle" column="INQ_TITLE"/>
+        <result property="inqConts" column="INQ_CONTS"/>
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="inqWrtDt" column="INQ_WRT_DT"/>
+        <result property="ansTitle" column="ANS_TITLE"/>
+        <result property="ansConts" column="ANS_CONTS"/>
+        <result property="ansWrtrNo" column="ANS_WRTR_NO"/>
+        <result property="ansWrtDt" column="ANS_WRT_DT"/>
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+
+        <association property="comDetCodeInfoVO" resultMap="comDetMap"/>
+        <association property="franchiseVO" resultMap="franchiseMap" />
+        <association property="memberVO" resultMap="memberMap" />
+        <collection property="atchFileVOList" resultMap="atchFileMap"/>
+    </resultMap>
+
+    <resultMap id="comDetMap" type="comDetCodeInfoVO">
+        <result property="comDetCode" column="COM_DET_CODE"/>
+        <result property="comCode" column="COM_CODE"/>
+        <result property="comDetCodeNm" column="COM_DET_CODE_NM"/>
+        <result property="comDetCodeRm" column="COM_DET_CODE_RM"/>
+    </resultMap>
+
+    <resultMap id="atchFileMap" type="atchFileVO">
+        <result property="atchFileNo" column="ATCH_FILE_NO"/>
+        <result property="fileSn" column="FILE_SN"/>
+        <result property="orignlFileNm" column="ORIGNL_FILE_NM"/>
+        <result property="fileStreCours" column="FILE_STRE_COURS"/>
+        <result property="streFileNm" column="STRE_FILE_NM"/>
+        <result property="fileThumYn" column="FILE_THUM_YN"/>
+        <result property="fileUploadDt" column="FILE_UPLOAD_DT"/>
+        <result property="fileExtsn" column="FILE_EXTSN"/>
+        <result property="fileSize" column="FILE_SIZE"/>
+    </resultMap>
+
+    <resultMap id="franchiseMap" type="franchiseVO">
+        <result property="frcsNo" column="FRCS_NO"/>
+        <result property="frcsNm" column="FRCS_NM"/>
+        <result property="frcsStsCd" column="FRCS_STS_CD"/>
+        <result property="frcsRgstDt" column="FRCS_RGST_DT"/>
+        <result property="frcsEndDt" column="FRCS_END_DT"/>
+        <result property="frcsPostNo" column="FRCS_POST_NO"/>
+        <result property="frcsAddr" column="FRCS_ADDR"/>
+        <result property="frcsDtlAddr" column="FRCS_DTL_ADDR"/>
+        <result property="frcsBsnsStrtTm" column="FRCS_BSNS_STRT_TM"/>
+        <result property="frcsBsnsEndTm" column="FRCS_BSNS_END_TM"/>
+        <result property="frcsCtrtCnclsDt" column="FRCS_CTRT_CNCLS_DT"/>
+        <result property="frcsExptCmplDt" column="FRCS_EXPT_CMPL_DT"/>
+        <result property="frcsFnlInspDt" column="FRCS_FNL_INSP_DT"/>
+        <result property="frcsOpngDt" column="FRCS_OPNG_DT"/>
+        <result property="frcsCpctPsn" column="FRCS_CPCT_PSN"/>
+        <result property="frcsOwnrNo" column="FRCS_OWNR_NO"/>
+        <result property="frcsRegionCd" column="FRCS_REGION_CD"/>
+        <result property="frcsTel" column="FRCS_TEL"/>
+    </resultMap>
+
+    <resultMap id="memberMap" type="memberVO">
+        <result property="memNo" column="MEM_NO"/>
+        <result property="memId" column="MEM_ID"/>
+        <result property="memPw" column="MEM_PW"/>
+        <result property="memNick" column="MEM_NICK"/>
+        <result property="memNm" column="MEM_NM"/>
+        <result property="memTel" column="MEM_TEL"/>
+        <result property="memMail" column="MEM_MAIL"/>
+        <result property="memZip" column="MEM_ZIP"/>
+        <result property="memAddr" column="MEM_ADDR"/>
+        <result property="memAddr2" column="MEM_ADDR2"/>
+        <result property="memJoinDt" column="MEM_JOIN_DT"/>
+        <result property="memBirth" column="MEM_BIRTH"/>
+        <result property="enabled" column="ENABLED"/>
+        <result property="mbsCd" column="MBS_CD"/>
+        <result property="memMileage" column="MEM_MILEAGE"/>
+    </resultMap>
+</mapper>

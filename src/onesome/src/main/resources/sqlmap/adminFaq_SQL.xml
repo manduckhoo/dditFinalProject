@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.onesome.faq.mapper.AdminFaqMapper">
+
+    <select id="faqList" resultType="faqVO">
+        SELECT FAQ_NO
+             , FAQ_TYPE_CD
+             , FAQ_TITLE
+             , FAQ_CONTS
+        FROM FAQ
+        order by FAQ_NO
+    </select>
+
+    <insert id="createFaq" parameterType="faqVO">
+        INSERT
+        INTO FAQ
+        ( FAQ_NO
+        , FAQ_TYPE_CD
+        , FAQ_TITLE
+        , FAQ_CONTS)
+        VALUES ( (SELECT NVL(MAX(FAQ_NO), 0) + 1
+                  FROM FAQ)
+               , #{faqTypeCd}
+               , #{faqTitle}
+               , #{faqConts})
+    </insert>
+
+    <update id="modifyFaq" parameterType="faqVO">
+        UPDATE
+            FAQ
+        SET
+            FAQ_TYPE_CD = #{faqTypeCd}
+          , FAQ_TITLE = #{faqTitle}
+          , FAQ_CONTS = #{faqConts}
+        WHERE
+            FAQ_NO = #{faqNo}
+    </update>
+
+    <select id="selectAjax" parameterType="HashMap" resultType="faqVO">
+        SELECT FAQ_NO
+             , FAQ_TYPE_CD
+             , FAQ_TITLE
+             , FAQ_CONTS
+        FROM FAQ
+        WHERE FAQ_NO = #{faqNo}
+    </select>
+
+    <delete id="deleteFaq" parameterType="faqVO">
+        DELETE
+        FROM
+            FAQ
+        WHERE
+            FAQ_NO = #{faqNo}
+    </delete>
+
+</mapper>

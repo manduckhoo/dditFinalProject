@@ -1,0 +1,77 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Noto+Sans+KR:wght@100;400;700;800;900&family=Oswald&family=Poppins&family=Roboto&display=swap");
+
+/* 로그인버튼 간격 조정 */
+#loginBtn{
+	margin-left: 50px;
+	margin-right: 10px;
+}
+
+/* 회원가입버튼 간격 조정 */
+#joinBtn{
+	margin-right: 10px;
+}
+
+/* 홈페이지 맨위로 가는 버튼 */
+/* #arrowBtn{ */
+/*     width: 40px; */
+/*     height: 40px; */
+/*     position: fixed; */
+/*     right : 20px; */
+/*     bottom: 20px; */
+/* } */
+
+/* 회원가입 메인 사진 뒷배경 */
+.mainSectionJoin {
+	height : 1080px;
+  	padding: 20px;
+	background: url('/resources/image/회원가입배경.jpg') no-repeat;
+	position: relative;
+}
+
+
+/* 회원가입 약관동의 및 안내 글씨 굵고 크게*/
+h2{
+	color: #2B2934;
+	font-weight: 600;
+	text-align: center;
+	font-size: 30px;
+}
+
+/* 회원가입 약관 페이지 폼*/
+#joinTerms-form {
+    position: absolute;
+   	height: 100%;
+	max-height: 80vh; /* 전체 높이 제한*/
+	width: 40%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+	padding: 30px 40px;
+	border-radius: 10px;
+	background-color: #fff; /* 배경 색상을 흰색으로 지정 */
+	background: transparent;
+	border: 2px solid rgba(255,255,255.2);
+	backdrop-filter: blur(4px);
+	box-shadow: 0 0 10px rgba(0,0,0,.1);
+	font-weight: 600;
+	font-family: 'Noto Sans KR', sans-serif;
+	overflow : auto; /* 스크롤 생성 */
+}
+
+/* 필수 값 색상 red */
+.type_red{
+	color: #e60000;
+	font-size: 14px;
+}
+
+/* 필수 값 색상 green */
+.type_green{
+	color: #408080;
+	font-size: 14px;
+}
+
+/* 필수 값 색상 red */
+.type_red{
+	color: #e60000;
+	font-size: 14px;
+}

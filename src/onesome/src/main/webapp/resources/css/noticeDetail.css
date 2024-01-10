@@ -1,0 +1,375 @@
+@charset "UTF-8";
+
+.btnUpDel {
+   margin-left: 900px;
+}
+
+
+#container {
+    margin-top: 72px;
+}
+
+.button {
+    color: #000;
+    cursor: pointer;
+    vertical-align: middle;
+    justify-content: center;
+    padding-left: 24px;
+    padding-right: 24px;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 16px;
+}
+
+.is-cmd::before {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #333;
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(0.16, 0.04, 0.03, 0.95);
+}
+
+.breadcrumb li.is-active a, .breadcrumb li.is-active .button {
+    color: #d50037;
+    font-weight: 600;
+    cursor: pointer;
+    pointer-events: inherit;
+}
+
+.breadcrumb li a {
+    cursor: pointer;
+    pointer-events: inherit;
+    font-size: 14px;
+    color: #707070;
+}
+
+.breadcrumb ol {
+    display: -moz-flex;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.is-cmd.button {
+    border: 2px solid #333;
+    color: #000;
+}
+
+.title-wrap {
+    display: -moz-flex;
+    display: flex;
+    position: relative;
+}
+
+.breadcrumb li.home {
+    padding: 0;
+}
+
+.breadcrumb {
+    margin-bottom: 56px;
+}
+
+html, body {
+    font-size: 18px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.title-wrap {
+    display: -moz-flex;
+    display: flex;
+    position: relative;
+}
+
+.content-title-wrap {
+    margin-bottom: 80px;
+}
+
+.ui-bbs-view .title-wrap {
+    display: block;
+}
+
+.buttons:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.ui-bbs-view+.buttons {
+    margin: 64px auto;
+    justify-content: center;
+}
+
+.buttons {
+    align-items: center;
+    display: -moz-flex;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.ui-bbs-view+.buttons .button {
+    margin-bottom: 0;
+}
+
+.button.is-large {
+    min-width: 240px;
+    height: 64px;
+    padding-left: 24px;
+    padding-right: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-width: 2px;
+    border-style: solid;
+}
+
+.is-cmd {
+    position: relative;
+    transition: color .3s cubic-bezier(0.16, 0.04, 0.03, 0.95);
+}
+
+html, body, section, div, button, input, select, textarea {
+    font-family: 'Noto Sans KR', 'Noto+Sans', 'Malgun Gothic', '맑은 고딕', arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.sr-only, .is-sr-only {
+    border: none !important;
+    clip: rect(0, 0, 0, 0) !important;
+    height: 0.01em !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+    width: 0.01em !important;
+}
+
+
+
+.title-h1 {
+    font-size: 72px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.container {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+    padding: 0 48px;
+    max-width: 1312px;
+}
+
+.title-h3 {
+    font-size: 40px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.ui-bbs-view .title-wrap .date {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-top: 12px;
+}
+
+.ui-bbs-view .ui-bbs-content {
+    margin-top: 36px;
+    padding: 40px 0 64px 0;
+    border-top: 1px solid #ebebeb;
+    border-bottom: 1px solid #ebebeb;
+}
+
+header, main, footer, section, article, aside, nav {
+    display: block;
+}
+
+.breadcrumb li {
+    display: inline-block;
+    position: relative;
+    padding: 0 0 0 8px;
+    list-style: none;
+    vertical-align: middle;
+}
+
+.button, .pagination-link, .pagination-ellipsis {
+    display: inline-flex;
+    position: relative;
+    overflow: hidden;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    align-items: center;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+}
+a{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 160px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 20px;
+  text-align: center;
+  font-family: sans-serif;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: #ccc;
+}
+
+#list {
+   background: #ffffff;
+  color: #000000;
+  z-index: 1;
+}
+#list:after {
+  position: absolute;
+  content: "";
+  width: 0;
+  height: 100%;
+  top: 0;
+  left: 0;
+  direction: rtl;
+  z-index: -1;
+  background: #000000;
+  transition: all 0.3s ease;
+}
+#list:hover {
+  color: #ffffff;
+}
+#list:hover:after {
+  left: auto;
+  right: 0;
+  width: 100%;
+}
+#list:active {
+  top: 2px;
+}
+
+.ui-bbs-nav {
+    margin-top: 80px;
+}
+
+.ui-bbs-nav dl:first-child {
+    border-bottom: none;
+}
+
+.ui-bbs-nav dl {
+    display: -moz-flex;
+    display: flex;
+    height: 90px;
+    align-items: center;
+    padding: 0 32px;
+    border-top: 1px solid #ebebeb;
+    border-bottom: 1px solid #ebebeb;
+}
+
+.ui-bbs-nav dd a {
+    flex: 1 1 auto;
+    width: calc(100% - 80px);
+    padding: 20px 32px;
+    font-weight: 400;
+    color: #000;
+    line-height: 1;
+    display: block;
+    word-wrap: normal;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 15px;
+    text-decoration: inherit;
+}
+
+
+.ui-bbs-nav dd {
+    display: -moz-flex;
+    display: flex;
+    width: calc(100% - 40px);
+    align-items: center;
+}
+
+.ui-bbs-nav dd .date {
+    display: block;
+    flex: 0 0 80px;
+    font-size: 14px;
+    line-height: 1;
+    text-align: right;
+}
+
+.ui-bbs-nav dt {
+    flex: 0 0 40px;
+    font-size: 12px;
+    line-height: 1;
+    color: #707070;
+}
+
+/* 이전,다음글 네비 */
+.list-nav {
+	margin-bottom : 70px;
+	display: flex;
+    flex-direction: column;
+    border-top: 1px solid #ebebeb;
+}
+/* 이전글, 다음글 */
+.list-nav .nav-prev, .nav-next {
+    height: 90px;
+    padding: 0px 32px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ebebeb;
+    font-size: 14px;
+}
+
+.btn-prev, .btn-next{
+	width: 94px;
+	color: #999;
+}
+
+/* 이전글, 다음글 */
+.nav-prev a, .nav-next a {
+    width: 100%;
+	padding: 0px 32px;
+    font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    color: #000;
+}
+
+/* 이전, 다음글이 없을 떄 */
+.btn-none-list {
+	width: 100%;
+	padding: 0px 32px;
+    font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+
+.list-nav a .list-title:hover {
+    text-decoration: underline;
+}
+
+.list-date, .next-date{
+	font-size: 14px;
+}
