@@ -3,7 +3,6 @@
 <!DOCTYPE html>
 <html>
 <link rel="stylesheet" href="/resources/css/memMap.css">
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a382bb614c6212247a8fe33dc71232a3"></script>
 <!--  ================= 매장관리 [시작] ================= -->
 <div class="container breadcrumb" style="margin-top:70px;">
 	<nav class="breadcrumb" aria-label="breadcrumb">

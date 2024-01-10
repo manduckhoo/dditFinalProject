@@ -3,7 +3,6 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!-- <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?9b66b242d99a62e251cf9fee5901e169"></script> -->
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9b66b242d99a62e251cf9fee5901e169&libraries=services,drawing"></script>
 <script src="${pageContext.request.contextPath}/resources/js/jquery-3.6.0.js"></script>
 
 <!-- 키 물어보기 -->
