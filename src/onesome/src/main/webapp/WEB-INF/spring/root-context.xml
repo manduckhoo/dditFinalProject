@@ -113,7 +113,7 @@
 	</bean>
 
 	<bean id="smsSenderNo" class="java.lang.String">
-		<constructor-arg value="01028543586"/>
+		<constructor-arg value=""/><!-- 문자 발송번호 -->
 	</bean>
 	<!-- 문자발송을 위한 설정객체 끝 -->
 </beans>

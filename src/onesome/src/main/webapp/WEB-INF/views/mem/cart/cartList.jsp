@@ -741,7 +741,7 @@ function requestPay(type){
 
    //결제 API
    var IMP = window.IMP;
-   IMP.init("imp33463165");
+   IMP.init("");
       IMP.request_pay(
             {
                pg: pg,                     		   // pg파라미터 값(이니시스(계좌이체,카드), 카카오, 토스)
