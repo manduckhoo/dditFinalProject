@@ -250,7 +250,7 @@ data.region='';
         	    	    'packages':['geochart'],
         	    	    // Note: you will need to get a mapsApiKey for your project.
         	    	    // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-        	    	    'mapsApiKey': 'AIzaSyCJS1rGv1X5YE1oA7yMn1JaAonq5UjP_pI'
+        	    	    'mapsApiKey': ''
         	    	  });
         	    	  google.charts.setOnLoadCallback(drawRegionsMap);
 
